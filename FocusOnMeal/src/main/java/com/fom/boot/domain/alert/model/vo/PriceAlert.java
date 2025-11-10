@@ -6,11 +6,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Alert {
-
+public class PriceAlert {
+    private int alertId;
+    private String memberId;
+    private int ingredientId;
+    private BigDecimal thresholdPrice;
+    private String notificationEnabled;
 }
