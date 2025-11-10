@@ -17,7 +17,6 @@ $RECYCLE.BIN/
 .recommenders/
 .classpath
 .project
-.class
 
 
 # Windows 전용: 자동 백업, 임시 파일 제거
@@ -25,6 +24,10 @@ $RECYCLE.BIN/
 *.cmd~
 *.tmp
 ~$*
+*.class
+target/
+*.jar
+*.war
 
 # Mac 전용: Spotlight, AppleDouble
 .Spotlight-V100
