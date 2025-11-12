@@ -152,6 +152,35 @@
         </div>
     </div>
 </div>
+
+<!-- 저장 모달 -->
+<div id="saveModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>식단 저장하기</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="serving-input-group">
+                <label for="servingSize">몇 인분 기준으로 저장하시겠습니까?</label>
+                <div class="serving-controls">
+                    <button class="serving-btn" id="decreaseBtn">-</button>
+                    <input type="number" id="servingSize" value="1" min="1" max="10">
+                    <button class="serving-btn" id="increaseBtn">+</button>
+                    <span class="serving-label">인분</span>
+                </div>
+            </div>
+            <div class="modal-info">
+                <p>선택한 인분수에 맞춰 가격이 계산됩니다.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn cancel-btn" id="cancelSaveBtn">취소</button>
+            <button class="modal-btn save-confirm-btn" id="confirmSaveBtn">저장</button>
+        </div>
+    </div>
+</div>
+
 <script src="/resources/js/meal/mealPlan.js"></script>
 </body>
 </html>

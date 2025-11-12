@@ -14,6 +14,15 @@ const mealPlanArea = document.getElementById('mealPlanArea');
 const emptyState = document.getElementById('emptyState');
 const errorMessage = document.getElementById('errorMessage');
 
+// 모달 요소
+const saveModal = document.getElementById('saveModal');
+const modalClose = document.querySelector('.modal-close');
+const servingSizeInput = document.getElementById('servingSize');
+const decreaseBtn = document.getElementById('decreaseBtn');
+const increaseBtn = document.getElementById('increaseBtn');
+const cancelSaveBtn = document.getElementById('cancelSaveBtn');
+const confirmSaveBtn = document.getElementById('confirmSaveBtn');
+
 // 알러지 정보 수집
 function getAllergies() {
     const allergies = [];
@@ -70,7 +79,7 @@ function addMealPlanGroup(title, meals) {
     saveBtn.className = 'save-btn';
     saveBtn.innerHTML = '<span>❤</span><span>저장하기</span>';
     saveBtn.addEventListener('click', () => {
-        alert('식단이 저장되었습니다!');
+        openSaveModal();
     });
     groupDiv.appendChild(saveBtn);
 
@@ -78,6 +87,41 @@ function addMealPlanGroup(title, meals) {
 
     // 버튼 이벤트 다시 바인딩
     bindMealButtonEvents();
+}
+
+// 모달 열기
+function openSaveModal() {
+    servingSizeInput.value = 1;
+    saveModal.classList.add('active');
+}
+
+// 모달 닫기
+function closeSaveModal() {
+    saveModal.classList.remove('active');
+}
+
+// 인분수 증가
+function increaseServing() {
+    const currentValue = parseInt(servingSizeInput.value);
+    if (currentValue < 10) {
+        servingSizeInput.value = currentValue + 1;
+    }
+}
+
+// 인분수 감소
+function decreaseServing() {
+    const currentValue = parseInt(servingSizeInput.value);
+    if (currentValue > 1) {
+        servingSizeInput.value = currentValue - 1;
+    }
+}
+
+// 저장 확인
+function confirmSave() {
+    const servingSize = servingSizeInput.value;
+    alert(`${servingSize}인분 기준으로 식단이 저장되었습니다!`);
+    // 실제로는 서버에 저장 API 호출
+    closeSaveModal();
 }
 
 // 에러 표시
@@ -234,5 +278,19 @@ chatSendBtn.addEventListener('click', sendChatMessage);
 chatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         sendChatMessage();
+    }
+});
+
+// 모달 이벤트 리스너
+modalClose.addEventListener('click', closeSaveModal);
+cancelSaveBtn.addEventListener('click', closeSaveModal);
+confirmSaveBtn.addEventListener('click', confirmSave);
+decreaseBtn.addEventListener('click', decreaseServing);
+increaseBtn.addEventListener('click', increaseServing);
+
+// 모달 바깥 클릭 시 닫기
+saveModal.addEventListener('click', (e) => {
+    if (e.target === saveModal) {
+        closeSaveModal();
     }
 });
