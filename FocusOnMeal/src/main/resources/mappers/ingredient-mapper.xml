@@ -4,4 +4,46 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   <mapper namespace="com.fom.boot.domain.ingredient.model.mapper.IngredientMapper">
   	
+  	<!-- 찜 등록 및 해제 resultMap -->
+  	<resultMap id="FavoriteIngredient" type="com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient">
+  		<id			property="favoriteId"	column="FAVORITE_ID" 	/>
+  		<result 	property="memberId"		column="MEMBER_ID"	 	/>
+  		<result 	property="ingredientId"	column="INGREDIENT_ID"	/>
+  		<result		property="isCustom"		column="IS_CUSTOM"		/>
+  	</resultMap>
+  	
+  	<!-- 찜 등록 -->
+    <insert id="insertFavorite" parameterType="com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient">
+        <!-- 오라클 시퀀스를 사용한 자동 번호 생성 -->
+        <selectKey keyProperty="favoriteId" resultType="int" order="BEFORE">
+            SELECT SEQ_FAVORITE_ID.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO FAVORITE (
+            FAVORITE_ID,
+            MEMBER_ID,
+            INGREDIENT_ID,
+            IS_CUSTOM
+        ) VALUES (
+            #{favoriteId},
+            #{memberId},
+            #{ingredientId},
+            #{isCustom}
+        )
+    </insert>
+    
+    <!-- 찜 해제 -->
+    <delete id="deleteFavorite">
+    	DELETE FROM FAVORITE
+    	WHERE MEMBER_ID = #{memberId}
+    	AND INGREDIENT_ID = #{ingredientId}
+    </delete>
+    
+    <!-- 찜 존재 여부 확인 -->
+    <select id="checkFavoriteExists" resultType="int">
+        SELECT COUNT(*)
+        FROM FAVORITE
+        WHERE MEMBER_ID = #{memberId}
+        AND INGREDIENT_ID = #{ingredientId}
+    </select>
+    
   </mapper>
