@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-  <mapper namespace="com.fom.boot.domain.member.model.mapper.MemberMapper">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fom.boot.domain.member.model.mapper.MemberMapper">
 
-  </mapper>
+    <!-- Spring Security용 쿼리 -->
+    <select id="findByMemberId" parameterType="string" 
+            resultType="com.fom.boot.domain.member.model.vo.Member">
+        SELECT
+            MEMBER_ID,
+            MEMBER_PW,
+            MEMBER_NAME,
+            MEMBER_NICKNAME,
+            EMAIL,
+            PHONE,
+            GENDER,
+            ENROLL_DATE,
+            STATUS_YN,
+            ADMIN_YN
+        FROM MEMBER
+        WHERE MEMBER_ID = #{memberId}
+          AND STATUS_YN = 'Y' 
+    </select>
+</mapper>
