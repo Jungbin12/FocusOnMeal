@@ -1,0 +1,61 @@
+.sidebar {
+    width: 180px;
+    border-right: 1px solid #dcdcdc;
+    padding: 24px 16px; 
+    background: #fff;
+    flex-shrink: 0;
+}
+
+
+/* 전체 목록 스타일 */
+.menuList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menuList li {
+    margin: 0;
+    margin-bottom: 8px;
+    padding: 0;
+}
+
+/* 링크 기본 제거 */
+.menuList a {
+    text-decoration: none;
+    color: #222;
+    display: block;
+}
+
+
+/* ========== 큰 제목(카테고리) ========== */
+.menuTitle {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 40px 0 14px; 
+}
+
+/* 첫 번째 카테고리만 위쪽 여백 조정 */
+.menuTitle:first-of-type {
+    margin-top: 10px; 
+}
+
+
+/* ========== submenu ========== */
+.subItem {
+    font-size: 14px;
+    padding: 6px 0 6px 10px;
+    color: #555;
+    transition: 0.2s ease;
+}
+
+.subItem:hover {
+    color: #67932A;
+}
+
+
+/* active */
+.active {
+    font-weight: bold;
+    color: #67932A !important;
+}

@@ -1,7 +1,10 @@
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from './Dashboard.module.css';
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import styles from "./Dashboard.module.css";
+import Sidebar from "../../components/mypage/Sidebar";
 
 const Dashboard = () => {
 
@@ -38,5 +41,6 @@ const Dashboard = () => {
         </>
     )
 }
+
 
 export default Dashboard;

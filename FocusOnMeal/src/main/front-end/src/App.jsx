@@ -3,6 +3,7 @@ import './App.css'
 import Login from './pages/member/Login'
 import IngredientSearch from './pages/ingredient/list';
 import IngredientDetail from './pages/ingredient/detail';
+import NoticeList from './pages/board/notice/NoticeList';
 import Header from "./components/common/Header";
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Dashboard from './pages/mypage/Dashboard';
@@ -10,23 +11,39 @@ import Join from './pages/member/Join';
 
 
 function App() {
+  
+  return (
+    <> 
+      <Header />
+      <Routes>
+        {/* 메인페이지 */}
+        <Route path="/" element={<div>홈페이지</div>} />
 
-	return (
-		<>
-		<Header />
-		<Routes>
-	        <Route path="/member/join" element={<Join />} />
-			<Route path="/member/login" element={<Login />} />
-			<Route path="/" element={<div>홈페이지</div>} />
-			<Route path="/ingredient/list" element={<IngredientSearch />} />
-            <Route path="/ingredient/:id" element={<IngredientDetail />} />
-			{/* 관리자 홈 (대시보드) */}
-			<Route path="/admin" element={<AdminDashboard />} />
-			{/* 마이페이지 홈 (대시보드) */}
-			<Route path="/mypage" element={<Dashboard />} />
-		</Routes>
-		</>
-	)
+        {/* 회원 관련 */}
+        <Route path="/member/login" element={<Login />} />
+
+        {/* 마이페이지 관련 */}
+        <Route path="/mypage" element={<Dashboard />} />
+
+        {/* 식자재 관련 */}
+        <Route path="/ingredient" element={<IngredientLayout />}>
+          <Route index element={<IngredientSearch />} /> 
+          <Route path="list" element={<IngredientSearch />} /> 
+        </Route>
+		
+		{/* 관리자 홈 (대시보드) */}
+		<Route path="/admin" element={<AdminDashboard />} />
+		{/* 마이페이지 홈 (대시보드) */}
+		<Route path="/mypage" element={<Dashboard />} />
+
+        {/* 공지사항 게시판 관련 */}
+        <Route path="/board/notice/list" element={<NoticeList /> }/>
+        {/* <Route path="/notice/detail" element={<NoticeDetail />} /> */}
+
+        {/* 안전정보 게시판 관련 */}
+      </Routes>
+    </>
+  );
 }
 
 export default App

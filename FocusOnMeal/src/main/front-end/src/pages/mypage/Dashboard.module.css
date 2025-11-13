@@ -1,0 +1,18 @@
+.container {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    --background: #fafafa;
+}
+
+/* 우측 메인 */
+.main {
+    flex: 1;
+    padding: 40px 50px;
+}
+
+.mainTitle {
+    font-size: 26px;
+    font-weight: 700;
+    color: #333;
+}
