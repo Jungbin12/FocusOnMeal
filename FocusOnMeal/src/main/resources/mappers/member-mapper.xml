@@ -40,4 +40,8 @@
           AND STATUS_YN = 'Y' 
     </select>
     
+    <insert id="insertMember">
+    		
+    </insert>
+    
   </mapper>

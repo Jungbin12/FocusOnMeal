@@ -61,5 +61,24 @@ public class MemberController {
 				.body("서버 오류가 발생했습니다: " + e.getMessage());
 		}
 	}
+	
+	
+	
+	@PostMapping("form")
+	public String sigupFormPage() {
+		return "member/join";
+	}
+	
+	@PostMapping("join")
+	public String joinMember(@ModelAttribute Member member, Model model) {
+		try {
+			member.setMemberPw(bcrypt.encode(member.getMemberPw()));
+			int resutl = mService.insertMember(member);
+			return "redirect:/member/login";
+		} catch (Exception e) {
+			model.addAttribute("errorMsg", e.getMessage());
+			return "common/error";
+		}
+	}
 
 }
