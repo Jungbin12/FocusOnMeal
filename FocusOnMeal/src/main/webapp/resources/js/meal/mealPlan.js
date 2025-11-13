@@ -166,33 +166,7 @@ generateBtn.addEventListener('click', async () => {
     addMessage('건강한 식단을 추천해주세요!', 'user');
 
     try {
-        // 로딩 시뮬레이션
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // 로딩 종료
-        loadingArea.classList.remove('active');
-
-        // AI 응답 메시지 추가
-        addMessage('당신의 체형에 맞는 건강한 식단을 추천해드렸습니다!', 'ai');
-
-        // 식단 결과 표시
-        mealPlanArea.classList.add('active');
-        emptyState.style.display = 'none';
-
-        // 샘플 식단 데이터 추가
-        const currentTime = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-        const sampleMeals = [
-            { name: '김치찌개', carbs: '25g', fat: '8g', calories: '180kcal', price: '5,000원' },
-            { name: '백미밥', carbs: '45g', fat: '1g', calories: '210kcal', price: '1,000원' },
-            { name: '배추김치', carbs: '5g', fat: '0g', calories: '20kcal', price: '0원' },
-            { name: '콩자반', carbs: '12g', fat: '5g', calories: '95kcal', price: '2,000원' },
-            { name: '시금치나물', carbs: '3g', fat: '2g', calories: '30kcal', price: '1,500원' }
-        ];
-
-        addMealPlanGroup(`추천 식단 - ${currentTime}`, sampleMeals);
-
-        // 실제 API 호출 (주석 처리)
-        /*
+        // 실제 API 호출
         const response = await fetch(`${API_BASE_URL}/test/gemini/meal`, {
             method: 'POST',
             headers: {
@@ -212,7 +186,34 @@ generateBtn.addEventListener('click', async () => {
         }
 
         const data = await response.json();
-        */
+
+        // 로딩 종료
+        loadingArea.classList.remove('active');
+
+        if (data.status === 'SUCCESS') {
+            // AI 응답 메시지 추가
+            addMessage('당신의 체형에 맞는 건강한 식단을 추천해드렸습니다!', 'ai');
+
+            // 식단 결과 표시
+            mealPlanArea.classList.add('active');
+            emptyState.style.display = 'none';
+
+            // AI 응답을 식단 카드로 표시
+            const currentTime = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+            // AI 응답을 그대로 표시 (파싱은 나중에 개선 가능)
+            const mealPlanDiv = document.createElement('div');
+            mealPlanDiv.className = 'meal-plan-group';
+            mealPlanDiv.innerHTML = `
+                <div class="meal-plan-header">추천 식단 - ${currentTime}</div>
+                <div class="meal-plan-content" style="white-space: pre-wrap; padding: 20px; background: white; border-radius: 8px;">
+                    ${data.mealPlan}
+                </div>
+            `;
+            mealPlanArea.appendChild(mealPlanDiv);
+        } else {
+            throw new Error(data.message || 'AI 응답 오류');
+        }
 
     } catch (error) {
         console.error('Error:', error);

@@ -1,0 +1,296 @@
+package com.fom.boot.app.api.controller;
+
+
+import com.fom.boot.domain.meal.model.service.ChamgaApiService;
+import com.fom.boot.domain.meal.model.service.GeminiApiService;
+import com.fom.boot.domain.meal.model.service.KamisApiService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * API 연결 테스트 컨트롤러
+ * 각 외부 API의 연결 상태를 테스트하는 엔드포인트 제공
+ */
+@Slf4j
+@RestController
+@RequestMapping("/api/test")
+@RequiredArgsConstructor
+public class ApiTestController {
+    private final GeminiApiService geminiApiService;
+    private final KamisApiService kamisApiService;
+    private final ChamgaApiService chamgaApiService;
+
+    /**
+     * 전체 API 연결 테스트
+     * GET /api/test/all
+     */
+    @GetMapping("/all")
+    public ResponseEntity<Map<String, Object>> testAllApis() {
+        log.info("전체 API 연결 테스트 시작");
+
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // Gemini API 테스트
+            String geminiResult = geminiApiService.testConnection();
+            result.put("gemini", Map.of(
+                    "status", geminiResult.contains("성공") ? "SUCCESS" : "FAIL",
+                    "message", geminiResult
+            ));
+        } catch (Exception e) {
+            result.put("gemini", Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+
+        try {
+            // KAMIS API 테스트
+            String kamisResult = kamisApiService.testConnection();
+            result.put("kamis", Map.of(
+                    "status", kamisResult.contains("성공") ? "SUCCESS" : "FAIL",
+                    "message", kamisResult
+            ));
+        } catch (Exception e) {
+            result.put("kamis", Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+
+        try {
+            // 참가격 API 테스트
+            String chamgaResult = chamgaApiService.testConnection();
+            result.put("chamga", Map.of(
+                    "status", chamgaResult.contains("성공") ? "SUCCESS" : "FAIL",
+                    "message", chamgaResult
+            ));
+        } catch (Exception e) {
+            result.put("chamga", Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+
+        log.info("전체 API 연결 테스트 완료: {}", result);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Gemini API 테스트
+     * GET /api/test/gemini
+     */
+    @GetMapping("/gemini")
+    public ResponseEntity<Map<String, Object>> testGemini() {
+        log.info("Gemini API 단독 테스트");
+
+        try {
+            String result = geminiApiService.testConnection();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "message", result
+            ));
+        } catch (Exception e) {
+            log.error("Gemini API 테스트 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Gemini API로 식단 생성 테스트
+     * POST /api/test/gemini/meal
+     */
+    @PostMapping("/gemini/meal")
+    public ResponseEntity<Map<String, Object>> testGeminiMealGeneration(
+            @RequestBody Map<String, Object> request
+    ) {
+        log.info("Gemini 식단 생성 테스트: {}", request);
+
+        try {
+            int height = (Integer) request.getOrDefault("height", 170);
+            int weight = (Integer) request.getOrDefault("weight", 70);
+            int servingSize = (Integer) request.getOrDefault("servingSize", 1);
+            List<String> allergies = (List<String>) request.getOrDefault("allergies", List.of());
+            String message = (String) request.getOrDefault("message", "건강한 식단을 추천해주세요");
+
+            String mealPlan = geminiApiService.generateMealPlan(
+                    height, weight, servingSize, allergies, message
+            );
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "mealPlan", mealPlan
+            ));
+
+        } catch (Exception e) {
+            log.error("Gemini 식단 생성 테스트 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * KAMIS API 테스트
+     * GET /api/test/kamis
+     */
+    @GetMapping("/kamis")
+    public ResponseEntity<Map<String, Object>> testKamis() {
+        log.info("KAMIS API 단독 테스트");
+
+        try {
+            String result = kamisApiService.testConnection();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "message", result
+            ));
+        } catch (Exception e) {
+            log.error("KAMIS API 테스트 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * KAMIS API 원본 응답 조회 (디버깅용)
+     * GET /api/test/kamis/raw?date=2025-11-09&category=100
+     */
+    @GetMapping("/kamis/raw")
+    public ResponseEntity<String> testKamisRaw(
+            @RequestParam(required = false) String date,
+            @RequestParam(defaultValue = "100") String category
+    ) {
+        log.info("KAMIS API 원본 응답 조회 - 날짜: {}, 부류: {}", date, category);
+
+        try {
+            // KamisApiService에 getRawResponse 메서드 필요
+            String rawResponse = kamisApiService.getRawResponse(date, category);
+            return ResponseEntity.ok(rawResponse);
+        } catch (Exception e) {
+            log.error("KAMIS API 원본 응답 조회 실패", e);
+            return ResponseEntity.ok("ERROR: " + e.getMessage());
+        }
+    }
+
+    /**
+     * KAMIS API 품목 가격 조회 테스트
+     * GET /api/test/kamis/price?item=쌀
+     */
+    @GetMapping("/kamis/price")
+    public ResponseEntity<Map<String, Object>> testKamisPrice(
+            @RequestParam(defaultValue = "쌀") String item
+    ) {
+        log.info("KAMIS 가격 조회 테스트 - 품목: {}", item);
+
+        try {
+            Integer price = kamisApiService.getRetailPrice(item);
+
+            if (price != null) {
+                return ResponseEntity.ok(Map.of(
+                        "status", "SUCCESS",
+                        "item", item,
+                        "price", price,
+                        "unit", "원/kg"
+                ));
+            } else {
+                return ResponseEntity.ok(Map.of(
+                        "status", "NOT_FOUND",
+                        "message", "품목을 찾을 수 없습니다: " + item
+                ));
+            }
+
+        } catch (Exception e) {
+            log.error("KAMIS 가격 조회 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * 참가격 API 테스트
+     * GET /api/test/chamga
+     */
+    @GetMapping("/chamga")
+    public ResponseEntity<Map<String, Object>> testChamga() {
+        log.info("참가격 API 단독 테스트");
+
+        try {
+            String result = chamgaApiService.testConnection();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "message", result
+            ));
+        } catch (Exception e) {
+            log.error("참가격 API 테스트 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * 참가격 API 상품 가격 조회 테스트
+     * GET /api/test/chamga/price?product=계란
+     */
+    @GetMapping("/chamga/price")
+    public ResponseEntity<Map<String, Object>> testChamgaPrice(
+            @RequestParam(defaultValue = "계란") String product
+    ) {
+        log.info("참가격 가격 조회 테스트 - 상품: {}", product);
+
+        try {
+            Integer price = chamgaApiService.getRetailPrice(product);
+
+            if (price != null) {
+                return ResponseEntity.ok(Map.of(
+                        "status", "SUCCESS",
+                        "product", product,
+                        "price", price,
+                        "unit", "원"
+                ));
+            } else {
+                return ResponseEntity.ok(Map.of(
+                        "status", "NOT_FOUND",
+                        "message", "상품을 찾을 수 없습니다: " + product
+                ));
+            }
+
+        } catch (Exception e) {
+            log.error("참가격 가격 조회 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * 헬스 체크 엔드포인트
+     * GET /api/test/health
+     */
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, String>> healthCheck() {
+        return ResponseEntity.ok(Map.of(
+                "status", "UP",
+                "message", "API Test Controller is running"
+        ));
+    }
+}
