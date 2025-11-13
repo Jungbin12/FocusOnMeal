@@ -1,0 +1,125 @@
+/* 헤더 전체 */
+.header {
+    width: 100%;
+    --max-width: 1280px;
+    background-color: #fff;
+    border-bottom: 1px solid #0b7a2a;
+    margin: 0 auto;
+    padding: 10px 40px;
+}
+
+/* 내부 레이아웃: 로고 / 메뉴 / 로그인 */
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    --max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    --padding: 10px 40px;
+}
+
+/* 로고 */
+.logo-area {
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    width: 60px;
+    height: 60px;
+}
+
+/* nav 영역 가운데 정렬 */
+.nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+/* 메뉴 기본 */
+.nav-menu {
+    list-style: none; /* 기본 점 제거 */
+    padding: 0;
+    margin: 0;
+    display: flex; /* 가로 정렬 */
+    gap: 40px;
+}
+
+/* 메뉴 아이템 */
+.nav-menu li {
+    position: relative;
+}
+
+/* 메뉴 링크 */
+.nav-menu a {
+    text-decoration: none;
+    color: #000;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+/* 호버 */
+.nav-menu a:hover {
+    color: #0b7a2a;
+}
+
+/* 드롭다운 기본 숨김 */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 35px;
+    left: 0;
+    background: white;
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* 드롭다운 항목 */
+.dropdown-menu li {
+    white-space: nowrap;
+    padding: 4px 16px;
+}
+.dropdown-menu a {
+    white-space: nowrap;
+    padding: 4px 16px;
+    font-size: 14px;   
+}
+
+.dropdown-menu li:hover {
+    background-color: #f0f8f0;
+}
+
+/* 호버 시 표시 */
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+/* 오른쪽 로그인 영역 */
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.user-area a {
+    font-size: 18px;
+    color: #4a60ff;
+    text-decoration: none;
+}
+
+.slash {
+    color: #333;
+    font-size: 18px;
+}
+
+/* 하단 라인 */
+/* .header-line {
+    border-top: 1px solid #0b7a2a;
+    width: 100%;
+    margin-top: 5px;
+} */
