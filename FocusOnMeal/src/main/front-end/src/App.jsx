@@ -6,6 +6,7 @@ import IngredientDetail from './pages/ingredient/detail';
 import Header from "./components/common/Header";
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Dashboard from './pages/mypage/Dashboard';
+import Join from './pages/member/Join';
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
 		<>
 		<Header />
 		<Routes>
+	        <Route path="/member/join" element={<Join />} />
 			<Route path="/member/login" element={<Login />} />
 			<Route path="/" element={<div>홈페이지</div>} />
 			<Route path="/ingredient/list" element={<IngredientSearch />} />

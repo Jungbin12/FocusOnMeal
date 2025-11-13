@@ -188,18 +188,19 @@ function Join() {
             // 닉네임 조합 패턴 (0: 형용사+동물, 1: 동물+접미사, 2: 형용사+동물+접미사, 3: 형용사+접미사)
             switch(type) {
                 case 0: 
-                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]}${animals[Math.floor(Math.random() * animals.length)]}`;
+                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${animals[Math.floor(Math.random() * animals.length)]}`;
                     break;
                 case 1: 
-                    nickname = `${animals[Math.floor(Math.random() * animals.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
+                    nickname = `${animals[Math.floor(Math.random() * animals.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
                     break;
                 case 2: 
-                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]}${animals[Math.floor(Math.random() * animals.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
+                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${animals[Math.floor(Math.random() * animals.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
                     break;
                 case 3: 
-                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
+                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
                     break;
             }
+
             
             attempts++;
         } while (
@@ -236,66 +237,48 @@ function Join() {
     }, []);
 
     // 폼 제출 처리
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        
-        // 폼 데이터 수집
-        const formData = new FormData(e.target);
-        
-        // 유효성 검사
-        if (selectedDomain === '선택') {
-            console.error('이메일 도메인을 선택해주세요.');
-            // 사용자에게 보일 커스텀 모달 메시지 출력 로직 추가 필요
-            return;
-        }
+    const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        // 이메일 조합
-        const emailId = formData.get('emailId');
-        let emailDomain = '';
-        
-        if (selectedDomain === '직접입력') {
-            emailDomain = formData.get('emailDomain');
-        } else if (selectedDomain !== '선택') {
-            emailDomain = selectedDomain;
-        }
-        
-        const fullEmail = `${emailId}@${emailDomain}`;
-        
-        // 최종 데이터 구성 (adminYn: 'N'으로 고정)
-        const submitData = {
-            memberId: formData.get('memberId'),
-            memberPw: formData.get('memberPw'),
-            memberName: formData.get('memberName'),
-            memberNickname: generatedNickname, // 자동 생성된 닉네임 (UI에 미표시)
-            email: fullEmail,
-            phone: formData.get('phone'),
-            gender: formData.get('gender'),
-            adminYn: 'N' // 회원가입 시에는 일반 유저로 고정
-        };
-        
-        console.log('회원가입 데이터:', submitData);
-        
-        // 실제 서버 전송 로직 (fetch 또는 axios 사용)
-        /*
-        fetch('/member/signup', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(submitData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('회원가입 완료');
-            // window.location.href = '/login';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-        */
-        
-        console.log(`회원가입 완료! 닉네임: ${generatedNickname}`);
+    const formData = new FormData(e.target);
+
+    // 이메일 조합
+    const emailId = formData.get("emailId");
+    const emailDomain =
+    selectedDomain === "직접입력"
+        ? formData.get("emailDomain")
+        : selectedDomain;
+    const email = `${emailId}@${emailDomain}`;
+
+    const memberData = {
+    memberId: formData.get("memberId"),
+    memberPw: formData.get("memberPw"),
+    memberName: formData.get("memberName"),
+    memberNickname: generatedNickname,
+    email: email,
+    phone: formData.get("phone"),
+    gender: formData.get("gender"),
+    adminYn: "N",
     };
+
+    try {
+    const response = await fetch("http://localhost:8080/member/join", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(memberData),
+    });
+
+    if (response.ok) {
+        alert("회원가입이 완료되었습니다!");
+        window.location.href = "/member/login";
+    } else {
+        const msg = await response.text();
+        alert("회원가입 실패: " + msg);
+    }
+    } catch (err) {
+    alert("서버 오류: " + err.message);
+    }
+};
 
     return (
         <div id="signup-container">
