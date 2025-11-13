@@ -32,6 +32,9 @@ const Login = () => {
                 localStorage.setItem('memberName', data.memberName);
                 localStorage.setItem('adminYn', data.adminYn);
 
+                // 로그인 상태 변경 이벤트 발생 (로그인 시 바로 변경된 상태를 확인해 헤더 상태를 변경할 수 있게 함)
+                window.dispatchEvent(new Event("loginStateChange"));
+
                 // 관리자 여부에 따라 페이지 이동
                 if (data.adminYn === 'Y') {
                     navigate('/admin');

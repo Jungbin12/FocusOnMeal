@@ -1,8 +1,50 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "./Header.css"
 import logo from "../../../../webapp/resources/images/headerLogo.png";
 
 const Header = () => {
+    const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [memberName, setMemberName] = useState("");
+
+    // 로그인 상태 확인
+    useEffect(() => {
+    const checkLogin = () => {
+        const token = localStorage.getItem("token");
+        const name = localStorage.getItem("memberName");
+
+        if (token) {
+        setIsLoggedIn(true);
+        setMemberName(name || "");
+        } else {
+        setIsLoggedIn(false);
+        }
+    };
+
+    // 컴포넌트 처음 로드 시 체크
+    checkLogin();
+
+    // 로그인 상태 변경 이벤트 받기
+    window.addEventListener("loginStateChange", checkLogin);
+
+    // cleanup
+    return () => {
+        window.removeEventListener("loginStateChange", checkLogin);
+    };
+    }, []);
+
+    // 로그아웃 기능
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("memberId");
+        localStorage.removeItem("memberName");
+        localStorage.removeItem("adminYn");
+
+        setIsLoggedIn(false);
+        navigate("/");
+    };
+
     return (
         <header className="header">
             <div className="header-inner">
@@ -30,14 +72,32 @@ const Header = () => {
                 </ul>
                 </nav>
 
-                {/* 로그인 / 회원가입 */}
+                {/* 로그인 상태에 따라 헤더 변경 */}
                 <div className="user-area">
-                    <Link to="/member/login" className="login">로그인</Link>
+                    {isLoggedIn ? (
+                    <>
+                    <span className="welcome">{memberName}님</span>
+                    <Link to="/mypage" className="mypage">
+                        마이페이지
+                    </Link>
                     <span className="slash">/</span>
-                    <Link to="/member/join" className="join">회원가입</Link>
+                    <button onClick={handleLogout} className="logout">
+                        로그아웃
+                    </button>
+                    </>
+                ) : (
+                    <>
+                    <Link to="/member/login" className="login">
+                        로그인
+                    </Link>
+                    <span className="slash">/</span>
+                    <Link to="/member/join" className="join">
+                        회원가입
+                    </Link>
+                    </>
+                )}
                 </div>
             </div>
-
             {/* <div className="header-line"></div> */}
         </header>
     );
