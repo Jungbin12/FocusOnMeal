@@ -1,3 +1,4 @@
+import styles from './Dashboard.module.css';
 import {
     LineChart,
     Line,
@@ -9,7 +10,7 @@ import {
 } from "recharts";
 
 
-const Dashboard = () => {
+const AdminDashboard = () => {
 
     // 더미 데이터
     const data = [
@@ -64,4 +65,4 @@ const Dashboard = () => {
     )
 }
 
-export default Dashboard;
+export default AdminDashboard;

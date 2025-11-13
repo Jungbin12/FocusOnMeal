@@ -4,7 +4,8 @@ import Login from './pages/member/Login'
 import IngredientLayout from './components/IngredientLayout';
 import IngredientSearch from './pages/ingredient/list';
 import Header from "./components/common/Header";
-import Dashboard from './pages/admin/Dashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import Dashboard from './pages/mypage/Dashboard';
 
 
 function App() {
@@ -19,7 +20,9 @@ function App() {
 				<Route path="list" element={<IngredientSearch/>}/>
 			</Route>
 			{/* 관리자 홈 (대시보드) */}
-			<Route path="/admin" element={<Dashboard />} />
+			<Route path="/admin" element={<AdminDashboard />} />
+			{/* 마이페이지 홈 (대시보드) */}
+			<Route path="/mypage" element={<Dashboard />} />
 		</Routes>
 		</>
 	)
