@@ -188,18 +188,19 @@ function Join() {
             // 닉네임 조합 패턴 (0: 형용사+동물, 1: 동물+접미사, 2: 형용사+동물+접미사, 3: 형용사+접미사)
             switch(type) {
                 case 0: 
-                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]}${animals[Math.floor(Math.random() * animals.length)]}`;
+                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${animals[Math.floor(Math.random() * animals.length)]}`;
                     break;
                 case 1: 
-                    nickname = `${animals[Math.floor(Math.random() * animals.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
+                    nickname = `${animals[Math.floor(Math.random() * animals.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
                     break;
                 case 2: 
-                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]}${animals[Math.floor(Math.random() * animals.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
+                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${animals[Math.floor(Math.random() * animals.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
                     break;
                 case 3: 
-                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
+                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
                     break;
             }
+
             
             attempts++;
         } while (
@@ -261,10 +262,10 @@ function Join() {
     };
 
     try {
-    const response = await fetch("/member/join", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(memberData),
+    const response = await fetch("http://localhost:8080/member/join", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(memberData),
     });
 
     if (response.ok) {
