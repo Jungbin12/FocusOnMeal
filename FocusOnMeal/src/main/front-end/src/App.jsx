@@ -1,14 +1,22 @@
 import { Routes, Route } from 'react-router-dom'
 import './App.css'
+import Header from "./components/common/Header";
+// 회원
 import Login from './pages/member/Login'
+import Join from './pages/member/Join';
+// 마이페이지
+import Dashboard from './pages/mypage/Dashboard';
+
+// 식재료
 import IngredientSearch from './pages/ingredient/list';
 import IngredientDetail from './pages/ingredient/detail';
-import NoticeList from './pages/board/notice/NoticeList';
-import Header from "./components/common/Header";
-import AdminDashboard from './pages/admin/AdminDashboard';
-import Dashboard from './pages/mypage/Dashboard';
-import Join from './pages/member/Join';
 
+//게시판
+import NoticeList from './pages/board/notice/NoticeList';
+
+//관리자
+import AdminDashboard from './pages/admin/AdminDashboard';
+import MemberInfo from './pages/admin/MemberInfo';
 
 function App() {
   
@@ -32,6 +40,8 @@ function App() {
       
         {/* 관리자 홈 (대시보드) */}
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/memberInfo" element={<MemberInfo />} />
+
         {/* 마이페이지 홈 (대시보드) */}
         <Route path="/mypage" element={<Dashboard />} />
 
