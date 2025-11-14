@@ -166,8 +166,8 @@ generateBtn.addEventListener('click', async () => {
     addMessage('건강한 식단을 추천해주세요!', 'user');
 
     try {
-        // 실제 API 호출
-        const response = await fetch(`${API_BASE_URL}/test/gemini/meal`, {
+        // 실제 API 호출 (가격 정보 포함)
+        const response = await fetch(`${API_BASE_URL}/chat/meal-recommendation`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

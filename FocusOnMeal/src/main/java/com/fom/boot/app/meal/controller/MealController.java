@@ -12,4 +12,9 @@ public class MealController {
     public String Meal(){
         return "meal/mealPlan";
     }
+
+    @GetMapping("mealPlan")
+    public String mealPlan(){
+        return "meal/mealPlan";
+    }
 }

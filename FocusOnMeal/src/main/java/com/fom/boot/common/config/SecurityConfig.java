@@ -27,37 +27,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (JWT 사용 시)
-            .httpBasic(httpBasic -> httpBasic.disable()) // HTTP Basic 인증 비활성화
-            .formLogin(formLogin -> formLogin.disable()) // 폼 로그인 비활성화
-            
-            // 세션 정책을 STATELESS로 설정 (세션 사용 안 함)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                // 리소스 접근 권한 설정
-                .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/assets/**", "/resources/**").permitAll()
-
-                // 로그인/회원가입 API 경로 허용
-                .requestMatchers("/member/login", "/member/join").permitAll()
-                .requestMatchers("/api/member/login", "/api/member/join").permitAll()
-
-                // 식단 페이지 허용
-                .requestMatchers("/meal/**").permitAll()
-
-                // API 테스트 경로 허용
-                .requestMatchers("/api/test/**").permitAll()
-
-                // 채팅 API 경로 허용 (가격 정보 없이 테스트 가능)
-                .requestMatchers("/api/chat/**").permitAll()
-
-                .requestMatchers("/api/admin/**").hasRole("ADMIN") // /api/admin/ 경로는 ADMIN 권한 필요
-                .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
-            )
-            
-            // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), 
-                             UsernamePasswordAuthenticationFilter.class);
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().permitAll()
+            );
 
         return http.build();
     }
