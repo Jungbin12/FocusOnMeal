@@ -30,8 +30,10 @@ const Login = () => {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('memberId', data.memberId);
                 localStorage.setItem('memberName', data.memberName);
+                localStorage.setItem('memberNickname', data.memberNickname);
                 localStorage.setItem('adminYn', data.adminYn);
                 localStorage.setItem("memberNickname", data.memberNickname);
+
 
                 // 로그인 상태 변경 이벤트 발생 (로그인 시 바로 변경된 상태를 확인해 헤더 상태를 변경할 수 있게 함)
                 window.dispatchEvent(new Event("loginStateChange"));

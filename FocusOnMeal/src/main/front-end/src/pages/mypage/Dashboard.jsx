@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import styles from './Dashboard.module.css';
 import axios from "axios";
 import Sidebar from "../../components/mypage/Sidebar";
+import { useEffect, useState } from "react";
 
 const Dashboard = () => {
 

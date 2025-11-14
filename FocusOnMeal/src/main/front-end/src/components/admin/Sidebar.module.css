@@ -1,0 +1,71 @@
+/* ========== SIDEBAR LAYOUT ========== */
+.sidebar {
+    width: 150px;
+    background: #fff;
+    border-right: 1px solid #e0e0e0;
+    padding: 40px 20px 60px;
+    flex-shrink: 0;
+}
+
+.menuList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 큰 타이틀 버튼 공통 스타일 */
+.menuTitle {
+    display: block;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    list-style: none;
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    border-radius: 10px;
+    transition: background 0.2s ease, color 0.2s ease;
+    text-decoration: none;
+}
+
+/* 기본 상태 */
+.menuTitle {
+    background: transparent;
+    list-style: none;
+}
+
+.menuTitle:hover {
+    background: #dfeacc;
+    color: #4b6a1e;
+}
+
+/* 활성 상태 */
+.activeTitle {
+    display: block;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    list-style: none;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 10px;
+    text-decoration: none;
+
+    transition: background 0.2s ease, color 0.2s ease;
+    background: #d9e8c7;
+    color: #4b6a1e;
+}
+
+/* 서브메뉴 */
+.subItem {
+    font-size: 16px;
+    padding: 1px 0px 10px 20px;
+    color: #555;
+    margin-bottom: 8px;
+    display: block;
+    text-decoration: none;
+}
+
+.subItem:hover {
+    color: #67932A;
+}
+
+
