@@ -21,6 +21,7 @@ function App() {
 
         {/* 회원 관련 */}
         <Route path="/member/login" element={<Login />} />
+        <Route path="/member/join" element={<Join />} />
 
         {/* 마이페이지 관련 */}
         <Route path="/mypage" element={<Dashboard />} />
