@@ -8,6 +8,7 @@ import Header from "./components/common/Header";
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Dashboard from './pages/mypage/Dashboard';
 import Join from './pages/member/Join';
+import ProtectedRoute from './components/mypage/ProtectedRoute';
 
 
 function App() {
@@ -24,7 +25,11 @@ function App() {
         <Route path="/member/join" element={<Join />} />
 
         {/* 마이페이지 관련 */}
-        <Route path="/mypage" element={<Dashboard />} />
+        <Route path="/mypage" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>} 
+        />
 
         {/* 식자재 관련 */}
         <Route path="/ingredient/list" element={<IngredientSearch />} />

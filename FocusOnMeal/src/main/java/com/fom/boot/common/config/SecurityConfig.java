@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 import com.fom.boot.app.jwt.JwtAuthenticationFilter;
 import com.fom.boot.app.jwt.JwtTokenProvider;
@@ -26,6 +27,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    	
+    	// === CORS 설정 추가 ===
+        http.cors(cors -> cors.configurationSource(request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.addAllowedOrigin("http://localhost:5173");  // 프론트 주소
+            config.addAllowedHeader("*");
+            config.addAllowedMethod("*");
+            config.setAllowCredentials(true);
+            return config;
+        }));
+    	
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
