@@ -11,39 +11,38 @@ import Join from './pages/member/Join';
 
 
 function App() {
-  
-  return (
-    <> 
-      <Header />
-      <Routes>
-        {/* 메인페이지 */}
-        <Route path="/" element={<div>홈페이지</div>} />
 
-        {/* 회원 관련 */}
-        <Route path="/member/login" element={<Login />} />
+    return (
+        <>
+            <Header />
+            <Routes>
+                {/* 메인페이지 */}
+                <Route path="/" element={<div>홈페이지</div>} />
 
-        {/* 마이페이지 관련 */}
-        <Route path="/mypage" element={<Dashboard />} />
+                {/* 회원 관련 */}
+                <Route path="/member/login" element={<Login />} />
+                <Route path="/member/join" element={<Join />} />
 
-        {/* 식자재 관련 */}
-        <Route path="/ingredient" element={<IngredientLayout />}>
-          <Route index element={<IngredientSearch />} /> 
-          <Route path="list" element={<IngredientSearch />} /> 
-        </Route>
-		
-		{/* 관리자 홈 (대시보드) */}
-		<Route path="/admin" element={<AdminDashboard />} />
-		{/* 마이페이지 홈 (대시보드) */}
-		<Route path="/mypage" element={<Dashboard />} />
+                {/* 마이페이지 관련 */}
+                <Route path="/mypage" element={<Dashboard />} />
 
-        {/* 공지사항 게시판 관련 */}
-        <Route path="/board/notice/list" element={<NoticeList /> }/>
-        {/* <Route path="/notice/detail" element={<NoticeDetail />} /> */}
+                {/* 식자재 관련 */}
+                <Route path="/ingredient/list" element={<IngredientSearch />} />
+                <Route path="/ingredient/:id" element={<IngredientDetail />} />
 
-        {/* 안전정보 게시판 관련 */}
-      </Routes>
-    </>
-  );
+                {/* 관리자 홈 (대시보드) */}
+                <Route path="/admin" element={<AdminDashboard />} />
+                {/* 마이페이지 홈 (대시보드) */}
+                <Route path="/mypage" element={<Dashboard />} />
+
+                {/* 공지사항 게시판 관련 */}
+                <Route path="/board/notice/list" element={<NoticeList /> }/>
+                {/* <Route path="/notice/detail" element={<NoticeDetail />} /> */}
+
+                {/* 안전정보 게시판 관련 */}
+            </Routes>
+        </>
+    );
 }
 
 export default App

@@ -1,6 +1,7 @@
 package com.fom.boot.app.api.controller;
 
 
+import com.fom.boot.domain.ingredient.model.service.PriceService;
 import com.fom.boot.domain.meal.model.service.ChamgaApiService;
 import com.fom.boot.domain.meal.model.service.GeminiApiService;
 import com.fom.boot.domain.meal.model.service.KamisApiService;
@@ -25,6 +26,7 @@ public class ApiTestController {
     private final GeminiApiService geminiApiService;
     private final KamisApiService kamisApiService;
     private final ChamgaApiService chamgaApiService;
+    private final PriceService priceService;
 
     /**
      * 전체 API 연결 테스트
@@ -275,6 +277,73 @@ public class ApiTestController {
 
         } catch (Exception e) {
             log.error("참가격 가격 조회 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * PriceService 가격 조회 테스트
+     * GET /api/test/price?ingredient=쌀
+     */
+    @GetMapping("/price")
+    public ResponseEntity<Map<String, Object>> testPrice(
+            @RequestParam(defaultValue = "쌀") String ingredient
+    ) {
+        log.info("PriceService 가격 조회 테스트 - 식자재: {}", ingredient);
+
+        try {
+            Integer price = priceService.getPrice(ingredient);
+
+            if (price != null) {
+                return ResponseEntity.ok(Map.of(
+                        "status", "SUCCESS",
+                        "ingredient", ingredient,
+                        "price", price,
+                        "unit", "원/kg"
+                ));
+            } else {
+                return ResponseEntity.ok(Map.of(
+                        "status", "NOT_FOUND",
+                        "message", "가격을 찾을 수 없습니다: " + ingredient
+                ));
+            }
+
+        } catch (Exception e) {
+            log.error("가격 조회 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * PriceService 여러 식자재 가격 조회 테스트
+     * GET /api/test/prices?ingredients=쌀,배추,돼지고기
+     */
+    @GetMapping("/prices")
+    public ResponseEntity<Map<String, Object>> testPrices(
+            @RequestParam(defaultValue = "쌀,배추,돼지고기,계란,우유") String ingredients
+    ) {
+        log.info("PriceService 여러 식자재 가격 조회 테스트 - 식자재: {}", ingredients);
+
+        try {
+            String[] ingredientArray = ingredients.split(",");
+            Map<String, Integer> prices = priceService.getPrices(ingredientArray);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "requested", ingredientArray.length,
+                    "found", prices.size(),
+                    "prices", prices,
+                    "unit", "원/kg"
+            ));
+
+        } catch (Exception e) {
+            log.error("여러 식자재 가격 조회 실패", e);
             return ResponseEntity.ok(Map.of(
                     "status", "ERROR",
                     "message", e.getMessage()

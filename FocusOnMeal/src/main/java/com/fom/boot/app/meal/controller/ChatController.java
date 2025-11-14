@@ -1,5 +1,6 @@
 package com.fom.boot.app.meal.controller;
 
+import com.fom.boot.app.meal.dto.ChatRequest;
 import com.fom.boot.domain.meal.model.service.GeminiApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,32 +86,5 @@ public class ChatController {
             response.put("message", e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
-    }
-
-    /**
-     * 채팅 요청 DTO
-     */
-    public static class ChatRequest {
-        private String message;
-        private int height = 170;        // 기본값
-        private int weight = 70;         // 기본값
-        private int servingSize = 1;     // 기본값
-        private List<String> allergies = List.of(); // 기본값
-
-        // Getters and Setters
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-
-        public int getHeight() { return height; }
-        public void setHeight(int height) { this.height = height; }
-
-        public int getWeight() { return weight; }
-        public void setWeight(int weight) { this.weight = weight; }
-
-        public int getServingSize() { return servingSize; }
-        public void setServingSize(int servingSize) { this.servingSize = servingSize; }
-
-        public List<String> getAllergies() { return allergies; }
-        public void setAllergies(List<String> allergies) { this.allergies = allergies; }
     }
 }

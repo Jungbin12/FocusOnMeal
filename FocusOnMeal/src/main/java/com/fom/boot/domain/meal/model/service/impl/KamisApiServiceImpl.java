@@ -147,9 +147,26 @@ public class KamisApiServiceImpl implements KamisApiService {
             for (JsonNode item : items) {
                 String name = item.path("item_name").asText();
                 if (name.contains(itemName) || itemName.contains(name)) {
-                    // 평균 가격 추출 (dpr1: 소매가격)
-                    String priceStr = item.path("dpr1").asText();
+                    // 평균 가격 추출 (dpr1: 당일 → dpr2: 1일전 → dpr3: 1주일전 fallback)
+                    String priceStr = null;
+
+                    // 1. 당일 가격 시도
+                    priceStr = item.path("dpr1").asText();
                     if (priceStr != null && !priceStr.isEmpty() && !"-".equals(priceStr)) {
+                        return Integer.parseInt(priceStr.replace(",", ""));
+                    }
+
+                    // 2. 1일전 가격 시도
+                    priceStr = item.path("dpr2").asText();
+                    if (priceStr != null && !priceStr.isEmpty() && !"-".equals(priceStr)) {
+                        log.debug("당일 가격 없음, 1일전 가격 사용: {}", priceStr);
+                        return Integer.parseInt(priceStr.replace(",", ""));
+                    }
+
+                    // 3. 1주일전 가격 시도
+                    priceStr = item.path("dpr3").asText();
+                    if (priceStr != null && !priceStr.isEmpty() && !"-".equals(priceStr)) {
+                        log.debug("1일전 가격 없음, 1주일전 가격 사용: {}", priceStr);
                         return Integer.parseInt(priceStr.replace(",", ""));
                     }
                 }
@@ -191,9 +208,23 @@ public class KamisApiServiceImpl implements KamisApiService {
             }
 
             JsonNode firstItem = items.get(0);
-            String priceStr = firstItem.path("dpr1").asText();
+            String priceStr = null;
 
+            // dpr1: 당일 → dpr2: 1일전 → dpr3: 1주일전 fallback
+            priceStr = firstItem.path("dpr1").asText();
             if (priceStr != null && !priceStr.isEmpty() && !"-".equals(priceStr)) {
+                return Integer.parseInt(priceStr.replace(",", ""));
+            }
+
+            priceStr = firstItem.path("dpr2").asText();
+            if (priceStr != null && !priceStr.isEmpty() && !"-".equals(priceStr)) {
+                log.debug("당일 가격 없음, 1일전 가격 사용");
+                return Integer.parseInt(priceStr.replace(",", ""));
+            }
+
+            priceStr = firstItem.path("dpr3").asText();
+            if (priceStr != null && !priceStr.isEmpty() && !"-".equals(priceStr)) {
+                log.debug("1일전 가격 없음, 1주일전 가격 사용");
                 return Integer.parseInt(priceStr.replace(",", ""));
             }
 

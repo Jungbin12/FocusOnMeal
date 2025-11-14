@@ -14,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NutritionMaster {
-    private int nutritionId;
+    private int nutritionId; //
     private int ingredientId;
     private String measureUnit;
     private BigDecimal calories;
