@@ -1,4 +1,5 @@
 import styles from './Dashboard.module.css';
+import Sidebar from '../../components/admin/Sidebar';
 import {
     LineChart,
     Line,
@@ -9,10 +10,8 @@ import {
     ResponsiveContainer,
 } from "recharts";
 
-
 const AdminDashboard = () => {
 
-    // 더미 데이터
     const data = [
         { month: "Jan", members: 120 },
         { month: "Feb", members: 200 },
@@ -28,41 +27,51 @@ const AdminDashboard = () => {
         { month: "Dec", members: 850 },
     ];
 
-    return(
-        <>
-        <div>
-            <h2>관리자 대시보드</h2>
+    return (
+        <div className={styles.container}>
+            
+            <Sidebar />
 
-            <div>
-                <div>
-                <p>회원 수</p>
-                <h3>5000</h3>
-                </div>
-                <div>
-                <p>식자재 수</p>
-                <h3>1253</h3>
-                </div>
-                <div>
-                <p>회원 활동 수</p>
-                <h3>102</h3>
-                </div>
-            </div>
+            <main className={styles.main}>
+                
+                <h2 className={styles.title}>관리자 대시보드</h2>
 
-            <div>
-                <h4>회원 활동 추이</h4>
-                <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="members" stroke="#2470dc" />
-                </LineChart>
-                </ResponsiveContainer>
-            </div>
+                <div className={styles.cards}>
+
+                    <div className={styles.card}>
+                        <p className={styles.cardTitle}>회원 수</p>
+                        <h3 className={styles.cardValue}>5000</h3>
+                    </div>
+
+                    <div className={styles.card}>
+                        <p className={styles.cardTitle}>식자재 수</p>
+                        <h3 className={styles.cardValue}>1253</h3>
+                    </div>
+
+                    <div className={styles.card}>
+                        <p className={styles.cardTitle}>회원 활동 수</p>
+                        <h3 className={styles.cardValue}>102</h3>
+                    </div>
+
+                </div>
+
+                <div className={styles.chartBox}>
+                    <h4>회원 활동 추이</h4>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={data}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="month" />
+                            <YAxis />
+                            <Tooltip />
+                            <Line type="monotone" dataKey="members" stroke="#2470dc" />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+
+            </main>
+
         </div>
-        </>
-    )
-}
+    );
+};
 
 export default AdminDashboard;
