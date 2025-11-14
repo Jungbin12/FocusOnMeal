@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fom.boot.domain.ingredient.model.mapper.PriceHistoryMapper">
+
+     <!-- PriceHistory resultMap -->
+     <resultMap id="PriceHistory" type="com.fom.boot.domain.ingredient.model.vo.PriceHistory">
+        <id         property="priceHistoryId"   column="PRICE_HISTORY_ID"    />
+        <result    property="ingredientId"      column="INGREDIENT_ID"       />
+        <result    property="priceValue"      column="PRICE_VALUE"      />
+        <result      property="priceType"      column="PRICE_TYPE"         />
+        <result      property="region"         column="REGION"            />
+        <result      property="collectedDate"   column="COLLECTED_DATE"      />
+     </resultMap>
+
+     <!-- 특정 식자재의 최근 가격 조회 (1개) -->
+     <select id="getRecentPriceByName" resultMap="PriceHistory">
+        SELECT ph.*
+        FROM PRICE_HISTORY ph
+        JOIN INGREDIENT i ON ph.INGREDIENT_ID = i.INGREDIENT_ID
+        WHERE i.NAME LIKE '%' || #{ingredientName} || '%'
+        ORDER BY ph.COLLECTED_DATE DESC
+        FETCH FIRST 1 ROWS ONLY
+     </select>
+
+     <!-- 특정 식자재의 최근 가격 이력 조회 (여러 개) -->
+     <select id="getRecentPricesByName" resultMap="PriceHistory">
+        SELECT ph.*
+        FROM PRICE_HISTORY ph
+        JOIN INGREDIENT i ON ph.INGREDIENT_ID = i.INGREDIENT_ID
+        WHERE i.NAME LIKE '%' || #{ingredientName} || '%'
+        ORDER BY ph.COLLECTED_DATE DESC
+        FETCH FIRST #{limit} ROWS ONLY
+     </select>
+
+     <!-- 가격 정보 저장 -->
+    <insert id="insertPrice" parameterType="com.fom.boot.domain.ingredient.model.vo.PriceHistory">
+        <!-- 오라클 시퀀스를 사용한 자동 번호 생성 -->
+        <selectKey keyProperty="priceHistoryId" resultType="int" order="BEFORE">
+            SELECT SEQ_PRICE_HISTORY_ID.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO PRICE_HISTORY (
+            PRICE_HISTORY_ID,
+            INGREDIENT_ID,
+            PRICE_VALUE,
+            PRICE_TYPE,
+            REGION,
+            COLLECTED_DATE
+        ) VALUES (
+            #{priceHistoryId},
+            #{ingredientId},
+            #{priceValue},
+            #{priceType},
+            #{region},
+            #{collectedDate}
+        )
+    </insert>
+
+    <!-- 특정 식자재의 모든 가격 이력 조회 -->
+    <select id="getPriceHistoryByIngredientId" resultMap="PriceHistory">
+       SELECT *
+       FROM PRICE_HISTORY
+       WHERE INGREDIENT_ID = #{ingredientId}
+       ORDER BY COLLECTED_DATE DESC
+    </select>
+
+</mapper>
