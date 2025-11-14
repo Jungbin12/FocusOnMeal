@@ -2,6 +2,7 @@ package com.fom.boot.domain.member.model.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,12 +17,13 @@ import java.sql.Timestamp;
 
 /**
  * 비밀번호 재설정 서비스
- * 
+ *
  * @author FocusOnMale Team
  * @since 2025-11-15
  */
 @Slf4j
 @Service
+@ConditionalOnProperty(name = "spring.mail.host")
 public class PasswordResetService {
     
     @Autowired

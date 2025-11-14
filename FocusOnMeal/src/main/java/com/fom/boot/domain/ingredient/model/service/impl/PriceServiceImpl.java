@@ -4,14 +4,14 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fom.boot.domain.meal.model.service.SeoulPriceApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.fom.boot.domain.ingredient.model.mapper.PriceHistoryMapper;
+import com.fom.boot.domain.ingredient.model.mapper.IngredientPriceHistoryMapper;
 import com.fom.boot.domain.ingredient.model.service.PriceService;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
-import com.fom.boot.domain.meal.model.service.SeoulPriceApiService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PriceServiceImpl implements PriceService {
 
-	private final PriceHistoryMapper priceHistoryMapper;
+	private final IngredientPriceHistoryMapper priceHistoryMapper;
 
 	@Autowired
 	@Lazy

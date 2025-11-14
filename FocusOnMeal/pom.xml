@@ -97,21 +97,11 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- Spring AOP 추가 -->
-        <!--  -->
+        <!-- Spring AOP -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-		<!-- Spring Security for BCrypt -->
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-crypto</artifactId>
-		</dependency>
 		<!-- Spring Security -->
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
@@ -140,47 +130,20 @@
 		    <groupId>com.fasterxml.jackson.dataformat</groupId>
 		    <artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>
-		<!-- Spring Actuator 설정 -->
+		<!-- Spring Actuator -->
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-		<!-- Spring Actuator의 데이터를 주기적으로 수집하는 서버 prometheus -->
+		<!-- Prometheus -->
 		<dependency>
 		    <groupId>io.micrometer</groupId>
 		    <artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
-		<!-- Spring Boot Mail (이메일 발송) -->
+		<!-- Spring Boot Mail -->
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-		
-		<!-- Lombok (선택사항 - VO 클래스 간소화) -->
-		<dependency>
-		    <groupId>org.projectlombok</groupId>
-		    <artifactId>lombok</artifactId>
-		    <optional>true</optional>
-		</dependency>
-		
-		<!-- Spring Security Crypto (비밀번호 암호화) -->
-		<!-- 이미 있다면 추가하지 않아도 됨 -->
-		<dependency>
-		    <groupId>org.springframework.security</groupId>
-		    <artifactId>spring-security-crypto</artifactId>
-		</dependency>
-		
-		<!-- JavaMail API -->
-		<dependency>
-		    <groupId>javax.mail</groupId>
-		    <artifactId>javax.mail-api</artifactId>
-		    <version>1.6.2</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>com.sun.mail</groupId>
-		    <artifactId>javax.mail</artifactId>
-		    <version>1.6.2</version>
 		</dependency>
 	</dependencies>
 
@@ -191,6 +154,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>com.fom.boot.FocusOnMealApplication</mainClass>
+                    <addResources>true</addResources>
                 </configuration>
             </plugin>
             <plugin>

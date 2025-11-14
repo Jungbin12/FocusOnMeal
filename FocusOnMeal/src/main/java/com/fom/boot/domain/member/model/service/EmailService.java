@@ -2,6 +2,7 @@ package com.fom.boot.domain.member.model.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@ConditionalOnProperty(name = "spring.mail.host")
 public class EmailService {
     
-    @Autowired
+    @Autowired(required = false)
     private JavaMailSender mailSender;
     
     /**
