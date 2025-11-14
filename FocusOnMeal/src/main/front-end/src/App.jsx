@@ -8,6 +8,7 @@ import Header from "./components/common/Header";
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Dashboard from './pages/mypage/Dashboard';
 import Join from './pages/member/Join';
+import ProtectedRoute from './components/mypage/ProtectedRoute';
 
 
 function App() {
@@ -23,18 +24,20 @@ function App() {
         <Route path="/member/login" element={<Login />} />
 
         {/* 마이페이지 관련 */}
-        <Route path="/mypage" element={<Dashboard />} />
+        <Route path="/mypage" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>} 
+        />
 
         {/* 식자재 관련 */}
-        <Route path="/ingredient" element={<IngredientLayout />}>
-          <Route index element={<IngredientSearch />} /> 
-          <Route path="list" element={<IngredientSearch />} /> 
-        </Route>
-		
-		{/* 관리자 홈 (대시보드) */}
-		<Route path="/admin" element={<AdminDashboard />} />
-		{/* 마이페이지 홈 (대시보드) */}
-		<Route path="/mypage" element={<Dashboard />} />
+        <Route path="/ingredient/list" element={<IngredientSearch />} />
+        <Route path="/ingredient/:id" element={<IngredientDetail />} />
+      
+        {/* 관리자 홈 (대시보드) */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        {/* 마이페이지 홈 (대시보드) */}
+        <Route path="/mypage" element={<Dashboard />} />
 
         {/* 공지사항 게시판 관련 */}
         <Route path="/board/notice/list" element={<NoticeList /> }/>
