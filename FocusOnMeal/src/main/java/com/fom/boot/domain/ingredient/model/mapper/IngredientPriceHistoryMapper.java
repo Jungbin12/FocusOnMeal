@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
 
 @Mapper
-public interface PriceHistoryMapper {
+public interface IngredientPriceHistoryMapper {
 
 	/**
 	 * 특정 식자재의 최근 가격 조회 (1개)

@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
+import com.fom.boot.domain.ingredient.model.vo.Ingredient;
 
 @Mapper
 public interface IngredientMapper {
@@ -14,5 +15,7 @@ public interface IngredientMapper {
 					   @Param("ingredientId") int ingredientId);
 	int checkFavoriteExists(@Param("memberId") String memberId, 
 			   				@Param("ingredientId") int ingredientId);
+	
+	Ingredient selectById(int ingredientId);
 
 }

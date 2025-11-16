@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 import com.fom.boot.app.jwt.JwtAuthenticationFilter;
 import com.fom.boot.app.jwt.JwtTokenProvider;
@@ -26,12 +27,48 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    	
+    	// === CORS 설정 추가 ===
+        http.cors(cors -> cors.configurationSource(request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.addAllowedOrigin("http://localhost:5173");  // 프론트 주소
+            config.addAllowedHeader("*");
+            config.addAllowedMethod("*");
+            config.setAllowCredentials(true);
+            return config;
+        }));
+    	
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
-            );
+//                // 리소스 접근 권한 설정
+//                .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/assets/**", "/resources/**").permitAll()
+//
+//                // 로그인/회원가입 API 경로 허용
+//                .requestMatchers("/member/login", "/member/join").permitAll()
+//                .requestMatchers("/api/member/login", "/api/member/join").permitAll()
+//
+//                // 식단 페이지 허용
+//                .requestMatchers("/meal/**").permitAll()
+//
+//                // API 테스트 경로 허용
+//                .requestMatchers("/api/test/**").permitAll()
+//
+//                // 채팅 API 경로 허용 (가격 정보 없이 테스트 가능)
+//                .requestMatchers("/api/chat/**").permitAll()
+//                
+//                // Actuator 경로는 모두 허용
+//                .requestMatchers("/actuator/**", "/actuator/prometheus", "/favicon.ico").permitAll()
+//                
+//                .requestMatchers("/api/admin/**").hasRole("ADMIN") // /api/admin/ 경로는 ADMIN 권한 필요
+//                .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
+            )
+            
+            // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), 
+                             UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
