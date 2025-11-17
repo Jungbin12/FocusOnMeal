@@ -125,19 +125,16 @@
 	</select>
 	
 	<!-- 관리자 : 회원 등급 변경 -->
-	<!-- 
 	<update id="updateAdminYn">
 	    UPDATE MEMBER
 	    SET ADMIN_YN = #{adminYn}
 	    WHERE MEMBER_ID = #{memberId}
 	</update>
-	 -->
+	
 	<!-- 관리자 : 회원 상태 변경 -->
-	<!-- 
 	<update id="updateStatusYn">
 	    UPDATE MEMBER
 	    SET STATUS_YN = #{statusYn}
 	    WHERE MEMBER_ID = #{memberId}
 	</update>
-	 -->
   </mapper>

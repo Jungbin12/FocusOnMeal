@@ -39,7 +39,7 @@ public class MemberServiceImpl implements MemberService {
 	public Member findByMemberId(String memberId) {
 		return mapper.findByMemberId(memberId);
 	}
-/*
+	
 	// 회원 등급 변경
 	@Override
 	public int updateAdminYn(String memberId, String adminYn) {
@@ -53,5 +53,4 @@ public class MemberServiceImpl implements MemberService {
 		return mapper.updateStatusYn(memberId, statusYn);
 		
 	}
-*/
 }
