@@ -8,7 +8,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.security.SecureRandom;
 
 @Slf4j
 @Service
@@ -17,6 +19,8 @@ public class EmailService {
     
     @Autowired(required = false)
     private JavaMailSender mailSender;
+    private static final String CHARACTERS = "0123456789";
+    private static final SecureRandom random = new SecureRandom();
     
     /**
      * 서버 도메인 (application.properties에서 설정)
@@ -222,5 +226,59 @@ public class EmailService {
         String masked = "*".repeat(length - visibleChars);
         
         return visible + masked;
+    }
+    
+    /**
+     * 6자리 인증 코드 생성
+     */
+    public String generateVerificationCode() {
+        StringBuilder code = new StringBuilder(6);
+        for (int i = 0; i < 6; i++) {
+            code.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
+        }
+        return code.toString();
+    }
+
+    /**
+     * 이메일 인증 코드 발송
+     */
+    public void sendVerificationEmail(String toEmail, String verificationCode) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            
+            helper.setTo(toEmail);
+            helper.setSubject("[FocusOnMale] 이메일 인증 코드");
+            helper.setFrom("noreply@focusonmale.com");
+            
+            String content = """
+                <!DOCTYPE html>
+                <html>
+                <body style='font-family: Arial, sans-serif; padding: 40px; background-color: #f5f5f5;'>
+                    <div style='max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px;'>
+                        <h2 style='color: #2563eb;'>🔐 이메일 인증</h2>
+                        <p>FocusOnMale 회원가입을 위한 인증 코드입니다.</p>
+                        <div style='background: #f3f4f6; padding: 30px; margin: 30px 0; text-align: center; border-radius: 8px;'>
+                            <p style='font-size: 36px; font-weight: bold; color: #2563eb; letter-spacing: 8px; margin: 0;'>
+                                %s
+                            </p>
+                        </div>
+                        <p style='color: #92400e; background: #fef3c7; padding: 15px; border-radius: 6px;'>
+                            ⚠️ 이 인증 코드는 <strong>5분 동안만</strong> 유효합니다.
+                        </p>
+                    </div>
+                </body>
+                </html>
+                """.formatted(verificationCode);
+            
+            helper.setText(content, true);
+            mailSender.send(message);
+            
+            log.info("이메일 인증 코드 발송 성공: email={}", toEmail);
+            
+        } catch (Exception e) {
+            log.error("이메일 인증 코드 발송 실패: {}", e.getMessage());
+            throw new RuntimeException("이메일 발송에 실패했습니다.");
+        }
     }
 }

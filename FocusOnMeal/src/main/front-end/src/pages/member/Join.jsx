@@ -1,5 +1,7 @@
+// src/components/auth/Join.jsx
 import React, { useState, useEffect } from 'react';
-// import './JoinForm.css'; // 실제 프로젝트에서는 이 경로를 사용해 CSS 파일을 연결합니다.
+import { useNavigate } from 'react-router-dom';
+import authService from '../../services/authService';
 
 // 이메일 도메인 목록
 const emailDomains = [
@@ -13,14 +15,42 @@ const emailDomains = [
 ];
 
 function Join() {
-    const [selectedDomain, setSelectedDomain] = useState(emailDomains[0]);
-    // 자동 생성된 닉네임은 상태로만 관리하고, UI에 표시하지 않습니다.
-    const [generatedNickname, setGeneratedNickname] = useState(''); 
+    const navigate = useNavigate();
     
-    // 이메일 도메인 직접 입력 플래그
+    // 폼 데이터
+    const [formData, setFormData] = useState({
+        memberId: '',
+        memberPw: '',
+        confirmPw: '',
+        memberName: '',
+        phone: '',
+        emailId: '',
+        emailDomain: emailDomains[0],
+        customDomain: '',
+        gender: 'M'
+    });
+    
+    // UI 상태
+    const [selectedDomain, setSelectedDomain] = useState(emailDomains[0]);
+    const [generatedNickname, setGeneratedNickname] = useState('');
+    const [passwordStrength, setPasswordStrength] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+    
+    // 아이디 중복 확인
+    const [idChecked, setIdChecked] = useState(false);
+    const [idAvailable, setIdAvailable] = useState(false);
+    
+    // 이메일 인증
+    const [emailVerificationCode, setEmailVerificationCode] = useState('');
+    const [emailVerified, setEmailVerified] = useState(false);
+    const [verificationSent, setVerificationSent] = useState(false);
+    const [verificationTimer, setVerificationTimer] = useState(0);
+    
     const isCustomDomain = selectedDomain === "직접입력";
-
-    // --- 닉네임 생성에 필요한 상수 목록 (유저 & 관리자 공용) ---
+    
+    // ============ 랜덤 닉네임 생성 로직 (기존 코드 그대로) ============
+    
     // 형용사
     const adjectives = [
         // 따뜻한 느낌
@@ -53,7 +83,7 @@ function Join() {
         '민첩한', '재빠른', '영리한', '현명한', '슬기로운', '총명한'
     ];
 
-    // 동물 (일반 사용자 전용)
+    // 동물
     const animals = [
         // 귀여운 동물
         '강아지', '고양이', '토끼', '햄스터', '다람쥐', '펭귄', '코알라', '판다', 
@@ -83,7 +113,7 @@ function Join() {
         '도마뱀', '카멜레온', '이구아나', '코브라', '비단뱀'
     ];
 
-    // 접미사 (일반 사용자 전용)
+    // 접미사
     const suffixes = [
         // 판타지
         '왕', '여왕', '왕자', '공주', '요정', '천사', '악마', '마왕', '드래곤', 
@@ -112,53 +142,9 @@ function Join() {
         '9호', '10호', '11호', '12호', '13호', '14호', '15호', '16호',
         '17호', '18호', '19', '20호', '21호', '22호', '23호', '100호'
     ];
-
-    // 관리자 닉네임 전용 접두사
-    const adminPrefixes = [
-        // 권위있는
-        '전지전능한', '위대한', '최고의', '절대적인', '신성한', '강력한',
-        '카리스마있는', '막강한', '무적의', '지혜로운',
-        // 추가 - 능력
-        '전능한', '만능의', '천재적인', '초월적인', '궁극의', '최강의',
-        '압도적인', '독보적인', '완벽한', '무결점의', '완전무결한',
-        // 추가 - 품격
-        '고귀한', '숭고한', '존엄한', '위엄있는', '장엄한', '찬란한',
-        '빛나는', '영광스러운', '위대하신', '존귀하신',
-        // 추가 - 카리스마
-        '압도하는', '통솔하는', '이끄는', '군림하는', '지배하는',
-        '총괄하는', '관장하는', '주관하는', '감독하는',
-        // 추가 - 특별함
-        '전설의', '신화의', '전무후무한', '유일무이한', '독보적인',
-        '초월한', '차원이다른', '범접불가한', '경외스러운',
-        // 추가 - 긍정적
-        '친절한', '자비로운', '인자한', '온화한', '다정한',
-        '배려심깊은', '섬세한', '세심한', '따뜻한', '포근한'
-    ];
-
-    // 관리자 닉네임 전용 접미사 (추후 관리자/수정 페이지에서 사용)
-    const adminSuffixes = [
-        // 기본 관리자
-        '관리자', '관리자님', '운영자', '마스터', '매니저', '총관리자',
-        '슈퍼관리자', '시스템관리자', '최고관리자',
-        // 추가 - 직책
-        '총책임자', '총괄책임자', '총지배인', '총수', '총재',
-        '대표', '회장', '사장', '이사장', '의장', '국장',
-        // 추가 - 최고
-        '최고운영자', '최고책임자', '슈퍼바이저', '디렉터', '치프',
-        '프로듀서', '크리에이터', '아키텍트',
-        // 추가 - 권한
-        '어드민', '루트', '슈퍼유저', '오너', '호스트',
-        'GM', 'OP', '모더레이터', '가디언',
-        // 추가 - 귀여운 버전
-        '님', '냥', '쨩', '왕님', '여왕님', '대인',
-        '각하', '전하', '폐하', '성하'
-    ];
-    // -----------------------------------------------------------------
-
+    
     /**
      * 문자열의 바이트 길이를 계산합니다. (한글 1글자는 3바이트로 가정)
-     * @param {string} str - 입력 문자열
-     * @returns {number} 바이트 길이
      */
     const getByteLength = (str) => {
         let byteLength = 0;
@@ -176,10 +162,9 @@ function Join() {
         }
         return byteLength;
     };
-
+    
     /**
-     * 일반 사용자 랜덤 닉네임을 생성합니다.
-     * @returns {string} 생성된 닉네임
+     * 랜덤 닉네임 생성 (길이 제한: 12자 이하 또는 40바이트 이하)
      */
     const generateUserNickname = () => {
         let nickname;
@@ -189,7 +174,7 @@ function Join() {
         do {
             const type = Math.floor(Math.random() * 4);
             
-            // 닉네임 조합 패턴 (0: 형용사+동물, 1: 동물+접미사, 2: 형용사+동물+접미사, 3: 형용사+접미사)
+            // 닉네임 조합 패턴
             switch(type) {
                 case 0: 
                     nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${animals[Math.floor(Math.random() * animals.length)]}`;
@@ -203,215 +188,632 @@ function Join() {
                 case 3: 
                     nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
                     break;
+                default:
+                    nickname = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${animals[Math.floor(Math.random() * animals.length)]}`;
             }
-
             
             attempts++;
         } while (
-            // 길이 제한: 문자열 길이 12자 이하 또는 바이트 길이 40 이하
             (nickname.length > 12 || getByteLength(nickname) > 40) && 
             attempts < maxAttempts
         );
 
         return nickname;
     };
-
-    /**
-     * **[관리자 페이지 전용 유틸리티 함수]**
-     * 이 함수는 회원가입(Join) 페이지에서는 호출되지 않습니다.
-     * * 용도: 관리자가 기존 사용자에게 관리자 권한을 부여할 때,
-     * 해당 사용자의 닉네임을 관리자용 조합으로 변경하기 위해
-     * **별도의 관리자 페이지에서** 호출되어야 합니다.
-     * * @param {string} originalNickname - 기존 사용자 닉네임 (현재는 사용하지 않음)
-     * @returns {string} 조합된 "접두사_접미사" 형태의 관리자 닉네임
-     */
-    const generateAdminNickname = (originalNickname) => {
-        const prefix = adminPrefixes[Math.floor(Math.random() * adminPrefixes.length)];
-        const suffix = adminSuffixes[Math.floor(Math.random() * adminSuffixes.length)];
-        
-        // 새로운 관리자 전용 닉네임 생성 (Prefix + Suffix)
-        return `${prefix}_${suffix}`;
-    };
-
-    // 초기 닉네임 생성 (페이지 로드 시)
+    
+    // 초기 닉네임 생성
     useEffect(() => {
-        // 이 부분은 오직 회원가입 시에만 실행됩니다.
-        const nickname = generateUserNickname();
-        setGeneratedNickname(nickname);
+        setGeneratedNickname(generateUserNickname());
     }, []);
-
-    // 폼 제출 처리
-    const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.target);
-
-    // 이메일 조합
-    const emailId = formData.get("emailId");
-    const emailDomain =
-    selectedDomain === "직접입력"
-        ? formData.get("emailDomain")
-        : selectedDomain;
-    const email = `${emailId}@${emailDomain}`;
-
-    const memberData = {
-    memberId: formData.get("memberId"),
-    memberPw: formData.get("memberPw"),
-    memberName: formData.get("memberName"),
-    memberNickname: generatedNickname,
-    email: email,
-    phone: formData.get("phone"),
-    gender: formData.get("gender"),
-    adminYn: "N",
+    
+    // ============ 비밀번호 강도 계산 ============
+    useEffect(() => {
+        const password = formData.memberPw;
+        let strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) strength++;
+        
+        setPasswordStrength(Math.min(strength, 5));
+    }, [formData.memberPw]);
+    
+    // ============ 인증 타이머 ============
+    useEffect(() => {
+        let interval = null;
+        if (verificationTimer > 0) {
+            interval = setInterval(() => {
+                setVerificationTimer(prev => prev - 1);
+            }, 1000);
+        } else if (verificationTimer === 0 && verificationSent) {
+            setVerificationSent(false);
+        }
+        return () => clearInterval(interval);
+    }, [verificationTimer, verificationSent]);
+    
+    // ============ 입력 변경 핸들러 ============
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        
+        // 아이디 변경 시 중복 확인 초기화
+        if (name === 'memberId') {
+            setIdChecked(false);
+            setIdAvailable(false);
+        }
+        
+        // 에러 메시지 초기화
+        if (errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
+        }
     };
-
-    try {
-    const response = await fetch("http://localhost:8080/member/join", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(memberData),
-    });
-
-    if (response.ok) {
-        alert("회원가입이 완료되었습니다!");
-        window.location.href = "/member/login";
-    } else {
-        const msg = await response.text();
-        alert("회원가입 실패: " + msg);
-    }
-    } catch (err) {
-    alert("서버 오류: " + err.message);
-    }
-};
-
+    
+    // ============ 아이디 중복 확인 ============
+    const handleCheckId = async () => {
+        if (!formData.memberId) {
+            setErrors(prev => ({ ...prev, memberId: '아이디를 입력해주세요.' }));
+            return;
+        }
+        
+        if (formData.memberId.length < 4) {
+            setErrors(prev => ({ ...prev, memberId: '아이디는 4자 이상이어야 합니다.' }));
+            return;
+        }
+        
+        try {
+            const response = await authService.checkMemberId(formData.memberId);
+            setIdChecked(true);
+            setIdAvailable(response.data.available);
+            
+            if (response.data.available) {
+                alert('사용 가능한 아이디입니다.');
+            } else {
+                setErrors(prev => ({ ...prev, memberId: '이미 사용중인 아이디입니다.' }));
+            }
+        } catch (error) {
+            alert('아이디 중복 확인 중 오류가 발생했습니다.');
+        }
+    };
+    
+    // ============ 이메일 인증 코드 발송 ============
+    const handleSendVerificationCode = async () => {
+        const email = selectedDomain === "직접입력" 
+            ? `${formData.emailId}@${formData.customDomain}`
+            : `${formData.emailId}@${selectedDomain}`;
+        
+        if (!formData.emailId) {
+            setErrors(prev => ({ ...prev, email: '이메일을 입력해주세요.' }));
+            return;
+        }
+        
+        if (selectedDomain === "선택") {
+            setErrors(prev => ({ ...prev, email: '이메일 도메인을 선택해주세요.' }));
+            return;
+        }
+        
+        if (selectedDomain === "직접입력" && !formData.customDomain) {
+            setErrors(prev => ({ ...prev, email: '이메일 도메인을 입력해주세요.' }));
+            return;
+        }
+        
+        try {
+            setLoading(true);
+            await authService.sendVerificationCode(email);
+            setVerificationSent(true);
+            setVerificationTimer(300); // 5분
+            alert('인증 코드가 이메일로 발송되었습니다.');
+        } catch (error) {
+            alert(error.message || '인증 코드 발송에 실패했습니다.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    // ============ 이메일 인증 코드 확인 ============
+    const handleVerifyCode = async () => {
+        const email = selectedDomain === "직접입력" 
+            ? `${formData.emailId}@${formData.customDomain}`
+            : `${formData.emailId}@${selectedDomain}`;
+        
+        if (!emailVerificationCode) {
+            alert('인증 코드를 입력해주세요.');
+            return;
+        }
+        
+        try {
+            setLoading(true);
+            const response = await authService.verifyEmailCode(email, emailVerificationCode);
+            
+            if (response.data.verified) {
+                setEmailVerified(true);
+                setVerificationTimer(0);
+                alert('이메일 인증이 완료되었습니다.');
+            } else {
+                alert('인증 코드가 일치하지 않습니다.');
+            }
+        } catch (error) {
+            alert(error.message || '인증 코드 확인에 실패했습니다.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    // ============ 폼 검증 ============
+    const validateForm = () => {
+        const newErrors = {};
+        
+        // 아이디
+        if (!formData.memberId) {
+            newErrors.memberId = '아이디를 입력해주세요.';
+        } else if (!idChecked || !idAvailable) {
+            newErrors.memberId = '아이디 중복 확인이 필요합니다.';
+        }
+        
+        // 비밀번호
+        if (!formData.memberPw) {
+            newErrors.memberPw = '비밀번호를 입력해주세요.';
+        } else if (formData.memberPw.length < 8) {
+            newErrors.memberPw = '비밀번호는 8자 이상이어야 합니다.';
+        } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(formData.memberPw)) {
+            newErrors.memberPw = '비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.';
+        }
+        
+        // 비밀번호 확인
+        if (!formData.confirmPw) {
+            newErrors.confirmPw = '비밀번호 확인을 입력해주세요.';
+        } else if (formData.memberPw !== formData.confirmPw) {
+            newErrors.confirmPw = '비밀번호가 일치하지 않습니다.';
+        }
+        
+        // 이름
+        if (!formData.memberName) {
+            newErrors.memberName = '이름을 입력해주세요.';
+        }
+        
+        // 전화번호
+        if (!formData.phone) {
+            newErrors.phone = '전화번호를 입력해주세요.';
+        } else if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/-/g, ''))) {
+            newErrors.phone = '올바른 전화번호 형식이 아닙니다.';
+        }
+        
+        // 이메일
+        if (!formData.emailId) {
+            newErrors.email = '이메일을 입력해주세요.';
+        } else if (!emailVerified) {
+            newErrors.email = '이메일 인증이 필요합니다.';
+        }
+        
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+    
+    // ============ 폼 제출 ============
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        if (!validateForm()) {
+            alert('입력 내용을 확인해주세요.');
+            return;
+        }
+        
+        const email = selectedDomain === "직접입력" 
+            ? `${formData.emailId}@${formData.customDomain}`
+            : `${formData.emailId}@${selectedDomain}`;
+        
+        const memberData = {
+            memberId: formData.memberId,
+            memberPw: formData.memberPw,
+            memberName: formData.memberName,
+            memberNickname: generatedNickname, // 랜덤 생성된 닉네임
+            email: email,
+            phone: formData.phone,
+            gender: formData.gender
+        };
+        
+        try {
+            setLoading(true);
+            await authService.joinMember(memberData);
+            alert('회원가입이 완료되었습니다!');
+            navigate('/login');
+        } catch (error) {
+            alert(error.message || '회원가입에 실패했습니다.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    // ============ 유틸리티 함수 ============
+    const getStrengthColor = () => {
+        if (passwordStrength >= 5) return '#10b981';
+        if (passwordStrength >= 4) return '#22c55e';
+        if (passwordStrength >= 3) return '#eab308';
+        if (passwordStrength >= 2) return '#f97316';
+        return '#ef4444';
+    };
+    
+    const getStrengthText = () => {
+        if (passwordStrength >= 5) return '매우 강함';
+        if (passwordStrength >= 4) return '강함';
+        if (passwordStrength >= 3) return '보통';
+        if (passwordStrength >= 2) return '약함';
+        return '매우 약함';
+    };
+    
+    const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+    
     return (
-        <div id="signup-container">
-            <div className="signup-wrapper">
+        <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', padding: '40px 20px' }}>
+            <div style={{ maxWidth: '600px', margin: '0 auto', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', padding: '40px' }}>
                 
-                {/* 제목 섹션 */}
-                <div className="signup-title text-center mb-6">
-                    <h2 className="title-text">회원가입</h2>
+                {/* 제목 */}
+                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937' }}>회원가입</h2>
                 </div>
                 
-                {/* 닉네임 미리보기 섹션 제거됨 */}
-                
-                {/* 폼 시작 */}
-                <form onSubmit={handleSubmit} className="signup-form" method="post">
+                {/* 폼 */}
+                <form onSubmit={handleSubmit}>
                     
-                    {/* Hidden 닉네임 필드 (서버 전송용 - UI에 표시하지 않아도 값은 전송됨) */}
-                    <input type="hidden" name="memberNickname" value={generatedNickname} />
+                    {/* Hidden 닉네임 */}
+                    <input type="hidden" value={generatedNickname} />
                     
                     {/* 1. 아이디 */}
-                    <div className="form-group">
-                        <label className="required form-label" htmlFor="memberId">아이디</label>
-                        <input 
-                            type="text" 
-                            id="memberId" 
-                            name="memberId" 
-                            placeholder="아이디를 입력해주세요." 
-                            required 
-                            className="form-input"
-                        />
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
+                            아이디 <span style={{ color: '#dc2626' }}>*</span>
+                        </label>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <input
+                                type="text"
+                                name="memberId"
+                                value={formData.memberId}
+                                onChange={handleChange}
+                                placeholder="아이디를 입력해주세요 (4자 이상)"
+                                style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    border: errors.memberId ? '1px solid #dc2626' : '1px solid #d1d5db',
+                                    borderRadius: '6px'
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={handleCheckId}
+                                disabled={!formData.memberId || idChecked}
+                                style={{
+                                    padding: '12px 20px',
+                                    backgroundColor: idChecked && idAvailable ? '#10b981' : '#2563eb',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {idChecked && idAvailable ? '✓ 확인완료' : '중복확인'}
+                            </button>
+                        </div>
+                        {errors.memberId && (
+                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                                {errors.memberId}
+                            </p>
+                        )}
+                        {idChecked && idAvailable && (
+                            <p style={{ color: '#10b981', fontSize: '14px', marginTop: '5px' }}>
+                                사용 가능한 아이디입니다.
+                            </p>
+                        )}
                     </div>
                     
                     {/* 2. 비밀번호 */}
-                    <div className="form-group">
-                        <label className="required form-label" htmlFor="memberPw">비밀번호</label>
-                        <input 
-                            type="password" 
-                            id="memberPw" 
-                            name="memberPw" 
-                            placeholder="비밀번호를 입력해주세요." 
-                            required 
-                            className="form-input"
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
+                            비밀번호 <span style={{ color: '#dc2626' }}>*</span>
+                        </label>
+                        <input
+                            type="password"
+                            name="memberPw"
+                            value={formData.memberPw}
+                            onChange={handleChange}
+                            placeholder="8자 이상, 영문+숫자+특수문자"
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                border: errors.memberPw ? '1px solid #dc2626' : '1px solid #d1d5db',
+                                borderRadius: '6px'
+                            }}
                         />
+                        {formData.memberPw && (
+                            <div style={{ marginTop: '10px' }}>
+                                <div style={{ height: '6px', backgroundColor: '#e5e7eb', borderRadius: '3px', overflow: 'hidden' }}>
+                                    <div
+                                        style={{
+                                            width: `${(passwordStrength / 5) * 100}%`,
+                                            height: '100%',
+                                            backgroundColor: getStrengthColor(),
+                                            transition: 'all 0.3s'
+                                        }}
+                                    />
+                                </div>
+                                <p style={{ fontSize: '12px', marginTop: '5px', color: getStrengthColor() }}>
+                                    강도: {getStrengthText()}
+                                </p>
+                            </div>
+                        )}
+                        {errors.memberPw && (
+                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                                {errors.memberPw}
+                            </p>
+                        )}
+                        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
+                            영문 대소문자, 숫자, 특수문자를 모두 포함해야 합니다.
+                        </p>
                     </div>
                     
-                    {/* 3. 이름 */}
-                    <div className="form-group">
-                        <label className="required form-label" htmlFor="memberName">이름</label>
-                        <input 
-                            type="text" 
-                            id="memberName" 
-                            name="memberName" 
-                            placeholder="이름을 입력해주세요." 
-                            required 
-                            className="form-input"
+                    {/* 3. 비밀번호 확인 */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
+                            비밀번호 확인 <span style={{ color: '#dc2626' }}>*</span>
+                        </label>
+                        <input
+                            type="password"
+                            name="confirmPw"
+                            value={formData.confirmPw}
+                            onChange={handleChange}
+                            placeholder="비밀번호를 다시 입력해주세요"
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                border: errors.confirmPw ? '1px solid #dc2626' : '1px solid #d1d5db',
+                                borderRadius: '6px'
+                            }}
                         />
+                        {formData.confirmPw && formData.memberPw === formData.confirmPw && (
+                            <p style={{ color: '#10b981', fontSize: '14px', marginTop: '5px' }}>
+                                ✓ 비밀번호가 일치합니다.
+                            </p>
+                        )}
+                        {errors.confirmPw && (
+                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                                {errors.confirmPw}
+                            </p>
+                        )}
                     </div>
                     
-                    {/* 4. 전화번호 */}
-                    <div className="form-group">
-                        <label className="required form-label" htmlFor="phone">전화번호</label>
-                        <input 
-                            type="text" 
-                            id="phone" 
-                            name="phone" 
-                            placeholder="전화번호를 입력해주세요." 
-                            required 
-                            className="form-input"
+                    {/* 4. 이름 */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
+                            이름 <span style={{ color: '#dc2626' }}>*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="memberName"
+                            value={formData.memberName}
+                            onChange={handleChange}
+                            placeholder="이름을 입력해주세요"
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                border: errors.memberName ? '1px solid #dc2626' : '1px solid #d1d5db',
+                                borderRadius: '6px'
+                            }}
                         />
+                        {errors.memberName && (
+                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                                {errors.memberName}
+                            </p>
+                        )}
                     </div>
                     
-                    {/* 5. 이메일 */}
-                    <div className="form-group email-group">
-                        <label className="required form-label" htmlFor="emailId">이메일</label>
-                        <div className="email-input-group">
-                            <input 
-                                type="text" 
-                                id="emailId" 
-                                name="emailId" 
-                                required 
-                                className="form-input email-id-input"
+                    {/* 5. 전화번호 */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
+                            전화번호 <span style={{ color: '#dc2626' }}>*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            placeholder="01012345678 (- 없이 입력)"
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                border: errors.phone ? '1px solid #dc2626' : '1px solid #d1d5db',
+                                borderRadius: '6px'
+                            }}
+                        />
+                        {errors.phone && (
+                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                                {errors.phone}
+                            </p>
+                        )}
+                    </div>
+                    
+                    {/* 6. 이메일 + 인증 */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
+                            이메일 <span style={{ color: '#dc2626' }}>*</span>
+                        </label>
+                        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                            <input
+                                type="text"
+                                name="emailId"
+                                value={formData.emailId}
+                                onChange={handleChange}
+                                placeholder="이메일"
+                                disabled={emailVerified}
+                                style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '6px'
+                                }}
                             />
-                            <span className="separator">@</span>
-                            
-                            <select 
-                                name="emailDomainSelect" 
-                                onChange={(e) => setSelectedDomain(e.target.value)}
+                            <span style={{ alignSelf: 'center' }}>@</span>
+                            <select
                                 value={selectedDomain}
-                                className="form-select email-select"
+                                onChange={(e) => setSelectedDomain(e.target.value)}
+                                disabled={emailVerified}
+                                style={{
+                                    padding: '12px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '6px'
+                                }}
                             >
                                 {emailDomains.map((domain, index) => (
-                                    <option key={index} value={domain}>
-                                        {domain}
-                                    </option>
+                                    <option key={index} value={domain}>{domain}</option>
                                 ))}
                             </select>
-
                             {isCustomDomain && (
-                                <input 
-                                    type="text" 
-                                    name="emailDomain" 
-                                    placeholder="직접 입력" 
-                                    required 
-                                    className="form-input custom-domain-input"
+                                <input
+                                    type="text"
+                                    name="customDomain"
+                                    value={formData.customDomain}
+                                    onChange={handleChange}
+                                    placeholder="직접입력"
+                                    disabled={emailVerified}
+                                    style={{
+                                        flex: 1,
+                                        padding: '12px',
+                                        border: '1px solid #d1d5db',
+                                        borderRadius: '6px'
+                                    }}
                                 />
                             )}
                         </div>
+                        
+                        {!emailVerified && (
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={handleSendVerificationCode}
+                                    disabled={loading || verificationSent}
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px',
+                                        backgroundColor: verificationSent ? '#9ca3af' : '#2563eb',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        marginBottom: '10px',
+                                        cursor: verificationSent ? 'not-allowed' : 'pointer'
+                                    }}
+                                >
+                                    {verificationSent ? `재전송 (${formatTime(verificationTimer)})` : '인증 코드 발송'}
+                                </button>
+                                
+                                {verificationSent && (
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <input
+                                            type="text"
+                                            value={emailVerificationCode}
+                                            onChange={(e) => setEmailVerificationCode(e.target.value)}
+                                            placeholder="인증 코드 6자리"
+                                            maxLength={6}
+                                            style={{
+                                                flex: 1,
+                                                padding: '12px',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '6px'
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleVerifyCode}
+                                            disabled={loading}
+                                            style={{
+                                                padding: '12px 20px',
+                                                backgroundColor: '#10b981',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '6px',
+                                                cursor: 'pointer',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            확인
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                        
+                        {emailVerified && (
+                            <div style={{ backgroundColor: '#d1fae5', padding: '12px', borderRadius: '6px', textAlign: 'center' }}>
+                                <p style={{ color: '#065f46', fontWeight: '600' }}>
+                                    ✓ 이메일 인증이 완료되었습니다.
+                                </p>
+                            </div>
+                        )}
+                        
+                        {errors.email && (
+                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                                {errors.email}
+                            </p>
+                        )}
                     </div>
-
-                    {/* 6. 성별 */}
-                    <div className="form-group gender-group">
-                        <span className="form-label gender-label">성별</span>
-                        <div className="gender-options">
-                            <label className="radio-label">
-                                <input type="radio" name="gender" value="M" defaultChecked className="radio-input" />
-                                <span className="radio-text">남</span>
+                    
+                    {/* 7. 성별 */}
+                    <div style={{ marginBottom: '30px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
+                            성별
+                        </label>
+                        <div style={{ display: 'flex', gap: '20px' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                <input
+                                    type="radio"
+                                    name="gender"
+                                    value="M"
+                                    checked={formData.gender === 'M'}
+                                    onChange={handleChange}
+                                    style={{ marginRight: '8px' }}
+                                />
+                                <span>남</span>
                             </label>
-                            <label className="radio-label">
-                                <input type="radio" name="gender" value="F" className="radio-input" />
-                                <span className="radio-text">여</span>
+                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                <input
+                                    type="radio"
+                                    name="gender"
+                                    value="F"
+                                    checked={formData.gender === 'F'}
+                                    onChange={handleChange}
+                                    style={{ marginRight: '8px' }}
+                                />
+                                <span>여</span>
                             </label>
                         </div>
                     </div>
                     
                     {/* 제출 버튼 */}
-                    <button 
-                        type="submit" 
-                        className="signup-button"
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        style={{
+                            width: '100%',
+                            padding: '16px',
+                            backgroundColor: loading ? '#9ca3af' : '#2563eb',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            cursor: loading ? 'not-allowed' : 'pointer'
+                        }}
                     >
-                        가입하기
+                        {loading ? '처리 중...' : '가입하기'}
                     </button>
                 </form>
             </div>

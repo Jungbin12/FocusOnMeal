@@ -29,11 +29,21 @@ public interface MemberMapper {
 //
 //	int updateStatusYn(String memberId, String statusYn);
 
-	Member selectOneById(String memberId);
+	// package com.fom.boot.domain.member.model.mapper;
+	// public interface MemberMapper { ... } 내부에 추가
 
-	String searchMemberId(String memberName, String email);
+	// 1. 회원 ID로 회원 정보 조회 (PasswordResetService.sendPasswordResetLink에서 사용)
+	Member selectOneById(@Param("memberId") String memberId);
 
-	int updateMemberPassword(String memberId, String encodedPassword);
+	// 2. 비밀번호 업데이트 (PasswordResetService.resetPassword에서 사용)
+	int updateMemberPassword(@Param("memberId") String memberId, @Param("encodedPw") String encodedPw);
+
+	// 3. 이름/이메일로 회원 ID 조회 (PasswordResetService.sendMemberIdByEmail에서 사용)
+	String searchMemberId(@Param("memberName") String memberName, @Param("email") String email);
+
+	int checkEmailExists(String email);
+	
+	
 
 }
 

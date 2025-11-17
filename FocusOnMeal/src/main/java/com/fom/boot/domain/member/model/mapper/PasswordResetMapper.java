@@ -108,4 +108,29 @@ public interface PasswordResetMapper {
      * @return 삭제된 행 수
      */
     int deleteOldUsedTokens(@Param("days") int days);
+    
+// ========== 유틸리티 메서드 ==========
+    
+    // ... getClientIpAddress 메서드 ...
+
+    /**
+     * 비밀번호 유효성 검증
+     * 조건: 8자 이상, 영문 + 숫자 + 특수문자 포함
+     */
+    private boolean isValidPassword(String password) {
+        if (password == null || password.length() < 8) {
+            return false;
+        }
+        
+        // 영문 포함 여부
+        boolean hasLetter = password.matches(".*[A-Za-z].*");
+        
+        // 숫자 포함 여부
+        boolean hasDigit = password.matches(".*\\d.*");
+        
+        // 특수문자 포함 여부
+        boolean hasSpecial = password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*");
+        
+        return hasLetter && hasDigit && hasSpecial;
+    }
 }
