@@ -33,7 +33,7 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
     @Override
     @Transactional
     public boolean syncTodayPrice(String itemCategoryCode, String itemCode, String kindCode) {
-        log.info("오늘 가격 동기화 시작 - 부류: {}, 품목: {}, 품종: {}", itemCategoryCode, itemCode, kindCode);
+        log.info("Today price sync started - category: {}, item: {}, kind: {}", itemCategoryCode, itemCode, kindCode);
 
         try {
             // 오늘 날짜로 API 호출
@@ -41,7 +41,7 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             String response = kamisApiService.getPeriodProductList(today, today, itemCategoryCode, itemCode, kindCode);
 
             if (response == null) {
-                log.error("KAMIS API 응답이 null입니다.");
+                log.error("KAMIS API response is null");
                 return false;
             }
 
@@ -49,7 +49,7 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             return parseAndSaveData(response, itemCategoryCode, itemCode, kindCode);
 
         } catch (Exception e) {
-            log.error("가격 동기화 실패", e);
+            log.error("Price sync failed", e);
             return false;
         }
     }
@@ -57,21 +57,21 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
     @Override
     @Transactional
     public int syncCategoryPrices(String itemCategoryCode) {
-        log.info("카테고리 전체 동기화 시작 - 부류: {}", itemCategoryCode);
+        log.info("Category sync started - category: {}", itemCategoryCode);
 
         try {
             String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             String response = kamisApiService.getDailyPriceByCategoryList(itemCategoryCode, today);
 
             if (response == null) {
-                log.error("KAMIS API 응답이 null입니다.");
+                log.error("KAMIS API response is null");
                 return 0;
             }
 
             return parseAndSaveAllItems(response, itemCategoryCode);
 
         } catch (Exception e) {
-            log.error("카테고리 전체 동기화 실패", e);
+            log.error("Category sync failed", e);
             return 0;
         }
     }
@@ -79,14 +79,14 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
     @Override
     @Transactional
     public String syncAndGetResult(String itemCategoryCode, String itemCode, String kindCode) {
-        log.info("테스트 동기화 시작 - 부류: {}, 품목: {}, 품종: {}", itemCategoryCode, itemCode, kindCode);
+        log.info("Test sync started - category: {}, item: {}, kind: {}", itemCategoryCode, itemCode, kindCode);
 
         try {
             String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             String response = kamisApiService.getPeriodProductList(today, today, itemCategoryCode, itemCode, kindCode);
 
             if (response == null) {
-                return "KAMIS API 응답이 null입니다.";
+                return "KAMIS API response is null";
             }
 
             // JSON 파싱
@@ -96,30 +96,30 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             // 에러 체크
             if (data.isArray() && data.size() > 0 && !data.get(0).isObject()) {
                 String errorCode = data.get(0).asText();
-                return "KAMIS API 에러 코드: " + errorCode;
+                return "KAMIS API error code: " + errorCode;
             }
 
             JsonNode items = data.path("item");
             if (!items.isArray() || items.size() == 0) {
-                return "데이터 없음";
+                return "No data";
             }
 
             // 품목 정보 추출 (첫 번째 아이템에서)
             String itemName = extractItemName(items);
             if (itemName == null) {
-                return "품목명을 찾을 수 없습니다.";
+                return "Item name not found";
             }
 
             // Ingredient 저장 또는 조회
             Ingredient ingredient = getOrCreateIngredient(itemName, itemCategoryCode, itemCode, kindCode);
             if (ingredient == null) {
-                return "식자재 저장 실패";
+                return "Ingredient save failed";
             }
 
             // 오늘 날짜의 평균 가격 추출
             Integer avgPrice = extractTodayAveragePrice(items, today);
             if (avgPrice == null) {
-                return "오늘 날짜의 평균 가격을 찾을 수 없습니다.";
+                return "Today's average price not found";
             }
 
             // PriceHistory 저장
@@ -133,15 +133,15 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             int saved = priceHistoryMapper.insertPrice(priceHistory);
 
             if (saved > 0) {
-                return String.format("동기화 성공 - 품목: %s, 가격: %d원, ingredientId: %d",
+                return String.format("Sync success - item: %s, price: %d KRW, ingredientId: %d",
                         itemName, avgPrice, ingredient.getIngredientId());
             } else {
-                return "가격 이력 저장 실패";
+                return "Price history save failed";
             }
 
         } catch (Exception e) {
-            log.error("테스트 동기화 실패", e);
-            return "에러: " + e.getMessage();
+            log.error("Test sync failed", e);
+            return "Error: " + e.getMessage();
         }
     }
 
@@ -156,20 +156,20 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             // 에러 체크
             if (data.isArray() && data.size() > 0 && !data.get(0).isObject()) {
                 String errorCode = data.get(0).asText();
-                log.error("KAMIS API 에러 코드: {}", errorCode);
+                log.error("KAMIS API error code: {}", errorCode);
                 return false;
             }
 
             JsonNode items = data.path("item");
             if (!items.isArray() || items.size() == 0) {
-                log.warn("응답 데이터 없음");
+                log.warn("No response data");
                 return false;
             }
 
             // 품목 정보 추출
             String itemName = extractItemName(items);
             if (itemName == null) {
-                log.error("품목명을 찾을 수 없습니다.");
+                log.error("Item name not found");
                 return false;
             }
 
@@ -183,7 +183,7 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             Integer avgPrice = extractTodayAveragePrice(items, today);
             if (avgPrice == null) {
-                log.warn("오늘 날짜의 평균 가격을 찾을 수 없습니다.");
+                log.warn("Today's average price not found");
                 return false;
             }
 
@@ -196,12 +196,12 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             priceHistory.setCollectedDate(LocalDateTime.now());
 
             int saved = priceHistoryMapper.insertPrice(priceHistory);
-            log.info("가격 이력 저장 완료 - 품목: {}, 가격: {}원", itemName, avgPrice);
+            log.info("Price history saved - item: {}, price: {} KRW", itemName, avgPrice);
 
             return saved > 0;
 
         } catch (Exception e) {
-            log.error("데이터 파싱 및 저장 실패", e);
+            log.error("Data parsing and save failed", e);
             return false;
         }
     }
@@ -254,7 +254,7 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
         // 기존 데이터 확인
         Ingredient existing = ingredientMapper.selectByKamisCode(itemCode, kindCode);
         if (existing != null) {
-            log.debug("기존 식자재 사용 - id: {}, name: {}", existing.getIngredientId(), existing.getName());
+            log.debug("Using existing ingredient - id: {}, name: {}", existing.getIngredientId(), existing.getName());
             return existing;
         }
 
@@ -269,11 +269,11 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
 
         int inserted = ingredientMapper.insertIngredient(newIngredient);
         if (inserted > 0) {
-            log.info("새 식자재 등록 - id: {}, name: {}", newIngredient.getIngredientId(), itemName);
+            log.info("New ingredient registered - id: {}, name: {}", newIngredient.getIngredientId(), itemName);
             return newIngredient;
         }
 
-        log.error("식자재 등록 실패 - name: {}", itemName);
+        log.error("Ingredient registration failed - name: {}", itemName);
         return null;
     }
 
@@ -282,20 +282,20 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
      */
     private String getCategoryName(String code) {
         return switch (code) {
-            case "100" -> "식량작물";
-            case "200" -> "채소류";
-            case "300" -> "특용작물";
-            case "400" -> "과일류";
-            case "500" -> "축산물";
-            case "600" -> "수산물";
-            default -> "기타";
+            case "100" -> "Grains";
+            case "200" -> "Vegetables";
+            case "300" -> "SpecialCrops";
+            case "400" -> "Fruits";
+            case "500" -> "Livestock";
+            case "600" -> "Seafood";
+            default -> "Others";
         };
     }
 
     @Override
     @Transactional
     public int syncAllCategories() {
-        log.info("전체 카테고리 동기화 시작");
+        log.info("All categories sync started");
 
         String[] categories = {"100", "200", "300", "400", "500", "600"};
         int totalSynced = 0;
@@ -304,20 +304,20 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             try {
                 int synced = syncCategoryPrices(category);
                 totalSynced += synced;
-                log.info("카테고리 {} 동기화 완료 - {}개 품목", getCategoryName(category), synced);
+                log.info("Category {} sync completed - {} items", getCategoryName(category), synced);
             } catch (Exception e) {
-                log.error("카테고리 {} 동기화 실패", category, e);
+                log.error("Category {} sync failed", category, e);
             }
         }
 
-        log.info("전체 카테고리 동기화 완료 - 총 {}개 품목", totalSynced);
+        log.info("All categories sync completed - total {} items", totalSynced);
         return totalSynced;
     }
 
     @Override
     @Transactional
     public String syncAllCategoriesAndGetResult() {
-        log.info("전체 카테고리 동기화 시작 (결과 반환)");
+        log.info("All categories sync started (with result)");
 
         StringBuilder result = new StringBuilder();
         String[] categories = {"100", "200", "300", "400", "500", "600"};
@@ -327,14 +327,14 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             try {
                 int synced = syncCategoryPrices(category);
                 totalSynced += synced;
-                result.append(String.format("%s: %d개, ", getCategoryName(category), synced));
+                result.append(String.format("%s: %d, ", getCategoryName(category), synced));
             } catch (Exception e) {
-                log.error("카테고리 {} 동기화 실패", category, e);
-                result.append(String.format("%s: 실패, ", getCategoryName(category)));
+                log.error("Category {} sync failed", category, e);
+                result.append(String.format("%s: failed, ", getCategoryName(category)));
             }
         }
 
-        String finalResult = String.format("동기화 완료 - 총 %d개 품목 [%s]", totalSynced, result.toString());
+        String finalResult = String.format("Sync completed - total %d items [%s]", totalSynced, result.toString());
         log.info(finalResult);
         return finalResult;
     }
@@ -350,13 +350,13 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             // 에러 체크
             if (data.isArray() && data.size() > 0 && !data.get(0).isObject()) {
                 String errorCode = data.get(0).asText();
-                log.error("KAMIS API 에러 코드: {}", errorCode);
+                log.error("KAMIS API error code: {}", errorCode);
                 return 0;
             }
 
             JsonNode items = data.path("item");
             if (!items.isArray() || items.size() == 0) {
-                log.warn("응답 데이터 없음 - 카테고리: {}", categoryCode);
+                log.warn("No response data - category: {}", categoryCode);
                 return 0;
             }
 
@@ -378,7 +378,7 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
                     // 가격 추출 (dpr1: 당일)
                     String priceStr = item.path("dpr1").asText();
                     if (priceStr == null || priceStr.isEmpty() || "-".equals(priceStr)) {
-                        log.debug("가격 없음 - 품목: {}", itemName);
+                        log.debug("No price - item: {}", itemName);
                         continue;
                     }
 
@@ -393,7 +393,7 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
                     // 오늘 이미 저장된 가격이 있는지 확인
                     int exists = priceHistoryMapper.checkTodayPriceExists(ingredient.getIngredientId());
                     if (exists > 0) {
-                        log.debug("오늘 가격 이미 존재 - 품목: {}, 건너뜀", itemName);
+                        log.debug("Today's price already exists - item: {}, skipped", itemName);
                         continue;
                     }
 
@@ -408,19 +408,19 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
                     int saved = priceHistoryMapper.insertPrice(priceHistory);
                     if (saved > 0) {
                         savedCount++;
-                        log.debug("가격 저장 - 품목: {}, 가격: {}원", itemName, price);
+                        log.debug("Price saved - item: {}, price: {} KRW", itemName, price);
                     }
 
                 } catch (Exception e) {
-                    log.warn("품목 저장 실패", e);
+                    log.warn("Item save failed", e);
                 }
             }
 
-            log.info("카테고리 {} 저장 완료 - {}개 품목", getCategoryName(categoryCode), savedCount);
+            log.info("Category {} save completed - {} items", getCategoryName(categoryCode), savedCount);
             return savedCount;
 
         } catch (Exception e) {
-            log.error("전체 품목 파싱 및 저장 실패", e);
+            log.error("All items parsing and save failed", e);
             return 0;
         }
     }

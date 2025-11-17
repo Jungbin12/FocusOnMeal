@@ -41,7 +41,7 @@ public class KamisApiServiceImpl implements KamisApiService {
      * @return 가격 정보 (원)
      */
     public Integer getRetailPrice(String itemName) {
-        log.info("KAMIS API 호출 - 품목: {}", itemName);
+        log.info("KAMIS API call - item: {}", itemName);
 
         try {
             String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -58,7 +58,7 @@ public class KamisApiServiceImpl implements KamisApiService {
                     .build()
                     .toUriString();
 
-            log.debug("KAMIS API 요청 URL: {}", url);
+            log.debug("KAMIS API request URL: {}", url);
 
             // API 호출
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
@@ -67,15 +67,15 @@ public class KamisApiServiceImpl implements KamisApiService {
             Integer price = parsePriceFromResponse(response.getBody(), itemName);
 
             if (price != null) {
-                log.info("KAMIS API 호출 성공 - 품목: {}, 가격: {}원", itemName, price);
+                log.info("KAMIS API call success - item: {}, price: {} KRW", itemName, price);
             } else {
-                log.warn("KAMIS API - 품목을 찾을 수 없음: {}", itemName);
+                log.warn("KAMIS API - item not found: {}", itemName);
             }
 
             return price;
 
         } catch (Exception e) {
-            log.error("KAMIS API 호출 실패 - 품목: {}", itemName, e);
+            log.error("KAMIS API call failed - item: {}", itemName, e);
             return null;
         }
     }
@@ -88,7 +88,7 @@ public class KamisApiServiceImpl implements KamisApiService {
      * @return 가격 (원/kg)
      */
     public Integer getDailyPrice(String categoryCode, String itemCode) {
-        log.info("KAMIS API 일일가격 조회 - 부류: {}, 품목코드: {}", categoryCode, itemCode);
+        log.info("KAMIS API daily price query - category: {}, itemCode: {}", categoryCode, itemCode);
 
         try {
             String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -110,7 +110,7 @@ public class KamisApiServiceImpl implements KamisApiService {
             return parseFirstPrice(response.getBody());
 
         } catch (Exception e) {
-            log.error("KAMIS API 일일가격 조회 실패", e);
+            log.error("KAMIS API daily price query failed", e);
             return null;
         }
     }
@@ -126,7 +126,7 @@ public class KamisApiServiceImpl implements KamisApiService {
             // 에러 응답 체크: {"data":["001"]} 형태
             if (data.isArray() && data.size() > 0 && !data.get(0).isObject()) {
                 String errorCode = data.get(0).asText();
-                log.warn("KAMIS API - 에러 코드: {}", errorCode);
+                log.warn("KAMIS API - error code: {}", errorCode);
                 return null;
             }
 
@@ -139,7 +139,7 @@ public class KamisApiServiceImpl implements KamisApiService {
             }
 
             if (items == null || !items.isArray() || items.size() == 0) {
-                log.warn("KAMIS API - 응답 데이터 없음");
+                log.warn("KAMIS API - no response data");
                 return null;
             }
 
@@ -159,14 +159,14 @@ public class KamisApiServiceImpl implements KamisApiService {
                     // 2. 1일전 가격 시도
                     priceStr = item.path("dpr2").asText();
                     if (priceStr != null && !priceStr.isEmpty() && !"-".equals(priceStr)) {
-                        log.debug("당일 가격 없음, 1일전 가격 사용: {}", priceStr);
+                        log.debug("No today price, using 1 day ago: {}", priceStr);
                         return Integer.parseInt(priceStr.replace(",", ""));
                     }
 
                     // 3. 1주일전 가격 시도
                     priceStr = item.path("dpr3").asText();
                     if (priceStr != null && !priceStr.isEmpty() && !"-".equals(priceStr)) {
-                        log.debug("1일전 가격 없음, 1주일전 가격 사용: {}", priceStr);
+                        log.debug("No 1 day ago price, using 1 week ago: {}", priceStr);
                         return Integer.parseInt(priceStr.replace(",", ""));
                     }
                 }
@@ -175,7 +175,7 @@ public class KamisApiServiceImpl implements KamisApiService {
             return null;
 
         } catch (Exception e) {
-            log.error("KAMIS 응답 파싱 실패", e);
+            log.error("KAMIS response parsing failed", e);
             return null;
         }
     }
@@ -191,7 +191,7 @@ public class KamisApiServiceImpl implements KamisApiService {
             // 에러 응답 체크: {"data":["001"]} 형태
             if (data.isArray() && data.size() > 0 && !data.get(0).isObject()) {
                 String errorCode = data.get(0).asText();
-                log.warn("KAMIS API - 에러 코드: {}", errorCode);
+                log.warn("KAMIS API - error code: {}", errorCode);
                 return null;
             }
 
@@ -218,20 +218,20 @@ public class KamisApiServiceImpl implements KamisApiService {
 
             priceStr = firstItem.path("dpr2").asText();
             if (priceStr != null && !priceStr.isEmpty() && !"-".equals(priceStr)) {
-                log.debug("당일 가격 없음, 1일전 가격 사용");
+                log.debug("No today price, using 1 day ago");
                 return Integer.parseInt(priceStr.replace(",", ""));
             }
 
             priceStr = firstItem.path("dpr3").asText();
             if (priceStr != null && !priceStr.isEmpty() && !"-".equals(priceStr)) {
-                log.debug("1일전 가격 없음, 1주일전 가격 사용");
+                log.debug("No 1 day ago price, using 1 week ago");
                 return Integer.parseInt(priceStr.replace(",", ""));
             }
 
             return null;
 
         } catch (Exception e) {
-            log.error("가격 파싱 실패", e);
+            log.error("Price parsing failed", e);
             return null;
         }
     }
@@ -240,7 +240,7 @@ public class KamisApiServiceImpl implements KamisApiService {
      * API 연결 테스트
      */
     public String testConnection() {
-        log.info("KAMIS API 연결 테스트 시작");
+        log.info("KAMIS API connection test started");
 
         try {
             // 오늘부터 7일 전까지 시도
@@ -263,14 +263,14 @@ public class KamisApiServiceImpl implements KamisApiService {
                             .build()
                             .toUriString();
 
-                    log.debug("KAMIS API 테스트 - 날짜: {}, 부류: {}", testDate, categoryCode);
+                    log.debug("KAMIS API test - date: {}, category: {}", testDate, categoryCode);
 
                     try {
                         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
                         if (response.getStatusCode().is2xxSuccessful()) {
                             String responseBody = response.getBody();
-                            log.debug("KAMIS API 응답: {}", responseBody);
+                            log.debug("KAMIS API response: {}", responseBody);
 
                             JsonNode root = objectMapper.readTree(responseBody);
                             JsonNode data = root.path("data");
@@ -281,29 +281,29 @@ public class KamisApiServiceImpl implements KamisApiService {
                                 JsonNode items = data.path("item");
                                 if (items.isArray() && items.size() > 0) {
                                     String categoryName = getCategoryName(categoryCode);
-                                    log.info("KAMIS API 연결 성공 - 날짜: {}, 부류: {}, 품목 수: {}",
+                                    log.info("KAMIS API connection success - date: {}, category: {}, items: {}",
                                             testDate, categoryName, items.size());
-                                    return String.format("연결 성공 - %s (%s) %d개 품목 조회됨",
+                                    return String.format("Connection success - %s (%s) %d items found",
                                             testDate, categoryName, items.size());
                                 }
                             } else if (data.isArray() && data.size() > 0) {
                                 // 에러 코드 배열인 경우
                                 String errorCode = data.get(0).asText();
-                                log.debug("KAMIS API 에러 코드 - 날짜: {}, 부류: {}, 코드: {}",
+                                log.debug("KAMIS API error code - date: {}, category: {}, code: {}",
                                         testDate, categoryCode, errorCode);
                             }
                         }
                     } catch (Exception e) {
-                        log.debug("KAMIS API 테스트 실패 - 날짜: {}, 부류: {}", testDate, categoryCode);
+                        log.debug("KAMIS API test failed - date: {}, category: {}", testDate, categoryCode);
                     }
                 }
             }
 
-            return "연결 성공하나 최근 7일간 데이터 없음 (주말/공휴일 가능성)";
+            return "Connection success but no data for recent 7 days (possibly weekend/holiday)";
 
         } catch (Exception e) {
-            log.error("KAMIS API 연결 테스트 실패", e);
-            return "연결 실패: " + e.getMessage();
+            log.error("KAMIS API connection test failed", e);
+            return "Connection failed: " + e.getMessage();
         }
     }
 
@@ -312,11 +312,11 @@ public class KamisApiServiceImpl implements KamisApiService {
      */
     private String getCategoryName(String code) {
         return switch (code) {
-            case "100" -> "식량작물";
-            case "200" -> "채소류";
-            case "300" -> "과일류";
-            case "400" -> "축산물";
-            default -> "기타";
+            case "100" -> "Grains";
+            case "200" -> "Vegetables";
+            case "300" -> "Fruits";
+            case "400" -> "Livestock";
+            default -> "Others";
         };
     }
 
@@ -324,7 +324,7 @@ public class KamisApiServiceImpl implements KamisApiService {
      * KAMIS API 원본 응답 조회 (디버깅용)
      */
     public String getRawResponse(String date, String categoryCode) {
-        log.info("KAMIS API 원본 응답 조회 - 날짜: {}, 부류: {}", date, categoryCode);
+        log.info("KAMIS API raw response query - date: {}, category: {}", date, categoryCode);
 
         try {
             // 날짜가 null이면 오늘 날짜 사용
@@ -350,7 +350,7 @@ public class KamisApiServiceImpl implements KamisApiService {
             return response.getBody();
 
         } catch (Exception e) {
-            log.error("KAMIS API 원본 응답 조회 실패", e);
+            log.error("KAMIS API raw response query failed", e);
             return "ERROR: " + e.getMessage();
         }
     }
@@ -369,7 +369,7 @@ public class KamisApiServiceImpl implements KamisApiService {
     @Override
     public String getPeriodProductList(String startDay, String endDay, String itemCategoryCode,
                                          String itemCode, String kindCode) {
-        log.info("KAMIS API periodProductList 호출 - 기간: {} ~ {}, 부류: {}, 품목: {}, 품종: {}",
+        log.info("KAMIS API periodProductList call - period: {} ~ {}, category: {}, item: {}, kind: {}",
                 startDay, endDay, itemCategoryCode, itemCode, kindCode);
 
         try {
@@ -390,15 +390,15 @@ public class KamisApiServiceImpl implements KamisApiService {
                     .build()
                     .toUriString();
 
-            log.debug("KAMIS API 요청 URL: {}", url);
+            log.debug("KAMIS API request URL: {}", url);
 
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
-            log.info("KAMIS API periodProductList 호출 성공");
+            log.info("KAMIS API periodProductList call success");
             return response.getBody();
 
         } catch (Exception e) {
-            log.error("KAMIS API periodProductList 호출 실패", e);
+            log.error("KAMIS API periodProductList call failed", e);
             return null;
         }
     }
@@ -413,7 +413,7 @@ public class KamisApiServiceImpl implements KamisApiService {
      */
     @Override
     public String getDailyPriceByCategoryList(String categoryCode, String regDay) {
-        log.info("KAMIS API dailyPriceByCategoryList 호출 - 부류: {}, 날짜: {}", categoryCode, regDay);
+        log.info("KAMIS API dailyPriceByCategoryList call - category: {}, date: {}", categoryCode, regDay);
 
         try {
             if (regDay == null || regDay.isEmpty()) {
@@ -433,15 +433,15 @@ public class KamisApiServiceImpl implements KamisApiService {
                     .build()
                     .toUriString();
 
-            log.debug("KAMIS API 요청 URL: {}", url);
+            log.debug("KAMIS API request URL: {}", url);
 
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
-            log.info("KAMIS API dailyPriceByCategoryList 호출 성공");
+            log.info("KAMIS API dailyPriceByCategoryList call success");
             return response.getBody();
 
         } catch (Exception e) {
-            log.error("KAMIS API dailyPriceByCategoryList 호출 실패", e);
+            log.error("KAMIS API dailyPriceByCategoryList call failed", e);
             return null;
         }
     }
