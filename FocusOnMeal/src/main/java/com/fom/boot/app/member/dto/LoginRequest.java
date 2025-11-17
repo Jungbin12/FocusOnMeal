@@ -10,5 +10,4 @@ import lombok.ToString;
 public class LoginRequest {
 	private String memberId;
 	private String memberPw;
-	private String memberNickname;
 }

@@ -140,4 +140,13 @@
 	    WHERE MEMBER_ID = #{memberId}
 	</update>
 	 -->
+	 
+	 <!-- 이메일 중복 확인 -->
+<select id="checkEmailExists" parameterType="String" resultType="int">
+    SELECT COUNT(*)
+    FROM MEMBER
+    WHERE EMAIL = #{email}
+      AND STATUS_YN = 'Y'
+</select>
+	 
   </mapper>
