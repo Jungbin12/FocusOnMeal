@@ -35,9 +35,6 @@ public class AdminController {
 	//회원 목록 조회
 	@GetMapping("/memberInfo")
 	public ResponseEntity<?> selectMembers(Authentication authentication) {
-		System.out.println("Auth name = " + authentication.getName());
-		System.out.println("Auth authorities = " + authentication.getAuthorities());
-
 		// 1. 토큰 인증 체크
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, String> error = new HashMap<>();
@@ -45,6 +42,9 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
 
+        System.out.println("Auth name = " + authentication.getName());
+        System.out.println("Auth authorities = " + authentication.getAuthorities());
+        
         // 2. 토큰에서 관리자 여부 확인
         String memberId = authentication.getName();
         Member member = mService.findByMemberId(memberId);
@@ -68,14 +68,13 @@ public class AdminController {
 	        @RequestParam String memberId,
 	        @RequestParam String adminYn) {
 
-
 	    // 1. 토큰 인증 체크
 	    if (authentication == null || !authentication.isAuthenticated()) {
 	        Map<String, String> error = new HashMap<>();
 	        error.put("message", "로그인이 필요합니다.");
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
 	    }
-	    System.out.println("===  PATCH /memberInfo/adminYn 호출됨 ===");
+	    
 	    System.out.println("Auth name = " + authentication.getName());
 	    System.out.println("Auth authorities = " + authentication.getAuthorities());
 
@@ -130,9 +129,6 @@ public class AdminController {
 	// 관리자 공지사항 조회
 		@GetMapping("/noticeInfo")
 		public ResponseEntity<?> selectNotices(Authentication authentication) {
-			 System.out.println("Auth name = " + authentication.getName());
-			 System.out.println("Auth authorities = " + authentication.getAuthorities());
-
 			// 1. 토큰 인증 체크
 	        if (authentication == null || !authentication.isAuthenticated()) {
 	            Map<String, String> error = new HashMap<>();
@@ -140,6 +136,9 @@ public class AdminController {
 	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
 	        }
 
+	        System.out.println("Auth name = " + authentication.getName());
+	        System.out.println("Auth authorities = " + authentication.getAuthorities());
+	        
 	        // 2. 토큰에서 관리자 여부 확인
 	        String memberId = authentication.getName();
 	        Member member = mService.findByMemberId(memberId);
@@ -155,6 +154,4 @@ public class AdminController {
 	        List<Notice> list = nService.selectAllNotices();
 	        return ResponseEntity.ok(list);
 		}
-	
-
 }
