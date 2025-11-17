@@ -8,6 +8,8 @@ import Join from './pages/member/Join';
 import MyForm from './pages/member/MyForm';
 import Terms from './pages/member/TermsContent';
 import Privacy from './pages/member/PrivacyContent';
+import FindId from './pages/member/findId';
+import FindPw from './pages/member/findPassword';
 
 // 마이페이지
 import Dashboard from './pages/mypage/Dashboard';
@@ -41,6 +43,9 @@ function App() {
         <Route path="/member/terms" element={<Terms />} />
         <Route path="/member/privacy" element={<Privacy />} />
         <Route path="/member/Join" element={<Join />} />
+        <Route path="/member/findId" element={<FindId />} />
+        <Route path="/member/findPassword" element={<FindPw />} />
+
 
         {/* 마이페이지 관련 */}
         <Route path="/mypage" element={
