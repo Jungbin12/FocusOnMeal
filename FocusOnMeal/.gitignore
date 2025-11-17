@@ -66,3 +66,8 @@ build/
 
 # DB정보 제외
 application.properties
+
+# 로그 파일 무시
+logs/
+*.log
+server.log
