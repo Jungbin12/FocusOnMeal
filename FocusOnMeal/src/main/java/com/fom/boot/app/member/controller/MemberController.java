@@ -19,8 +19,10 @@ import com.fom.boot.domain.member.model.service.MemberService;
 import com.fom.boot.domain.member.model.vo.Member;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @CrossOrigin(origins = "http://localhost:5173")
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("member")
@@ -32,17 +34,22 @@ public class MemberController {
 
 	@PostMapping("login")
 	public ResponseEntity<?> checkLogin(@RequestBody LoginRequest loginRequest) {
+		// 로그인 시도 로그
+		log.info("[로그인 시도] ID: {}", loginRequest.getMemberId());
+				
 		try {
 			Member loginMember = mService.selectOneByLogin(loginRequest);
 
 			// 회원 정보 검증
 			if(loginMember == null || "N".equals(loginMember.getStatusYn())) {
+				log.warn("[로그인 실패] 존재하지 않는 회원: {}", loginRequest.getMemberId());
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body("회원정보가 없습니다.");
 			}
 
 			// 비밀번호 검증
 			if(!bcrypt.matches(loginRequest.getMemberPw(), loginMember.getMemberPw())) {
+				log.warn("[로그인 실패] 비밀번호 불일치: {}", loginRequest.getMemberId());
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body("비밀번호가 일치하지 않습니다.");
 			}
@@ -58,7 +65,7 @@ public class MemberController {
 				loginMember.getAdminYn(),
 				loginMember.getMemberNickname()
 			);
-
+			log.info("[로그인 성공] ID: {}", loginMember.getMemberId());
 			return ResponseEntity.ok(response);
 
 		} catch (Exception e) {
@@ -78,6 +85,7 @@ public class MemberController {
 		String token = authHeader.substring(7);
 		// 실제 운영 환경에서는 이 토큰을 Redis 같은 곳에 "블랙리스트"로 등록
 	    // 예: redisService.saveBlackList(token, jwtUtil.getExpiration(token));
+		log.info("[로그아웃] 토큰: {}", token.substring(0, 10) + "..."); // 토큰 일부만 로깅
 		return ResponseEntity.ok("로그아웃 완료");
 	}
 	
@@ -99,12 +107,17 @@ public class MemberController {
 	
 	@PostMapping("join")
 	public ResponseEntity<?> joinMember(@RequestBody Member member) {
+		// 회원가입 요청 로그 추가
+		log.info("[회원가입 시도] ID: {}, Name: {}", member.getMemberId(), member.getMemberName());
+		
 	    try {
 	        member.setMemberPw(bcrypt.encode(member.getMemberPw()));
 	        int result = mService.insertMember(member);
 	        if(result > 0) {
+	        	log.info("[회원가입 성공] ID: {}", member.getMemberId());
 	            return ResponseEntity.ok("회원가입 성공");
 	        } else {
+	        	log.warn("[회원가입 실패] DB 입력 실패 - ID: {}", member.getMemberId());
 	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 	                .body("회원가입 실패");
 	        }
