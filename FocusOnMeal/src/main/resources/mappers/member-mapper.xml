@@ -89,15 +89,14 @@
     </update>
 
     <!-- 아이디 찾기 -->
-    <select id="searchMemberId"
-            resultType="String">
-        SELECT MEMBER_ID
-        FROM MEMBER
-        WHERE MEMBER_NAME = #{memberName}
-          AND EMAIL = #{email}
-          AND STATUS_YN = 'Y'
-        FETCH FIRST 1 ROW ONLY
-    </select>
+    <select id="searchMemberId" parameterType="map" resultType="String">
+	  SELECT MEMBER_ID
+	  FROM MEMBER
+	  WHERE MEMBER_NAME = #{memberName}
+	    AND EMAIL = #{email}
+	    AND STATUS_YN = 'Y'
+	  FETCH FIRST 1 ROWS ONLY
+	</select>
 
     <!-- 회원 조회 -->
     <select id="selectOneById"

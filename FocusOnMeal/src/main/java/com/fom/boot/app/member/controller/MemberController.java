@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.fom.boot.app.jwt.JwtTokenProvider;
 import com.fom.boot.app.member.dto.*;
@@ -474,5 +475,12 @@ public class MemberController {
         boolean hasDigit = password.matches(".*\\d.*");
         boolean hasSpecial = password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*");
         return hasDigit && hasSpecial;
+    }
+    
+    @GetMapping("/password/resetPage")
+    public RedirectView passwordResetPage(@RequestParam("token") String token) {
+        // 프론트 리셋 페이지 URL로 리다이렉트 (프론트 포트에 맞게 변경)
+        String frontendUrl = "http://localhost:5173/member/reset-password?token=" + token;
+        return new RedirectView(frontendUrl);
     }
 }

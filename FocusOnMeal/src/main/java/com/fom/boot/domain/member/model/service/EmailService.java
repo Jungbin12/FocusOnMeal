@@ -47,10 +47,10 @@ public class EmailService {
             helper.setFrom("noreply@focusonmale.com"); // 발신자 주소
             
             // 재설정 링크 생성
-            String resetLink = appDomain + "/member/resetPassword?token=" + token;
+            String resetUrl = "http://localhost:3000/member/resetPassword?token=" + token;
             
             // HTML 이메일 내용 생성
-            String content = buildPasswordResetEmailHtml(memberId, resetLink);
+            String content = buildPasswordResetEmailHtml(memberId, resetUrl);
             helper.setText(content, true); // true = HTML 형식
             
             // 이메일 발송
