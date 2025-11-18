@@ -49,7 +49,8 @@ public class ChatController {
                     request.getWeight(),
                     request.getServingSize(),
                     request.getAllergies(),
-                    request.getMessage()
+                    request.getMessage(),
+                    request.getPreviousPrice()
             );
 
             log.info("Gemini API 응답 받음 (길이: {})", aiResponse.length());
@@ -224,7 +225,8 @@ public class ChatController {
                     70,   // 기본 몸무게
                     1,    // 1인분
                     List.of(), // 알러지 없음
-                    request.get("message")
+                    request.get("message"),
+                    null  // 이전 가격 없음
             );
 
             response.put("status", "SUCCESS");

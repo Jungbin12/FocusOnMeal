@@ -14,4 +14,5 @@ public class ChatRequest {
     private int weight = 70;         // 기본값
     private int servingSize = 1;     // 기본값
     private List<String> allergies = List.of(); // 기본값
+    private Integer previousPrice;   // 이전 추천 식단 가격 (더 저렴한 식단 요청 시 사용)
 }

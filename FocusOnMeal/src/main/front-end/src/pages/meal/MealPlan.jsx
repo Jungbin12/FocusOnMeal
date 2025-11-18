@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./MealPlan.css";
 
 const MealPlan = () => {
@@ -15,6 +15,23 @@ const MealPlan = () => {
     const [servingSize, setServingSize] = useState(1);
     const [showRecipeModal, setShowRecipeModal] = useState(false);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
+
+    // Refs
+    const resultBoxRef = useRef(null);
+    const lastMealCardRef = useRef(null);
+
+    // 새로운 식단 카드가 추가되면 자동 스크롤
+    useEffect(() => {
+        if (mealPlans.length > 0 && lastMealCardRef.current) {
+            // 부드러운 스크롤 애니메이션과 함께 마지막 카드로 이동
+            setTimeout(() => {
+                lastMealCardRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+            }, 100); // 카드 렌더링 후 스크롤
+        }
+    }, [mealPlans]);
 
     // 알러지 목록
     const allergyList = [
@@ -79,19 +96,31 @@ const MealPlan = () => {
         setLoading(true);
         addMessage(message, "user");
 
+        // 이전 가격 확인 (더 저렴한 식단 요청 시 사용)
+        const priceKeywords = ["더 싼", "저렴한", "싸게", "싼", "가성비", "경제적", "저가"];
+        const needsCheaperMeal = priceKeywords.some(keyword => message.includes(keyword));
+        const lastPrice = mealPlans.length > 0 ? mealPlans[mealPlans.length - 1].calculatedPrice : null;
+
         try {
+            const requestBody = {
+                height: parseInt(height),
+                weight: parseInt(weight),
+                servingSize: 1,
+                allergies: allergies,
+                message: message
+            };
+
+            // 저렴한 식단을 요청하고 이전 식단이 있으면 previousPrice 추가
+            if (needsCheaperMeal && lastPrice) {
+                requestBody.previousPrice = lastPrice;
+            }
+
             const response = await fetch("http://localhost:8080/api/chat/meal-recommendation", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    height: parseInt(height),
-                    weight: parseInt(weight),
-                    servingSize: 1,
-                    allergies: allergies,
-                    message: message
-                })
+                body: JSON.stringify(requestBody)
             });
 
             if (!response.ok) {
@@ -246,7 +275,7 @@ const MealPlan = () => {
                                 <div className="result-subtitle"></div>
                             </div>
                         </div>
-                        <div className="result-box">
+                        <div className="result-box" ref={resultBoxRef}>
                             {loading && (
                                 <div className="loading active">
                                     <div className="spinner"></div>
@@ -256,7 +285,11 @@ const MealPlan = () => {
 
                             <div className={`meal-plan ${mealPlans.length > 0 ? 'active' : ''}`}>
                                 {mealPlans.map((mealPlan, index) => (
-                                    <div key={index} className="meal-card">
+                                    <div
+                                        key={index}
+                                        className="meal-card"
+                                        ref={index === mealPlans.length - 1 ? lastMealCardRef : null}
+                                    >
                                         <div className="meal-card-header">
                                             <h3>{mealPlan.mealName}</h3>
                                             <span className="meal-type-badge">{mealPlan.mealType}</span>

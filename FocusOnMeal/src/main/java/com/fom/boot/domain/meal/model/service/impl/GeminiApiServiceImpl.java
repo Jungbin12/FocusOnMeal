@@ -43,16 +43,18 @@ public class GeminiApiServiceImpl implements GeminiApiService {
      * @param servingSize 인분
      * @param allergies 알러지 목록
      * @param chatMessage 사용자 요청 메시지
+     * @param previousPrice 이전 추천 식단 가격 (더 저렴한 식단 요청 시)
      * @return AI가 생성한 식단 추천 텍스트
      */
     public String generateMealPlan(int userHeight, int userWeight, int servingSize,
-                                   List<String> allergies, String chatMessage) {
+                                   List<String> allergies, String chatMessage, Integer previousPrice) {
 
-        log.info("Gemini API 호출 시작 - 키: {}cm, 몸무게: {}kg", userHeight, userWeight);
+        log.info("Gemini API 호출 시작 - 키: {}cm, 몸무게: {}kg, 이전 가격: {}원",
+                userHeight, userWeight, previousPrice);
 
         try {
             // 프롬프트 생성
-            String prompt = buildPrompt(userHeight, userWeight, servingSize, allergies, chatMessage);
+            String prompt = buildPrompt(userHeight, userWeight, servingSize, allergies, chatMessage, previousPrice);
 
             // API 호출 및 응답 반환
             return callGeminiApi(prompt);
@@ -63,7 +65,7 @@ public class GeminiApiServiceImpl implements GeminiApiService {
             throw new RuntimeException("AI 식단 생성에 실패했습니다: " + e.getMessage());
 
         } catch (Exception e) {
-            log.error("Gemini API 호출 중 예외 발생", e);
+            log.error("Gemini API 호출 중 예류 발생", e);
             throw new RuntimeException("AI 식단 생성 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
@@ -72,7 +74,7 @@ public class GeminiApiServiceImpl implements GeminiApiService {
      * 프롬프트 생성 (JSON 응답 형태로 수정)
      */
     private String buildPrompt(int height, int weight, int servingSize,
-                               List<String> allergies, String chatMessage) {
+                               List<String> allergies, String chatMessage, Integer previousPrice) {
 
         String allergyText = allergies == null || allergies.isEmpty()
                 ? "없음"
@@ -80,6 +82,20 @@ public class GeminiApiServiceImpl implements GeminiApiService {
 
         // 주요 식자재 가격 정보 조회
         String priceInfo = getPriceInformation();
+
+        // 이전 가격 정보 텍스트
+        String previousPriceText = "";
+        if (previousPrice != null && previousPrice > 0) {
+            previousPriceText = String.format("""
+
+                ⚠️ **중요: 가격 제약 조건**
+                - 이전에 추천한 식단 가격: %,d원
+                - 반드시 이것보다 최소 20%% 이상 저렴한 식단을 추천해야 합니다
+                - 목표 가격: %,d원 이하
+                - 저렴한 재료(계란, 두부, 콩나물, 감자, 양파, 배추, 무, 고등어 등)를 적극 활용하세요
+                - 비싼 재료(쇠고기, 연어, 새우 등)는 사용하지 마세요
+                """, previousPrice, (int)(previousPrice * 0.8));
+        }
 
         return String.format("""
             당신은 전문 영양사입니다.
@@ -94,8 +110,16 @@ public class GeminiApiServiceImpl implements GeminiApiService {
 
             현재 식자재 시장 가격 정보 (원/kg):
             %s
-
+            %s
             위 정보를 바탕으로 사용자 요청에 맞는 **한 끼 식단**을 추천해주세요.
+
+            **가격 고려 지침:**
+            - 사용자가 "저렴한", "싼", "가성비", "경제적인" 등의 키워드를 사용하면 가격이 낮은 재료를 우선 선택하세요
+            - 비싼 재료(연어, 쇠고기 등)보다 저렴한 재료(계란, 두부, 닭고기, 돼지고기, 고등어 등)를 활용하세요
+            - 제철 채소와 곡류를 적극 활용하여 가격을 낮추세요
+            - 예상 가격은 가능한 한 정확하게 계산하되, 경제적인 식단을 우선하세요
+            - 주 메뉴 뿐만 아니라 밑반찬의 활용도 생각하세요
+
             반드시 아래 JSON 형식으로만 응답해주세요. 다른 텍스트는 포함하지 마세요.
 
             {
@@ -157,6 +181,13 @@ public class GeminiApiServiceImpl implements GeminiApiService {
             - estimatedPrice는 숫자만 입력 (원, 약 등 제외)
             - 영양 정보는 대략적인 추정치로 제공
 
+            **재료 단위 지침 (매우 중요):**
+            - 재료 수량은 반드시 g, kg, ml, l 단위로 표기하세요
+            - "개" 단위는 계란 등 명확한 개수 단위 식재료에만 사용
+            - 채소(깻잎, 상추 등), 향신료는 반드시 g 단위로 표기 (예: "깻잎 20g", "대파 30g")
+            - 고기, 생선은 반드시 g 또는 kg 단위로 표기
+            - 액체 조미료는 ml 단위로 표기
+
             **다양성 지침 (매우 중요):**
             - 닭가슴살만 반복 추천하지 말고 다양한 단백질 공급원을 사용하세요 (생선, 두부, 콩류, 계란, 돼지고기, 쇠고기 등)
             - 한국 전통 식단을 우선적으로 고려하세요 (된장찌개, 김치찌개, 비빔밥, 불고기, 생선구이 등)
@@ -164,7 +195,7 @@ public class GeminiApiServiceImpl implements GeminiApiService {
             - 건강식이라고 해서 항상 닭가슴살이 필요한 것은 아닙니다
             - 제철 채소와 다양한 곡류를 활용하세요
             """,
-                height, weight, servingSize, allergyText, chatMessage, priceInfo
+                height, weight, servingSize, allergyText, chatMessage, priceInfo, previousPriceText
         );
     }
 
@@ -176,16 +207,25 @@ public class GeminiApiServiceImpl implements GeminiApiService {
             // 주요 식자재 목록 (곡류, 채소, 육류, 수산물 등)
             String[] ingredients = {
                 // 곡류
-                "쌀", "현미",
+                "쌀", "찹쌀", "현미",
                 // 채소류
                 "배추", "무", "당근", "양파", "대파", "마늘", "고추", "감자", "고구마",
-                "시금치", "상추", "깻잎", "토마토", "오이", "호박", "가지",
+                "시금치", "상추", "깻잎", "토마토", "오이", "호박", "가지", "양배추", "알배기배추",
+                    "브로콜리", "얼갈이배추", "갓"," 수박", "참외", "딸기", "열무", "건고추",
+                    "풋고추", "붉은고추", "생강", "고춧가루", "미나리", "피망", "파프리카",
+                    "멜론", "방울토마토", "땅콩", "느타리버섯", "팽이버섯", "새송이버섯", "호두", "아몬드",
+                    "사과", "배", "복숭아", "포도", "감귤", "단감", "바나나", "참다래", "파인애플",
+                    "오렌지", "자몽", "레몬", "체리", "건포도", "건블루베리", "망고", "아보카도",
+
                 // 육류
                 "쇠고기", "돼지고기", "삼겹살", "닭고기", "계란",
                 // 수산물
-                "고등어", "갈치", "삼치", "연어", "오징어",
+                "고등어", "갈치", "삼치", "연어", "오징어", "조기", "명태", "물오징어", "마른멸치",
+                    "마른오징어", "김", "마른미역", "굴", "새우젓", "멸치액젓", "천일염", "꽁치",
+                    "전복", "새우", "가리비", "건다시마", "바지락", "고등어필렛", "전어", "삼치",
+                    "꽃게", "홍합",
                 // 기타
-                "두부", "우유"
+                "두부", "우유", "계란"
             };
 
             Map<String, Integer> prices = priceService.getPrices(ingredients);
@@ -199,17 +239,29 @@ public class GeminiApiServiceImpl implements GeminiApiService {
 
             // 카테고리별로 분류
             priceInfo.append("【곡류】\n");
-            appendPricesByCategory(priceInfo, prices, "쌀", "현미");
+            appendPricesByCategory(priceInfo, prices, "쌀", "찹쌀", "현미");
 
             priceInfo.append("\n【채소류】\n");
             appendPricesByCategory(priceInfo, prices, "배추", "무", "당근", "양파", "대파",
-                    "마늘", "고추", "감자", "고구마", "시금치", "상추", "깻잎", "토마토", "오이", "호박", "가지");
+                    "마늘", "고추", "감자", "고구마", "시금치", "상추", "깻잎", "토마토", "오이", "호박", "가지",
+                    "양배추", "알배기배추", "브로콜리", "얼갈이배추", "갓", "열무", "건고추",
+                    "풋고추", "붉은고추", "생강", "고춧가루", "미나리", "피망", "파프리카",
+                    "땅콩", "느타리버섯", "팽이버섯", "새송이버섯", "호두", "아몬드");
+
+            priceInfo.append("\n【과일류】\n");
+            appendPricesByCategory(priceInfo, prices, " 수박", "참외", "딸기",
+                    "멜론", "방울토마토","사과", "배", "복숭아", "포도", "감귤", "단감", "바나나", "참다래", "파인애플",
+                    "오렌지", "자몽", "레몬", "체리", "건포도", "건블루베리", "망고", "아보카도");
 
             priceInfo.append("\n【육류】\n");
             appendPricesByCategory(priceInfo, prices, "쇠고기", "돼지고기", "삼겹살", "닭고기", "계란");
 
             priceInfo.append("\n【수산물】\n");
-            appendPricesByCategory(priceInfo, prices, "고등어", "갈치", "삼치", "연어", "오징어");
+            appendPricesByCategory(priceInfo, prices, "고등어", "갈치", "삼치", "연어", "오징어",
+                    "조기", "명태", "물오징어", "마른멸치",
+                    "마른오징어", "김", "마른미역", "굴", "새우젓", "멸치액젓", "천일염", "꽁치",
+                    "전복", "새우", "가리비", "건다시마", "바지락", "고등어필렛", "전어", "삼치",
+                    "꽃게", "홍합");
 
             priceInfo.append("\n【기타】\n");
             appendPricesByCategory(priceInfo, prices, "두부", "우유");

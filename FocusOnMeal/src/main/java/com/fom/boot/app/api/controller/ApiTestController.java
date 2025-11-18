@@ -130,7 +130,7 @@ public class ApiTestController {
             String message = (String) request.getOrDefault("message", "건강한 식단을 추천해주세요");
 
             String mealPlan = geminiApiService.generateMealPlan(
-                    height, weight, servingSize, allergies, message
+                    height, weight, servingSize, allergies, message, null
             );
 
             return ResponseEntity.ok(Map.of(
