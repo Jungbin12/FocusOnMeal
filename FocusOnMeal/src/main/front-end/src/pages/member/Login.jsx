@@ -42,6 +42,8 @@ const Login = () => {
                     navigate('/admin');
                 } else {
                     navigate('/');
+                    console.log("로그인 응답:", result);
+                    console.log("닉네임:", result.data.memberNickname);
                 }
             } else {
                 const errorText = await response.text();
@@ -87,8 +89,8 @@ const Login = () => {
                         <button type="submit">로그인</button>
                     </form>
                     <div className="login-links">
-                        <a href="#">아이디 찾기</a>
-                        <a href="#">비밀번호 찾기</a>
+                        <a href="/member/findId">아이디 찾기</a>
+                        <a href="/member/findPassword">비밀번호 찾기</a>
                         <a href="/member/form">회원가입</a>
                     </div>
                 </div>
