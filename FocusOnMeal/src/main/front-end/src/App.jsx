@@ -1,4 +1,4 @@
-import { Routes, Route, Form } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Header from "./components/common/Header";
 
@@ -10,6 +10,8 @@ import Terms from './pages/member/TermsContent';
 import Privacy from './pages/member/PrivacyContent';
 import FindId from './pages/member/findId';
 import FindPw from './pages/member/findPassword';
+// ✅ 추가: 비밀번호 재설정 페이지
+import ResetPassword from './pages/member/ResetPassword';
 
 // 마이페이지
 import Dashboard from './pages/mypage/Dashboard';
@@ -18,7 +20,6 @@ import ProtectedRoute from './components/mypage/ProtectedRoute';
 // 식재료
 import IngredientSearch from './pages/ingredient/list';
 import IngredientDetail from './pages/ingredient/detail';
-
 
 //게시판
 import NoticeList from './pages/board/notice/NoticeList';
@@ -42,10 +43,10 @@ function App() {
         <Route path="/member/form" element={<MyForm />} />
         <Route path="/member/terms" element={<Terms />} />
         <Route path="/member/privacy" element={<Privacy />} />
-        <Route path="/member/Join" element={<Join />} />
+        <Route path="/member/join" element={<Join />} />
         <Route path="/member/findId" element={<FindId />} />
         <Route path="/member/findPassword" element={<FindPw />} />
-
+        <Route path="/member/resetPassword" element={<ResetPassword />} />
 
         {/* 마이페이지 관련 */}
         <Route path="/mypage" element={
@@ -62,9 +63,6 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/memberInfo" element={<MemberInfo />} />
         <Route path="/admin/noticeInfo" element={<NoticeInfo/>} />
-
-        {/* 마이페이지 홈 (대시보드) */}
-        <Route path="/mypage" element={<Dashboard />} />
 
         {/* 공지사항 게시판 관련 */}
         <Route path="/board/notice/list" element={<NoticeList /> }/>
