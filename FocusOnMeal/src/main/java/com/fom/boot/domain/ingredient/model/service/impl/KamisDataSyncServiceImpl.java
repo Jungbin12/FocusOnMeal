@@ -61,17 +61,19 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
 
         try {
             String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            log.info("Calling KAMIS API for category: {}, date: {}", itemCategoryCode, today);
             String response = kamisApiService.getDailyPriceByCategoryList(itemCategoryCode, today);
 
             if (response == null) {
-                log.error("KAMIS API response is null");
+                log.error("KAMIS API response is null for category: {}", itemCategoryCode);
                 return 0;
             }
 
+            log.debug("KAMIS API response for category {}: {}", itemCategoryCode, response.substring(0, Math.min(500, response.length())));
             return parseAndSaveAllItems(response, itemCategoryCode);
 
         } catch (Exception e) {
-            log.error("Category sync failed", e);
+            log.error("Category sync failed for category: {}", itemCategoryCode, e);
             return 0;
         }
     }
@@ -350,17 +352,19 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
             // 에러 체크
             if (data.isArray() && data.size() > 0 && !data.get(0).isObject()) {
                 String errorCode = data.get(0).asText();
-                log.error("KAMIS API error code: {}", errorCode);
+                log.error("KAMIS API error code: {} for category: {}", errorCode, categoryCode);
                 return 0;
             }
 
             JsonNode items = data.path("item");
             if (!items.isArray() || items.size() == 0) {
-                log.warn("No response data - category: {}", categoryCode);
+                log.warn("No response data - category: {}, data structure: {}", categoryCode, data.toString().substring(0, Math.min(200, data.toString().length())));
                 return 0;
             }
 
+            log.info("Parsing {} items for category: {}", items.size(), categoryCode);
             int savedCount = 0;
+            int skippedCount = 0;
 
             for (JsonNode item : items) {
                 try {
@@ -393,6 +397,7 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
                     // 오늘 이미 저장된 가격이 있는지 확인
                     int exists = priceHistoryMapper.checkTodayPriceExists(ingredient.getIngredientId());
                     if (exists > 0) {
+                        skippedCount++;
                         log.debug("Today's price already exists - item: {}, skipped", itemName);
                         continue;
                     }
@@ -416,7 +421,8 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
                 }
             }
 
-            log.info("Category {} save completed - {} items", getCategoryName(categoryCode), savedCount);
+            log.info("Category {} save completed - saved: {}, skipped: {}, total in API: {}",
+                    getCategoryName(categoryCode), savedCount, skippedCount, items.size());
             return savedCount;
 
         } catch (Exception e) {
