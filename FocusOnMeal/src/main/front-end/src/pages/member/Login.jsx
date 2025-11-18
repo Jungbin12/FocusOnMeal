@@ -27,7 +27,7 @@ const Login = () => {
                 const result = await response.json();
                 const data = result.data; // ApiResponse 구조에서 실제 데이터 추출
 
-                // JWT 토큰 및 사용자 정보 저장
+                // JWT 토큰 및 사용자 정보 저장 (localStorage)
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('memberId', data.memberId);
                 localStorage.setItem('memberName', data.memberName);

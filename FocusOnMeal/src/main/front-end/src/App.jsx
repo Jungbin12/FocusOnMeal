@@ -17,6 +17,9 @@ import ProtectedRoute from './components/mypage/ProtectedRoute';
 import IngredientSearch from './pages/ingredient/list';
 import IngredientDetail from './pages/ingredient/detail';
 
+// 식단
+import MealPlan from './pages/meal/MealPlan';
+
 
 //게시판
 import NoticeList from './pages/board/notice/NoticeList';
@@ -52,7 +55,10 @@ function App() {
         {/* 식자재 관련 */}
         <Route path="/ingredient/list" element={<IngredientSearch />} />
         <Route path="/ingredient/:id" element={<IngredientDetail />} />
-      
+
+        {/* 식단 관련 */}
+        <Route path="/meal/mealAI" element={<MealPlan />} />
+
         {/* 관리자 홈 (대시보드) */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/memberInfo" element={<MemberInfo />} />

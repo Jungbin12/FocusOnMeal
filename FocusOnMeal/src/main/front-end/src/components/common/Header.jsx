@@ -36,6 +36,7 @@ const Header = () => {
 
     // 로그아웃 기능
     const handleLogout = () => {
+        // localStorage 삭제
         localStorage.removeItem("token");
         localStorage.removeItem("memberId");
         localStorage.removeItem("memberName");

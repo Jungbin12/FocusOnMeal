@@ -156,6 +156,13 @@ public class GeminiApiServiceImpl implements GeminiApiService {
             - 재료명은 DB에 있는 식자재명과 최대한 일치하도록 (쌀, 배추, 무, 쇠고기, 돼지고기 등)
             - estimatedPrice는 숫자만 입력 (원, 약 등 제외)
             - 영양 정보는 대략적인 추정치로 제공
+
+            **다양성 지침 (매우 중요):**
+            - 닭가슴살만 반복 추천하지 말고 다양한 단백질 공급원을 사용하세요 (생선, 두부, 콩류, 계란, 돼지고기, 쇠고기 등)
+            - 한국 전통 식단을 우선적으로 고려하세요 (된장찌개, 김치찌개, 비빔밥, 불고기, 생선구이 등)
+            - 같은 재료가 매번 반복되지 않도록 다채로운 식자재를 활용하세요
+            - 건강식이라고 해서 항상 닭가슴살이 필요한 것은 아닙니다
+            - 제철 채소와 다양한 곡류를 활용하세요
             """,
                 height, weight, servingSize, allergyText, chatMessage, priceInfo
         );

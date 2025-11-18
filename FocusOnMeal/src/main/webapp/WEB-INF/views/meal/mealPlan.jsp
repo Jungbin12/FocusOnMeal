@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="/resources/css/meal/mealPlan.css">
 </head>
 <body>
+
+<!-- 헤더 포함 -->
+<%@ include file="/WEB-INF/views/common/header.jsp" %>
+
 <div class="container">
     <h1>맞춤 식단 추천</h1>
     <div class="divider"></div>
