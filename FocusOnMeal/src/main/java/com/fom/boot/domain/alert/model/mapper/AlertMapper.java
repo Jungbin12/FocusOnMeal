@@ -1,8 +1,95 @@
 package com.fom.boot.domain.alert.model.mapper;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.fom.boot.domain.alert.model.vo.NotificationLog;
+import com.fom.boot.domain.alert.model.vo.SafetyAlert;
 
 @Mapper
 public interface AlertMapper {
 
+	/**
+     * 회원의 알림 목록 조회 (제목 포함)
+     * @param memberId 회원 ID
+     * @return 알림 목록
+     */
+    List<Map<String, Object>> selectNotificationsByMemberId(@Param("memberId") String memberId);
+    
+    /**
+     * 알림 읽음 상태 업데이트
+     * @param notificationId 알림 ID
+     * @param memberId 회원 ID
+     * @return 업데이트된 행 수
+     */
+    int updateNotificationReadStatus(@Param("notificationId") int notificationId, 
+                                     @Param("memberId") String memberId);
+    
+    /**
+     * 읽지 않은 알림 개수 조회
+     * @param memberId 회원 ID
+     * @return 읽지 않은 알림 개수
+     */
+    int selectUnreadNotificationCount(@Param("memberId") String memberId);
+    
+    /**
+     * 안전 알림 설정 조회
+     * @param memberId 회원 ID
+     * @return 알림 설정
+     */
+    Map<String, Object> selectSafetyAlertSettings(@Param("memberId") String memberId);
+    
+    /**
+     * 기본 안전 알림 설정 생성
+     * @param memberId 회원 ID
+     * @return 생성된 행 수
+     */
+    int insertDefaultSafetyAlertSettings(@Param("memberId") String memberId);
+    
+    /**
+     * 안전 알림 설정 생성
+     * @param memberId 회원 ID
+     * @param notificationEnabled 알림 수신 여부
+     * @return 생성된 행 수
+     */
+    int insertSafetyAlertSettings(@Param("memberId") String memberId, 
+                                  @Param("notificationEnabled") String notificationEnabled);
+    
+    /**
+     * 안전 알림 설정 업데이트
+     * @param memberId 회원 ID
+     * @param notificationEnabled 알림 수신 여부
+     * @return 업데이트된 행 수
+     */
+    int updateSafetyAlertSettings(@Param("memberId") String memberId, 
+                                  @Param("notificationEnabled") String notificationEnabled);
+    
+    /**
+     * 공표 정보 조회
+     * @param alertId 공표 ID
+     * @return 공표 정보
+     */
+    SafetyAlert selectSafetyAlertById(@Param("alertId") int alertId);
+    
+    /**
+     * 안전 알림 수신이 활성화된 회원 목록 조회
+     * @return 회원 ID 목록
+     */
+    List<String> selectMembersWithSafetyAlertEnabled();
+    
+    /**
+     * 알림 로그 생성
+     * @param memberId 회원 ID
+     * @param type 알림 유형
+     * @param message 알림 메시지
+     * @param alertId 공표 ID (선택)
+     * @return 생성된 행 수
+     */
+    int insertNotificationLog(@Param("memberId") String memberId, 
+                             @Param("type") String type, 
+                             @Param("message") String message,
+                             @Param("alertId") Integer alertId);
 }
