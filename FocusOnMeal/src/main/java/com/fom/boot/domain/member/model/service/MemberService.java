@@ -32,7 +32,7 @@ public interface MemberService {
     boolean checkEmailExists(Object email);
    
     // 관리자 회원 조회
-    List<Member> selectAllMembers(PageInfo pageInfo, String type ,String keyword);
+    List<Member> selectAllMembers(PageInfo pageInfo, String type ,String keyword, String sortColumn, String sortOrder);
     
 	// 관리자 체크용
 	Member findByMemberId(String memberId);

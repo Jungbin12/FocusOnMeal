@@ -42,7 +42,9 @@ public interface MemberMapper {
 			@Param("startRow") int startRow,
 			@Param("endRow") int endRow,
 			@Param("type") String type,
-			@Param("keyword") String keyword
+			@Param("keyword") String keyword,
+			@Param("sortColumn") String sortColumn,
+			@Param("sortOrder") String sortOrder
 			);
 	
 	// 관리자 : 회원 등급 변경

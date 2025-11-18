@@ -163,12 +163,14 @@ public class MemberServiceImpl implements MemberService {
 
 	// 관리자 목록 조회용
 	@Override
-	public List<Member> selectAllMembers(PageInfo pageInfo, String type, String keyword) {
+	public List<Member> selectAllMembers(PageInfo pageInfo, String type, String keyword, String sortColumn, String sortOrder) {
 		return memberMapper.selectAllMembers(
 	            pageInfo.getStartRow(),
 	            pageInfo.getEndRow(),
 	            type,
-	            keyword
+	            keyword,
+	            sortColumn,
+	            sortOrder
 	    );
 	}
 

@@ -41,6 +41,8 @@ public class AdminController {
 			@RequestParam(defaultValue ="1") int page
 			,@RequestParam(defaultValue = "all") String type
 	        ,@RequestParam(defaultValue = "") String keyword
+	        ,@RequestParam(required = false) String sortColumn
+	        ,@RequestParam(required = false) String sortOrder
 			,Authentication authentication) {
 		// 1. 토큰 인증 체크
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -70,7 +72,7 @@ public class AdminController {
         PageInfo pageInfo= Pagination.getPageInfo(page, totalCount);
         
         // 전체 회원 목록 조회
-        List<Member> mList = mService.selectAllMembers(pageInfo, type, keyword);
+        List<Member> mList = mService.selectAllMembers(pageInfo, type, keyword, sortColumn, sortOrder);
         
         Map<String, Object> data = new HashMap<>();
     	data.put("pageInfo", pageInfo);
