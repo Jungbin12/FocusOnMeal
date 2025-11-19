@@ -1,0 +1,211 @@
+/* Login 페이지 전체 컨테이너 */
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    font-family: 'Malgun Gothic', sans-serif;
+    padding: 20px;
+}
+
+.main {
+    width: 100%;
+    max-width: 450px;
+}
+
+/* 로그인 컨테이너 */
+.loginContainer {
+    background: white;
+    border-radius: 20px;
+    padding: 50px 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 로그인 타이틀 */
+.loginTitle {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.loginTitle h2 {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* 로그인 폼 */
+.loginForm {
+    margin-bottom: 30px;
+}
+
+/* 폼 그룹 */
+.formGroup {
+    margin-bottom: 25px;
+}
+
+.formGroup label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.formGroup input {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fafafa;
+    color: #333;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.formGroup input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.formGroup input::placeholder {
+    color: #999;
+}
+
+/* 에러 메시지 */
+.errorMessage {
+    background: #fee;
+    border: 1px solid #fcc;
+    color: #c33;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* 로그인 버튼 */
+.submitButton {
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    margin-top: 10px;
+}
+
+.submitButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.submitButton:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+}
+
+/* 로그인 링크들 */
+.loginLinks {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.loginLinks a {
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.loginLinks a:hover {
+    color: #667eea;
+}
+
+.loginLinks a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+
+.loginLinks a:hover::after {
+    width: 100%;
+}
+
+/* 링크 사이 구분선 */
+.loginLinks a:not(:last-child)::before {
+    content: '|';
+    position: absolute;
+    right: -11px;
+    color: #ddd;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+    .loginContainer {
+        padding: 40px 30px;
+    }
+
+    .loginTitle h2 {
+        font-size: 28px;
+    }
+
+    .loginLinks {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .loginLinks a:not(:last-child)::before {
+        display: none;
+    }
+}
+
+/* 입력 필드 자동완성 스타일 */
+.formGroup input:-webkit-autofill,
+.formGroup input:-webkit-autofill:hover,
+.formGroup input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #fafafa inset;
+    -webkit-text-fill-color: #333;
+    transition: background-color 5000s ease-in-out 0s;
+}

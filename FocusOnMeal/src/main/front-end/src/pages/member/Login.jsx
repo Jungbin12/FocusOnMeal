@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styles from './Login.module.css';
 
 const Login = () => {
     const [memberId, setMemberId] = useState('');
@@ -56,15 +57,15 @@ const Login = () => {
     };
 
     return (
-        <div id="container">
-            <main id="main">
-                <div className="login-container">
-                    <div className="login-title">
+        <div className={styles.container}>
+            <main className={styles.main}>
+                <div className={styles.loginContainer}>
+                    <div className={styles.loginTitle}>
                         <h2>로그인</h2>
                     </div>
-                    <form className="login-form" onSubmit={handleSubmit}>
-                        {error && <div style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
-                        <div className="form-group">
+                    <form className={styles.loginForm} onSubmit={handleSubmit}>
+                        {error && <div className={styles.errorMessage}>{error}</div>}
+                        <div className={styles.formGroup}>
                             <label htmlFor="memberIdInput">아이디</label>
                             <input
                                 type="text"
@@ -75,7 +76,7 @@ const Login = () => {
                                 onChange={(e) => setMemberId(e.target.value)}
                                 required />
                         </div>
-                        <div className="form-group">
+                        <div className={styles.formGroup}>
                             <label htmlFor="memberPwInput">비밀번호</label>
                             <input
                                 type="password"
@@ -86,9 +87,9 @@ const Login = () => {
                                 onChange={(e) => setMemberPw(e.target.value)}
                                 required />
                         </div>
-                        <button type="submit">로그인</button>
+                        <button type="submit" className={styles.submitButton}>로그인</button>
                     </form>
-                    <div className="login-links">
+                    <div className={styles.loginLinks}>
                         <a href="/member/findId">아이디 찾기</a>
                         <a href="/member/findPassword">비밀번호 찾기</a>
                         <a href="/member/form">회원가입</a>

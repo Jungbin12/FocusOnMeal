@@ -503,12 +503,12 @@ function Join() {
     };
     
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', padding: '40px 20px' }}>
-            <div style={{ maxWidth: '600px', margin: '0 auto', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', padding: '40px' }}>
-                
+        <div style={{ minHeight: '100vh', backgroundColor: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Malgun Gothic, sans-serif' }}>
+            <div style={{ maxWidth: '600px', width: '100%', backgroundColor: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', padding: '50px 40px', animation: 'slideUp 0.5s ease' }}>
+
                 {/* 제목 */}
-                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                    <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937' }}>회원가입</h2>
+                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                    <h2 style={{ fontSize: '32px', fontWeight: 'bold', margin: '0', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>회원가입</h2>
                 </div>
                 
                 {/* 폼 */}
@@ -518,9 +518,9 @@ function Join() {
                     <input type="hidden" value={generatedNickname} />
                     
                     {/* 1. 아이디 */}
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
-                            아이디 <span style={{ color: '#dc2626' }}>*</span>
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
+                            아이디 <span style={{ color: '#c33' }}>*</span>
                         </label>
                         <div style={{ display: 'flex', gap: '10px' }}>
                             <input
@@ -531,9 +531,28 @@ function Join() {
                                 placeholder="아이디를 입력해주세요 (4자 이상)"
                                 style={{
                                     flex: 1,
-                                    padding: '12px',
-                                    border: errors.memberId ? '1px solid #dc2626' : '1px solid #d1d5db',
-                                    borderRadius: '6px'
+                                    padding: '15px 20px',
+                                    border: errors.memberId ? '2px solid #c33' : '2px solid #e0e0e0',
+                                    borderRadius: '10px',
+                                    fontSize: '16px',
+                                    backgroundColor: '#fafafa',
+                                    color: '#333',
+                                    transition: 'all 0.3s ease',
+                                    boxSizing: 'border-box'
+                                }}
+                                onFocus={(e) => {
+                                    if (!errors.memberId) {
+                                        e.target.style.borderColor = '#667eea';
+                                        e.target.style.backgroundColor = 'white';
+                                        e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
+                                    }
+                                }}
+                                onBlur={(e) => {
+                                    if (!errors.memberId) {
+                                        e.target.style.borderColor = '#e0e0e0';
+                                        e.target.style.backgroundColor = '#fafafa';
+                                        e.target.style.boxShadow = 'none';
+                                    }
                                 }}
                             />
                             <button
@@ -541,34 +560,37 @@ function Join() {
                                 onClick={handleCheckId}
                                 disabled={!formData.memberId || idChecked}
                                 style={{
-                                    padding: '12px 20px',
-                                    backgroundColor: idChecked && idAvailable ? '#10b981' : '#2563eb',
+                                    padding: '15px 20px',
+                                    backgroundColor: idChecked && idAvailable ? '#10b981' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    background: idChecked && idAvailable ? '#10b981' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                     color: 'white',
                                     border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    whiteSpace: 'nowrap'
+                                    borderRadius: '10px',
+                                    cursor: (!formData.memberId || idChecked) ? 'not-allowed' : 'pointer',
+                                    whiteSpace: 'nowrap',
+                                    fontWeight: 'bold',
+                                    transition: 'all 0.3s ease'
                                 }}
                             >
                                 {idChecked && idAvailable ? '✓ 확인완료' : '중복확인'}
                             </button>
                         </div>
                         {errors.memberId && (
-                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                            <p style={{ color: '#c33', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
                                 {errors.memberId}
                             </p>
                         )}
                         {idChecked && idAvailable && (
-                            <p style={{ color: '#10b981', fontSize: '14px', marginTop: '5px' }}>
+                            <p style={{ color: '#10b981', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
                                 사용 가능한 아이디입니다.
                             </p>
                         )}
                     </div>
                     
                     {/* 2. 비밀번호 */}
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
-                            비밀번호 <span style={{ color: '#dc2626' }}>*</span>
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
+                            비밀번호 <span style={{ color: '#c33' }}>*</span>
                         </label>
                         <input
                             type="password"
@@ -578,9 +600,28 @@ function Join() {
                             placeholder="8자 이상, 영문+숫자+특수문자"
                             style={{
                                 width: '100%',
-                                padding: '12px',
-                                border: errors.memberPw ? '1px solid #dc2626' : '1px solid #d1d5db',
-                                borderRadius: '6px'
+                                padding: '15px 20px',
+                                border: errors.memberPw ? '2px solid #c33' : '2px solid #e0e0e0',
+                                borderRadius: '10px',
+                                fontSize: '16px',
+                                backgroundColor: '#fafafa',
+                                color: '#333',
+                                transition: 'all 0.3s ease',
+                                boxSizing: 'border-box'
+                            }}
+                            onFocus={(e) => {
+                                if (!errors.memberPw) {
+                                    e.target.style.borderColor = '#667eea';
+                                    e.target.style.backgroundColor = 'white';
+                                    e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
+                                }
+                            }}
+                            onBlur={(e) => {
+                                if (!errors.memberPw) {
+                                    e.target.style.borderColor = '#e0e0e0';
+                                    e.target.style.backgroundColor = '#fafafa';
+                                    e.target.style.boxShadow = 'none';
+                                }
                             }}
                         />
                         {formData.memberPw && (
@@ -611,9 +652,9 @@ function Join() {
                     </div>
                     
                     {/* 3. 비밀번호 확인 */}
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
-                            비밀번호 확인 <span style={{ color: '#dc2626' }}>*</span>
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
+                            비밀번호 확인 <span style={{ color: '#c33' }}>*</span>
                         </label>
                         <input
                             type="password"
@@ -623,27 +664,46 @@ function Join() {
                             placeholder="비밀번호를 다시 입력해주세요"
                             style={{
                                 width: '100%',
-                                padding: '12px',
-                                border: errors.confirmPw ? '1px solid #dc2626' : '1px solid #d1d5db',
-                                borderRadius: '6px'
+                                padding: '15px 20px',
+                                border: errors.confirmPw ? '2px solid #c33' : '2px solid #e0e0e0',
+                                borderRadius: '10px',
+                                fontSize: '16px',
+                                backgroundColor: '#fafafa',
+                                color: '#333',
+                                transition: 'all 0.3s ease',
+                                boxSizing: 'border-box'
+                            }}
+                            onFocus={(e) => {
+                                if (!errors.confirmPw) {
+                                    e.target.style.borderColor = '#667eea';
+                                    e.target.style.backgroundColor = 'white';
+                                    e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
+                                }
+                            }}
+                            onBlur={(e) => {
+                                if (!errors.confirmPw) {
+                                    e.target.style.borderColor = '#e0e0e0';
+                                    e.target.style.backgroundColor = '#fafafa';
+                                    e.target.style.boxShadow = 'none';
+                                }
                             }}
                         />
                         {formData.confirmPw && formData.memberPw === formData.confirmPw && (
-                            <p style={{ color: '#10b981', fontSize: '14px', marginTop: '5px' }}>
+                            <p style={{ color: '#10b981', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
                                 ✓ 비밀번호가 일치합니다.
                             </p>
                         )}
                         {errors.confirmPw && (
-                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                            <p style={{ color: '#c33', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
                                 {errors.confirmPw}
                             </p>
                         )}
                     </div>
-                    
+
                     {/* 4. 이름 */}
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
-                            이름 <span style={{ color: '#dc2626' }}>*</span>
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
+                            이름 <span style={{ color: '#c33' }}>*</span>
                         </label>
                         <input
                             type="text"
@@ -653,22 +713,41 @@ function Join() {
                             placeholder="이름을 입력해주세요"
                             style={{
                                 width: '100%',
-                                padding: '12px',
-                                border: errors.memberName ? '1px solid #dc2626' : '1px solid #d1d5db',
-                                borderRadius: '6px'
+                                padding: '15px 20px',
+                                border: errors.memberName ? '2px solid #c33' : '2px solid #e0e0e0',
+                                borderRadius: '10px',
+                                fontSize: '16px',
+                                backgroundColor: '#fafafa',
+                                color: '#333',
+                                transition: 'all 0.3s ease',
+                                boxSizing: 'border-box'
+                            }}
+                            onFocus={(e) => {
+                                if (!errors.memberName) {
+                                    e.target.style.borderColor = '#667eea';
+                                    e.target.style.backgroundColor = 'white';
+                                    e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
+                                }
+                            }}
+                            onBlur={(e) => {
+                                if (!errors.memberName) {
+                                    e.target.style.borderColor = '#e0e0e0';
+                                    e.target.style.backgroundColor = '#fafafa';
+                                    e.target.style.boxShadow = 'none';
+                                }
                             }}
                         />
                         {errors.memberName && (
-                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                            <p style={{ color: '#c33', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
                                 {errors.memberName}
                             </p>
                         )}
                     </div>
-                    
+
                     {/* 5. 전화번호 */}
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
-                            전화번호 <span style={{ color: '#dc2626' }}>*</span>
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
+                            전화번호 <span style={{ color: '#c33' }}>*</span>
                         </label>
                         <input
                             type="text"
@@ -678,22 +757,41 @@ function Join() {
                             placeholder="010-1234-5678"
                             style={{
                                 width: '100%',
-                                padding: '12px',
-                                border: errors.phone ? '1px solid #dc2626' : '1px solid #d1d5db',
-                                borderRadius: '6px'
+                                padding: '15px 20px',
+                                border: errors.phone ? '2px solid #c33' : '2px solid #e0e0e0',
+                                borderRadius: '10px',
+                                fontSize: '16px',
+                                backgroundColor: '#fafafa',
+                                color: '#333',
+                                transition: 'all 0.3s ease',
+                                boxSizing: 'border-box'
+                            }}
+                            onFocus={(e) => {
+                                if (!errors.phone) {
+                                    e.target.style.borderColor = '#667eea';
+                                    e.target.style.backgroundColor = 'white';
+                                    e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
+                                }
+                            }}
+                            onBlur={(e) => {
+                                if (!errors.phone) {
+                                    e.target.style.borderColor = '#e0e0e0';
+                                    e.target.style.backgroundColor = '#fafafa';
+                                    e.target.style.boxShadow = 'none';
+                                }
                             }}
                         />
                         {errors.phone && (
-                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                            <p style={{ color: '#c33', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
                                 {errors.phone}
                             </p>
                         )}
                     </div>
                     
                     {/* 6. 이메일 + 인증 */}
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
-                            이메일 <span style={{ color: '#dc2626' }}>*</span>
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
+                            이메일 <span style={{ color: '#c33' }}>*</span>
                         </label>
                         <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
                             <input
@@ -705,20 +803,30 @@ function Join() {
                                 disabled={emailVerified}
                                 style={{
                                     flex: 1,
-                                    padding: '12px',
-                                    border: '1px solid #d1d5db',
-                                    borderRadius: '6px'
+                                    padding: '15px 20px',
+                                    border: '2px solid #e0e0e0',
+                                    borderRadius: '10px',
+                                    fontSize: '16px',
+                                    backgroundColor: '#fafafa',
+                                    color: '#333',
+                                    transition: 'all 0.3s ease',
+                                    boxSizing: 'border-box'
                                 }}
                             />
-                            <span style={{ alignSelf: 'center' }}>@</span>
+                            <span style={{ alignSelf: 'center', color: '#555', fontWeight: 'bold' }}>@</span>
                             <select
                                 value={selectedDomain}
                                 onChange={(e) => setSelectedDomain(e.target.value)}
                                 disabled={emailVerified}
                                 style={{
-                                    padding: '12px',
-                                    border: '1px solid #d1d5db',
-                                    borderRadius: '6px'
+                                    padding: '15px 20px',
+                                    border: '2px solid #e0e0e0',
+                                    borderRadius: '10px',
+                                    fontSize: '16px',
+                                    backgroundColor: '#fafafa',
+                                    color: '#333',
+                                    transition: 'all 0.3s ease',
+                                    cursor: 'pointer'
                                 }}
                             >
                                 {emailDomains.map((domain, index) => (
@@ -735,14 +843,19 @@ function Join() {
                                     disabled={emailVerified}
                                     style={{
                                         flex: 1,
-                                        padding: '12px',
-                                        border: '1px solid #d1d5db',
-                                        borderRadius: '6px'
+                                        padding: '15px 20px',
+                                        border: '2px solid #e0e0e0',
+                                        borderRadius: '10px',
+                                        fontSize: '16px',
+                                        backgroundColor: '#fafafa',
+                                        color: '#333',
+                                        transition: 'all 0.3s ease',
+                                        boxSizing: 'border-box'
                                     }}
                                 />
                             )}
                         </div>
-                        
+
                         {!emailVerified && (
                             <>
                                 <button
@@ -751,18 +864,34 @@ function Join() {
                                     disabled={loading || verificationSent}
                                     style={{
                                         width: '100%',
-                                        padding: '12px',
-                                        backgroundColor: verificationSent ? '#9ca3af' : '#2563eb',
+                                        padding: '15px',
+                                        background: (loading || verificationSent) ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                         color: 'white',
                                         border: 'none',
-                                        borderRadius: '6px',
+                                        borderRadius: '10px',
+                                        fontSize: '16px',
+                                        fontWeight: 'bold',
                                         marginBottom: '10px',
-                                        cursor: verificationSent ? 'not-allowed' : 'pointer'
+                                        cursor: (loading || verificationSent) ? 'not-allowed' : 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        boxShadow: (loading || verificationSent) ? 'none' : '0 4px 15px rgba(102, 126, 234, 0.4)'
+                                    }}
+                                    onMouseOver={(e) => {
+                                        if (!loading && !verificationSent) {
+                                            e.target.style.transform = 'translateY(-2px)';
+                                            e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                                        }
+                                    }}
+                                    onMouseOut={(e) => {
+                                        if (!loading && !verificationSent) {
+                                            e.target.style.transform = 'translateY(0)';
+                                            e.target.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                                        }
                                     }}
                                 >
                                     {verificationSent ? `재전송 (${formatTime(verificationTimer)})` : '인증 코드 발송'}
                                 </button>
-                                
+
                                 {verificationSent && (
                                     <div style={{ display: 'flex', gap: '10px' }}>
                                         <input
@@ -773,9 +902,14 @@ function Join() {
                                             maxLength={6}
                                             style={{
                                                 flex: 1,
-                                                padding: '12px',
-                                                border: '1px solid #d1d5db',
-                                                borderRadius: '6px'
+                                                padding: '15px 20px',
+                                                border: '2px solid #e0e0e0',
+                                                borderRadius: '10px',
+                                                fontSize: '16px',
+                                                backgroundColor: '#fafafa',
+                                                color: '#333',
+                                                transition: 'all 0.3s ease',
+                                                boxSizing: 'border-box'
                                             }}
                                         />
                                         <button
@@ -783,13 +917,15 @@ function Join() {
                                             onClick={handleVerifyCode}
                                             disabled={loading}
                                             style={{
-                                                padding: '12px 20px',
+                                                padding: '15px 20px',
                                                 backgroundColor: '#10b981',
                                                 color: 'white',
                                                 border: 'none',
-                                                borderRadius: '6px',
-                                                cursor: 'pointer',
-                                                whiteSpace: 'nowrap'
+                                                borderRadius: '10px',
+                                                fontWeight: 'bold',
+                                                cursor: loading ? 'not-allowed' : 'pointer',
+                                                whiteSpace: 'nowrap',
+                                                transition: 'all 0.3s ease'
                                             }}
                                         >
                                             확인
@@ -798,25 +934,25 @@ function Join() {
                                 )}
                             </>
                         )}
-                        
+
                         {emailVerified && (
-                            <div style={{ backgroundColor: '#d1fae5', padding: '12px', borderRadius: '6px', textAlign: 'center' }}>
-                                <p style={{ color: '#065f46', fontWeight: '600' }}>
+                            <div style={{ backgroundColor: '#d1fae5', padding: '15px', borderRadius: '10px', textAlign: 'center' }}>
+                                <p style={{ color: '#065f46', fontWeight: '600', margin: '0', fontSize: '14px' }}>
                                     ✓ 이메일 인증이 완료되었습니다.
                                 </p>
                             </div>
                         )}
-                        
+
                         {errors.email && (
-                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
+                            <p style={{ color: '#c33', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
                                 {errors.email}
                             </p>
                         )}
                     </div>
-                    
+
                     {/* 7. 성별 */}
                     <div style={{ marginBottom: '30px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
+                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
                             성별
                         </label>
                         <div style={{ display: 'flex', gap: '20px' }}>
@@ -852,13 +988,28 @@ function Join() {
                         style={{
                             width: '100%',
                             padding: '16px',
-                            backgroundColor: loading ? '#9ca3af' : '#2563eb',
+                            background: loading ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                             color: 'white',
                             border: 'none',
-                            borderRadius: '6px',
-                            fontSize: '16px',
-                            fontWeight: '600',
-                            cursor: loading ? 'not-allowed' : 'pointer'
+                            borderRadius: '10px',
+                            fontSize: '18px',
+                            fontWeight: 'bold',
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: loading ? 'none' : '0 4px 15px rgba(102, 126, 234, 0.4)',
+                            marginTop: '10px'
+                        }}
+                        onMouseOver={(e) => {
+                            if (!loading) {
+                                e.target.style.transform = 'translateY(-2px)';
+                                e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                            }
+                        }}
+                        onMouseOut={(e) => {
+                            if (!loading) {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                            }
                         }}
                     >
                         {loading ? '처리 중...' : '가입하기'}
