@@ -89,7 +89,6 @@
           AND (IS_DELETED IS NULL OR IS_DELETED = 'N')
     </select>
 
-
     <!-- ====== 알레르기 기능 ====== -->
 
     <!-- 전체 알레르기 목록 -->

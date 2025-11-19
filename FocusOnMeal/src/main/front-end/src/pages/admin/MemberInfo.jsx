@@ -40,14 +40,20 @@ const MemberInfo = () => {
                 Authorization: `Bearer ${localStorage.getItem("token")}`
             }
         })
-        .then(() => {
+        .then((res) => {
+            // 서버에서 새 닉네임 받기
+            const newNickname = res.data.newNickname;
+            console.log("서버로부터 받은 새 닉네임:", newNickname);
             setMemberInfo(prev =>
                 prev.map(m =>
-                    m.memberId === member.memberId ? { ...m, adminYn: newGrade } : m
+                    m.memberId === member.memberId ? { ...m, adminYn: newGrade, memberNickname: newNickname } : m
                 )
             );
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+            console.error("등급 변경 실패:", err);
+            alert("등급 변경 중 오류가 발생했습니다.");
+        });
     };
 
     // 회원 상태 변경 토글

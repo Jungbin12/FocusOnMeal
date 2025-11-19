@@ -81,12 +81,14 @@ public class AdminController {
         return ResponseEntity.ok(data);
 	}
 	
-	// 관리자 등급 수정
+	// 관리자 등급 및 닉네임 수정
 	@PatchMapping("/memberInfo/adminYn")
 	public ResponseEntity<?> updateAdminYn(
 	        Authentication authentication,
 	        @RequestParam String memberId,
 	        @RequestParam String adminYn) {
+		
+		Map<String, String> responseBody = new HashMap<>();
 
 	    // 1. 토큰 인증 체크
 	    if (authentication == null || !authentication.isAuthenticated()) {
@@ -112,10 +114,32 @@ public class AdminController {
 	    // 3. 실제 수정
 	    System.out.println("받은 memberId : " + memberId);
 	    System.out.println("받은 adminYn  : " + adminYn);
+	    
+	    // 3. 자기 자신을 수정하려는 시도 방지 (선택 사항: 관리자가 실수로 자신의 권한을 해제하는 것을 막음)
+	    if (loginId.equals(memberId) && "N".equals(adminYn)) {
+	        responseBody.put("message", "자신의 관리자 권한을 해제할 수 없습니다.");
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseBody);
+	    }
 
-	    mService.updateAdminYn(memberId, adminYn);
-
-	    return ResponseEntity.ok("success");
+	    try {
+	        // 1. 서비스 호출하여 등급 및 닉네임 변경 로직 수행
+	        String newNickname = mService.updateAdminYn(memberId, adminYn);
+	        
+	        // 2. 변경된 닉네임을 클라이언트로 응답
+	        responseBody.put("newNickname", newNickname);
+	        responseBody.put("message", "등급 및 닉네임이 성공적으로 변경되었습니다.");
+	        
+	        return ResponseEntity.ok(responseBody);
+	        
+	    } catch (RuntimeException e) {
+	        // 서비스에서 발생시킨 실패 예외 처리
+	        responseBody.put("message", "DB 업데이트 오류: " + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
+	    } catch (Exception e) {
+	        // 기타 서버 오류 처리
+	        responseBody.put("message", "서버 처리 중 예기치 않은 오류가 발생했습니다.");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
+	    }
 	}
 
 	// 관리자 - 회원 상태 수정

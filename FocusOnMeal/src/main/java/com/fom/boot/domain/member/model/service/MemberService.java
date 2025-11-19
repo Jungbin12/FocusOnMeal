@@ -37,8 +37,8 @@ public interface MemberService {
     // 관리자 체크용
     Member findByMemberId(String memberId);
     
-    // 회원 등급 변경
-    int updateAdminYn(String memberId, String adminYn);
+    // 회원 등급 및 닉네임 변경
+    String updateAdminYn(String memberId, String adminYn);
 
 	// 회원 상태 변경
 	int updateStatusYn(String memberId, String statusYn);

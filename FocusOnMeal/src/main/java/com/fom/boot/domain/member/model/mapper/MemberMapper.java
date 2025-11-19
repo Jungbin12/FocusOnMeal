@@ -17,9 +17,7 @@ public interface MemberMapper {
 
 	int insertMember(Member member);
 	
-
     List<Member> selectAllMembers();
-
 
     Member selectOneById(@Param("memberId") String memberId);
 
@@ -28,7 +26,14 @@ public interface MemberMapper {
 
     int checkEmailExists(String email);
 
-	// 관리자 목록 조회용
+    String searchMemberId(@Param("memberName") String memberName,
+    		@Param("email") String email);
+
+    /* ========== 관리자 영역 시작 : 여기 아래에 일반 회원 메퍼 작성하지 마세요 ========== */
+    /* ===================================================================== */
+    /* ===================================================================== */
+	
+    // 관리자 목록 조회용
 	List<Member> selectAllMembers(
 			@Param("startRow") int startRow,
 			@Param("endRow") int endRow,
@@ -38,8 +43,8 @@ public interface MemberMapper {
 			@Param("sortOrder") String sortOrder
 			);
 	
-	// 관리자 : 회원 등급 변경
-	int updateAdminYn(String memberId, String adminYn);
+	// 관리자 : 회원 등급 및 닉네임 변경
+	int updateAdminNickname(Member member);
 	
 	// 관리자 : 회원 상태 변경
 	int updateStatusYn(String memberId, String statusYn);
@@ -49,8 +54,9 @@ public interface MemberMapper {
 	        @Param("type") String type,
 	        @Param("keyword") String keyword
 	);
-
-    String searchMemberId(@Param("memberName") String memberName,
-                          @Param("email") String email);
+	
+    /* ===================================================================== */
+    /* ===================================================================== */
+	/* ==========  관리자 영역 끝 : 여기 아래에 일반 회원 메퍼 작성하지 마세요  ========== */
 
 }
