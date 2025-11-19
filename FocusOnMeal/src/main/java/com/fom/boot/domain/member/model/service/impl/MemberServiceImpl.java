@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fom.boot.app.member.dto.LoginRequest;
 import com.fom.boot.common.pagination.PageInfo;
+import com.fom.boot.common.util.NicknameUtils;
 import com.fom.boot.domain.member.model.mapper.MemberMapper;
 import com.fom.boot.domain.member.model.service.EmailService;
 import com.fom.boot.domain.member.model.service.MemberService;
@@ -171,18 +172,41 @@ public class MemberServiceImpl implements MemberService {
 		return memberMapper.findByMemberId(memberId);
 	}
 	
-	// 회원 등급 변경
+	// 회원 등급 및 닉네임 변경
 	@Override
-	public int updateAdminYn(String memberId, String adminYn) {
-		return memberMapper.updateAdminYn(memberId, adminYn);
+	@Transactional
+	public String updateAdminYn(String memberId, String adminYn) {
 		
-	}
+		// 등급에 따른 닉네임 변경
+	    String newNickname;
+	    if ("Y".equals(adminYn)) {
+	        newNickname = NicknameUtils.generateAdminNickname(); 
+	    } else {
+	        newNickname = NicknameUtils.generateUserNickname();
+	    }
+	    
+	    // 2. DB 업데이트를 위한 Member 객체 준비
+        Member member = new Member();
+        member.setMemberId(memberId);
+        member.setAdminYn(adminYn);
+        member.setMemberNickname(newNickname);
 
+        // 3. DB에 등급과 닉네임 모두 반영
+        int result = memberMapper.updateAdminNickname(member);
+
+        if (result > 0) {
+            // 4. 업데이트된 닉네임만 프론트엔드로 반환
+            return newNickname;
+        } else {
+            // 업데이트 실패 시 예외 처리
+            throw new RuntimeException("회원 등급 및 닉네임 업데이트에 실패했습니다.");
+        }
+    }
+		
 	// 회원 상태 변경
 	@Override
 	public int updateStatusYn(String memberId, String statusYn) {
 		return memberMapper.updateStatusYn(memberId, statusYn);
-		
 	}
 
 	// 총 회원수 + 검색
