@@ -144,7 +144,13 @@ function IngredientDetail() {
 
                 {/* 2. 오른쪽 컬럼: 정보 박스들 */}
                 <div className={styles.rightColumn}>
-                    <h1 className={styles.itemTitle}>{itemInfo.name}</h1>
+                    <h1 className={styles.itemTitle}>
+                        {/* 품목명과 카테고리를 괄호로 묶어 표시 */}
+                        {itemInfo.name} 
+                        <span className={styles.categoryInTitle}>
+                            ({itemInfo.category})
+                        </span>
+                    </h1>
                     
                     {/* 2-1. 상단 요약 박스 (가격, 안전, 찜하기) */}
                     <div className={styles.infoBoxTop}>

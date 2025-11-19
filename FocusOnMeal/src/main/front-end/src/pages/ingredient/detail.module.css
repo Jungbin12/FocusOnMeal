@@ -52,6 +52,14 @@
     margin-bottom: 20px;
 }
 
+/* 카테고리 괄호 스타일 */
+.categoryInTitle {
+    font-size: 0.7em; /* H1 크기보다 작게 설정하여 부제목 느낌 */
+    font-weight: 500; /* 굵기를 낮춤 */
+    color: #666; /* 회색으로 색상 조정 */
+    margin-left: 10px;
+}
+
 /* --- 왼쪽 컬럼: 이미지 및 영양 정보 --- */
 .imagePlaceholder {
     width: 300px; 
