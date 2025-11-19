@@ -59,7 +59,7 @@ function App() {
           </ProtectedRoute>} 
         />
 
-        {/* 식자재 관련 */}
+        {/* 식재료 관련 */}
         <Route path="/ingredient/list" element={<IngredientSearch />} />
 
         {/* 식단 관련 */}
