@@ -16,6 +16,7 @@ import ResetPassword from './pages/member/ResetPassword';
 // 마이페이지
 import Dashboard from './pages/mypage/Dashboard';
 import ProtectedRoute from './components/mypage/ProtectedRoute';
+import Allergies from './pages/mypage/Allergies';
 
 // 식재료
 import IngredientSearch from './pages/ingredient/list';
@@ -53,6 +54,7 @@ function App() {
         <Route path="/member/resetPassword" element={<ResetPassword />} />
 
         {/* 마이페이지 관련 */}
+        <Route path="/mypage/allergies" element={<Allergies />} />
         <Route path="/mypage" element={
           <ProtectedRoute>
             <Dashboard />
