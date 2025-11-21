@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.fom.boot.app.mypage.dto.Allergy;
 import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.app.mypage.dto.MealPlanSummaryDTO;
 import com.fom.boot.domain.meal.model.vo.MealPlan;
@@ -39,7 +40,7 @@ public interface MyPageMapper {
 
 	Object getUserAllergyIds(String memberId);
 
-	Object getAllAllergies();
+	List<Allergy> getAllAllergies();
 
 	int insertUserAllergy(@Param("memberId") String memberId,
             					@Param("allergyId") int allergyId);

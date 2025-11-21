@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fom.boot.app.mypage.dto.Allergy;
 import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.app.mypage.dto.MealPlanSummaryDTO;
 import com.fom.boot.app.mypage.dto.MyPageDashboardDTO;
@@ -159,7 +160,7 @@ public class MyPageServiceImpl implements MyPageService {
 	}
 
 	@Override
-	public Object getAllAllergies() {
-		return mMapper.getAllAllergies();
+	public List<Allergy> getAllAllergies() {
+	    return mMapper.getAllAllergies();  // 그대로 반환
 	}
 }

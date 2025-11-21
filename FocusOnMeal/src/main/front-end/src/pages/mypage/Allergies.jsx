@@ -4,53 +4,155 @@ import axios from 'axios';
 const Allergies = () => {
     const [allergies, setAllergies] = useState([]);
     const [checked, setChecked] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
+    const API_BASE_URL = "http://localhost:8080";
 
     useEffect(() => {
-        loadAllergyList();
-        loadUserAllergies();
+        loadData();
     }, []);
 
-    /** 알레르기 전체 목록 조회 */
+    const loadData = async () => {
+        try {
+            await Promise.all([loadAllergyList(), loadUserAllergies()]);
+        } catch (error) {
+            console.error("데이터 로딩 오류:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const loadAllergyList = async () => {
         try {
-            const res = await axios.get("/api/allergy/list");
-            setAllergies(res.data);
+            console.log(`📤 요청: ${API_BASE_URL}/api/mypage/allergy/list`);
+            
+            const token = localStorage.getItem('token');
+            const res = await axios.get(`${API_BASE_URL}/api/mypage/allergy/list`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {}
+            });
+            
+            console.log("📥 알레르기 응답:", res.data);
+            setAllergies(res.data || []);
         } catch (error) {
-            console.error("알레르기 목록 조회 오류:", error);
+            console.error("❌ 알레르기 목록 조회 오류:", error);
+            console.error("상태:", error.response?.status);
+            console.error("응답:", error.response?.data);
         }
     };
 
-    /** 로그인한 사용자의 기존 알레르기 조회 */
     const loadUserAllergies = async () => {
         try {
-            const res = await axios.get("/api/mypage/allergies");
-            setChecked(res.data.allergies || []);
+            console.log(`📤 요청: ${API_BASE_URL}/api/mypage/allergies`);
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.warn("⚠️ 토큰 없음");
+                setChecked([]);
+                return;
+            }
+            
+            const res = await axios.get(`${API_BASE_URL}/api/mypage/allergies`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            console.log("📥 사용자 알레르기 응답:", res.data);
+            
+            const allergyIds = Array.isArray(res.data) 
+                ? res.data 
+                : (res.data.allergies || []);
+            
+            setChecked(allergyIds);
         } catch (error) {
-            console.error("사용자 알레르기 조회 오류:", error);
+            console.error("❌ 사용자 알레르기 조회 오류:", error);
+            setChecked([]);
         }
     };
 
-    /** 체크 토글 */
-    const toggleCheck = (id) => {
-        setChecked((prev) =>
-            prev.includes(id)
-                ? prev.filter(a => a !== id)
-                : [...prev, id]
-        );
+    const toggleCheck = (allergyId) => {
+        setChecked((prev) => {
+            if (allergyId === 1) {
+                return prev.includes(1) ? [] : [1];
+            }
+            
+            const filteredPrev = prev.filter(id => id !== 1);
+            
+            if (filteredPrev.includes(allergyId)) {
+                return filteredPrev.filter(id => id !== allergyId);
+            } else {
+                return [...filteredPrev, allergyId];
+            }
+        });
     };
 
-    /** 저장 */
     const handleSave = async () => {
         try {
-            await axios.post("/api/mypage/allergies", {
-                allergyIds: checked
-            });
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                return;
+            }
+            
+            console.log("📤 저장 요청:", checked);
+            
+            await axios.post(`${API_BASE_URL}/api/mypage/allergies`, 
+                { allergyIds: checked },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            
             alert("알레르기 정보가 저장되었습니다!");
         } catch (error) {
-            console.error("알레르기 저장 오류:", error);
-            alert("저장에 실패했습니다. 다시 시도해주세요.");
+            console.error("❌ 저장 오류:", error);
+            alert(error.response?.data?.error || "저장에 실패했습니다.");
         }
     };
+
+    if (loading) {
+        return (
+            <div style={{
+                minHeight: '100vh',
+                backgroundColor: '#f9fafb',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>
+                <p style={{ fontSize: '18px', color: '#6b7280' }}>로딩 중...</p>
+            </div>
+        );
+    }
+
+    if (allergies.length === 0) {
+        return (
+            <div style={{
+                minHeight: '100vh',
+                backgroundColor: '#f9fafb',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>
+                <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: '18px', color: '#dc2626', marginBottom: '10px' }}>
+                        알레르기 데이터가 없습니다.
+                    </p>
+                    <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>
+                        브라우저 콘솔(F12)에서 오류를 확인해주세요.
+                    </p>
+                    <button
+                        onClick={loadData}
+                        style={{
+                            padding: '10px 20px',
+                            backgroundColor: '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        새로고침
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div style={{
@@ -71,7 +173,6 @@ const Allergies = () => {
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
             }}>
                 
-                {/* 제목 */}
                 <h2 style={{
                     fontSize: '28px',
                     fontWeight: 'bold',
@@ -81,43 +182,91 @@ const Allergies = () => {
                     알레르기 정보
                 </h2>
 
-                {/* 체크박스 그리드 */}
+                <div style={{
+                    backgroundColor: '#f3f4f6',
+                    padding: '10px',
+                    borderRadius: '6px',
+                    marginBottom: '20px',
+                    fontSize: '12px',
+                    color: '#6b7280'
+                }}>
+                    <p>📊 총 알레르기: {allergies.length}개</p>
+                    <p>✅ 선택됨: {checked.length}개</p>
+                </div>
+
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(5, 1fr)',
-                    gap: '20px',
+                    gap: '15px 20px',
                     marginBottom: '40px'
                 }}>
-                    {allergies.map((allergy) => (
-                        <label
-                            key={allergy.id}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                cursor: 'pointer',
-                                fontSize: '16px',
-                                color: '#374151',
-                                userSelect: 'none'
-                            }}
-                        >
-                            <input
-                                type="checkbox"
-                                checked={checked.includes(allergy.id)}
-                                onChange={() => toggleCheck(allergy.id)}
+                    {allergies.map((allergy) => {
+                        const allergyId = allergy.allergyId;
+                        const allergyName = allergy.allergyName;
+                        
+                        return (
+                            <label
+                                key={allergyId}
                                 style={{
-                                    width: '20px',
-                                    height: '20px',
-                                    marginRight: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     cursor: 'pointer',
-                                    accentColor: '#3b82f6'
+                                    fontSize: '15px',
+                                    color: '#374151',
+                                    userSelect: 'none',
+                                    padding: '8px',
+                                    borderRadius: '6px',
+                                    backgroundColor: checked.includes(allergyId) ? '#dbeafe' : 'transparent',
+                                    transition: 'background-color 0.2s'
                                 }}
-                            />
-                            <span>{allergy.name}</span>
-                        </label>
-                    ))}
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={checked.includes(allergyId)}
+                                    onChange={() => toggleCheck(allergyId)}
+                                    style={{
+                                        width: '18px',
+                                        height: '18px',
+                                        marginRight: '8px',
+                                        cursor: 'pointer',
+                                        accentColor: '#3b82f6',
+                                        flexShrink: 0
+                                    }}
+                                />
+                                <span style={{ lineHeight: '1.3' }}>{allergyName}</span>
+                            </label>
+                        );
+                    })}
                 </div>
 
-                {/* 확인 버튼 */}
+                {checked.length > 0 && (
+                    <div style={{
+                        backgroundColor: '#f3f4f6',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        marginBottom: '30px'
+                    }}>
+                        <p style={{ 
+                            fontSize: '14px', 
+                            color: '#6b7280', 
+                            marginBottom: '8px',
+                            fontWeight: '600'
+                        }}>
+                            선택된 알레르기 ({checked.length}개):
+                        </p>
+                        <p style={{ 
+                            fontSize: '14px', 
+                            color: '#374151',
+                            lineHeight: '1.6'
+                        }}>
+                            {allergies
+                                .filter(a => checked.includes(a.allergyId))
+                                .map(a => a.allergyName)
+                                .join(', ')}
+                        </p>
+                    </div>
+                )}
+
                 <div style={{ textAlign: 'right' }}>
                     <button
                         onClick={handleSave}

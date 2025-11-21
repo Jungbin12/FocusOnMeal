@@ -2,6 +2,7 @@ package com.fom.boot.domain.mypage.model.service;
 
 import java.util.List;
 
+import com.fom.boot.app.mypage.dto.Allergy;
 import com.fom.boot.app.mypage.dto.MyPageDashboardDTO;
 import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
 
@@ -21,6 +22,6 @@ public interface MyPageService {
 
 	Object getUserAllergyIds(String memberId);
 
-	Object getAllAllergies();
+	List<Allergy> getAllAllergies();
 
 }
