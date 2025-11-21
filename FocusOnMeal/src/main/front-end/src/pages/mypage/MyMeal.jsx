@@ -20,6 +20,14 @@ const MyMeal = () => {
     const [trashCount, setTrashCount] = useState(0);
     const [trashLoading, setTrashLoading] = useState(false);
 
+    // 카카오 SDK 초기화
+    useEffect(() => {
+        if (window.Kakao && !window.Kakao.isInitialized()) {
+            window.Kakao.init('cb6aa5e0d6ef0e7cd10c04d280a20f77');
+            console.log('Kakao SDK 초기화 완료');
+        }
+    }, []);
+
     // 식단 목록 조회
     useEffect(() => {
         const fetchMealPlans = async () => {
@@ -233,6 +241,53 @@ const MyMeal = () => {
         return Math.max(0, 30 - diffDays);
     };
 
+    // ====== SNS 공유 기능 ======
+    const getShareText = (meal) => {
+        return `🍽️ ${meal.planName}\n⏰ ${meal.whenEat} | 💰 ${meal.totalCost?.toLocaleString()}원 | 🔥 ${meal.calories}kcal`;
+    };
+
+    // 카카오톡 공유 (SDK)
+    const shareToKakao = (meal) => {
+        if (!window.Kakao || !window.Kakao.isInitialized()) {
+            alert('카카오 SDK가 초기화되지 않았습니다.');
+            return;
+        }
+
+        window.Kakao.Share.sendDefault({
+            objectType: 'feed',
+            content: {
+                title: meal.planName,
+                description: `${meal.whenEat} | ${meal.totalCost?.toLocaleString()}원 | ${meal.calories}kcal`,
+                imageUrl: 'https://cdn-icons-png.flaticon.com/512/1046/1046857.png',
+                link: {
+                    mobileWebUrl: window.location.href,
+                    webUrl: window.location.href,
+                },
+            },
+            buttons: [
+                {
+                    title: '레시피 보기',
+                    link: {
+                        mobileWebUrl: window.location.href,
+                        webUrl: window.location.href,
+                    },
+                },
+            ],
+        });
+    };
+
+    // 링크 복사
+    const copyLink = async (meal) => {
+        const text = `${getShareText(meal)}\n${window.location.href}`;
+        try {
+            await navigator.clipboard.writeText(text);
+            alert('링크가 복사되었습니다!');
+        } catch (err) {
+            console.error('복사 실패:', err);
+            alert('복사에 실패했습니다.');
+        }
+    };
+
     if (loading) return <div className={styles.loading}>Loading...</div>;
 
     return (
@@ -402,6 +457,22 @@ const MyMeal = () => {
                             </div>
                         </div>
                         <div className={styles.modalFooter}>
+                            <div className={styles.shareButtons}>
+                                <button
+                                    className={`${styles.shareBtn} ${styles.kakaoBtn}`}
+                                    onClick={() => shareToKakao(selectedMeal)}
+                                    title="카카오톡 공유"
+                                >
+                                    <img src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png" alt="카카오톡" />
+                                </button>
+                                <button
+                                    className={styles.shareBtn}
+                                    onClick={() => copyLink(selectedMeal)}
+                                    title="링크 복사"
+                                >
+                                    🔗
+                                </button>
+                            </div>
                             <button className={styles.closeBtn} onClick={closeModal}>닫기</button>
                         </div>
                     </div>
