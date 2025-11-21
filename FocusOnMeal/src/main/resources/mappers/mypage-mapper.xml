@@ -118,4 +118,55 @@
         VALUES (#{memberId}, #{allergyId})
     </insert>
 
+    <!-- ====== 내 식단 페이지 ====== -->
+
+    <!-- 내 식단 목록 조회 (페이지네이션) -->
+    <select id="selectMyMealPlans" resultType="com.fom.boot.domain.meal.model.vo.MealPlan">
+        SELECT *
+        FROM (
+            SELECT
+                PLAN_ID as planId,
+                MEMBER_ID as memberId,
+                PLAN_NAME as planName,
+                SERVING_SIZE as servingSize,
+                TOTAL_COST as totalCost,
+                CALORIES as calories,
+                CARBS_G as carbsG,
+                PROTEIN_G as proteinG,
+                FAT_G as fatG,
+                AI_RECIPE as aiRecipe,
+                WHEN_EAT as whenEat,
+                CREATED_AT as createdAt,
+                IS_DELETED as isDelete,
+                DELETED_AT as deleteAt,
+                ROW_NUMBER() OVER (ORDER BY CREATED_AT DESC) AS rnum
+            FROM MEAL_PLAN
+            WHERE MEMBER_ID = #{memberId}
+              AND (IS_DELETED IS NULL OR IS_DELETED = 'N')
+        )
+        WHERE rnum BETWEEN #{startRow} AND #{endRow}
+    </select>
+
+    <!-- 식단 상세 조회 -->
+    <select id="selectMealPlanById" resultType="com.fom.boot.domain.meal.model.vo.MealPlan">
+        SELECT
+            PLAN_ID as planId,
+            MEMBER_ID as memberId,
+            PLAN_NAME as planName,
+            SERVING_SIZE as servingSize,
+            TOTAL_COST as totalCost,
+            CALORIES as calories,
+            CARBS_G as carbsG,
+            PROTEIN_G as proteinG,
+            FAT_G as fatG,
+            AI_RECIPE as aiRecipe,
+            WHEN_EAT as whenEat,
+            CREATED_AT as createdAt,
+            IS_DELETED as isDelete,
+            DELETED_AT as deleteAt
+        FROM MEAL_PLAN
+        WHERE PLAN_ID = #{planId}
+          AND (IS_DELETED IS NULL OR IS_DELETED = 'N')
+    </select>
+
 </mapper>

@@ -1,10 +1,16 @@
 package com.fom.boot.domain.mypage.model.service.impl;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fom.boot.common.pagination.PageInfo;
+import com.fom.boot.common.pagination.Pagination;
+import com.fom.boot.domain.meal.model.vo.MealPlan;
 
 import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.app.mypage.dto.MealPlanSummaryDTO;
@@ -161,5 +167,32 @@ public class MyPageServiceImpl implements MyPageService {
 	@Override
 	public Object getAllAllergies() {
 		return mMapper.getAllAllergies();
+	}
+
+	// 내 식단 페이지 - 페이지네이션 목록 조회
+	@Override
+	@Transactional(readOnly = true)
+	public Map<String, Object> getMyMealPlans(String memberId, int page) {
+		// 총 개수 조회
+		int totalCount = mMapper.countMealPlans(memberId);
+
+		// 페이지 정보 생성
+		PageInfo pageInfo = Pagination.getPageInfo(page, totalCount);
+
+		// 목록 조회
+		List<MealPlan> mealList = mMapper.selectMyMealPlans(memberId, pageInfo.getStartRow(), pageInfo.getEndRow());
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("pageInfo", pageInfo);
+		result.put("mealList", mealList);
+
+		return result;
+	}
+
+	// 식단 상세 조회
+	@Override
+	@Transactional(readOnly = true)
+	public MealPlan getMealPlanDetail(int planId) {
+		return mMapper.selectMealPlanById(planId);
 	}
 }

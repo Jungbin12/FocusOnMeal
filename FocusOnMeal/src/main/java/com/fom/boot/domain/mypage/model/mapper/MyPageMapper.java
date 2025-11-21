@@ -46,4 +46,12 @@ public interface MyPageMapper {
 
 	void deleteUserAllergies(String memberId);
 
+	// 내 식단 페이지 (페이지네이션)
+	List<MealPlan> selectMyMealPlans(@Param("memberId") String memberId,
+									 @Param("startRow") int startRow,
+									 @Param("endRow") int endRow);
+
+	// 식단 상세 조회
+	MealPlan selectMealPlanById(@Param("planId") int planId);
+
 }

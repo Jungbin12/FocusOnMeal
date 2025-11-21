@@ -16,6 +16,7 @@ import ResetPassword from './pages/member/ResetPassword';
 // 마이페이지
 import Dashboard from './pages/mypage/Dashboard';
 import ProtectedRoute from './components/mypage/ProtectedRoute';
+import MyMeal from './pages/meal/MyMeal';
 
 // 식재료
 import IngredientSearch from './pages/ingredient/list';
@@ -56,8 +57,13 @@ function App() {
         <Route path="/mypage" element={
           <ProtectedRoute>
             <Dashboard />
-          </ProtectedRoute>} 
-        />
+          </ProtectedRoute>
+        } />
+        <Route path="/meal/myMeal" element={
+          <ProtectedRoute>
+            <MyMeal />
+          </ProtectedRoute>
+        } />
 
         {/* 식재료 관련 */}
         <Route path="/ingredient/list" element={<IngredientSearch />} />

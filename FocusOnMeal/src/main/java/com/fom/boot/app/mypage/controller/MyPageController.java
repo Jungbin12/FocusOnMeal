@@ -169,6 +169,42 @@ public class MyPageController {
 	    return ResponseEntity.ok(Map.of("success", true, "message", "알레르기 정보가 저장되었습니다."));
 	}
 
-	
-	
+	// 내 식단 목록 조회 (페이지네이션)
+	@GetMapping("/myMeals")
+	public ResponseEntity<?> getMyMealPlans(
+			@RequestParam(defaultValue = "1") int page,
+			Authentication authentication) {
+
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "로그인이 필요합니다."));
+		}
+
+		String memberId = authentication.getName();
+		Map<String, Object> result = mService.getMyMealPlans(memberId, page);
+
+		return ResponseEntity.ok(result);
+	}
+
+	// 식단 상세 조회
+	@GetMapping("/myMeals/{planId}")
+	public ResponseEntity<?> getMealPlanDetail(
+			@PathVariable int planId,
+			Authentication authentication) {
+
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "로그인이 필요합니다."));
+		}
+
+		var mealPlan = mService.getMealPlanDetail(planId);
+
+		if (mealPlan == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("message", "식단을 찾을 수 없습니다."));
+		}
+
+		return ResponseEntity.ok(mealPlan);
+	}
+
 }

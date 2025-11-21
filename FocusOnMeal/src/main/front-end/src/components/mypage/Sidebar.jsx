@@ -20,7 +20,7 @@ const Sidebar = () => {
                 <li className={styles.menuTitle}>식단 관리</li>
                 <li>
                     <NavLink
-                        to="/mypage/mealList"
+                        to="/meal/myMeal"
                         className={({ isActive }) =>
                             isActive ? styles.active : styles.subItem
                         }
