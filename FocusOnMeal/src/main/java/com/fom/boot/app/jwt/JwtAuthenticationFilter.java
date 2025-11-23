@@ -58,6 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                path.startsWith("/api/member/send-verification-code") ||  // ✅ 추가
                path.startsWith("/api/member/verify-email-code") ||       // ✅ 추가
                path.startsWith("/api/member/random-nickname") ||         // ✅ 추가: 랜덤 닉네임은 인증 불필요
+               path.equals("/api/member/delete") ||
                path.startsWith("/member/login") ||
                path.startsWith("/member/join") ||
                path.startsWith("/meal/") ||

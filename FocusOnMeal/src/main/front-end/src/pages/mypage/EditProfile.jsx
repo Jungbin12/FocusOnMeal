@@ -34,7 +34,7 @@ const EditProfile = () => {
 
     const loadUserData = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 alert('로그인이 필요합니다.');
                 return;
@@ -240,7 +240,7 @@ const EditProfile = () => {
         }
 
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             const updateData = {
                 nickname: formData.nickname,
                 phone: formData.phone
@@ -601,26 +601,47 @@ const EditProfile = () => {
                     </p>
                 </div>
 
-                {/* 수정 버튼 */}
-                <button
-                    onClick={handleSubmit}
-                    style={{
-                        width: '100%',
-                        padding: '14px',
-                        backgroundColor: '#3b82f6',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
-                >
-                    수정하기
-                </button>
+                    {/* 수정/탈퇴 버튼 */}
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                        onClick={() => window.location.href = '/member/delete'}
+                        style={{
+                            flex: 1,
+                            padding: '14px',
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
+                    >
+                        회원 탈퇴
+                    </button>
+                    <button
+                        onClick={handleSubmit}
+                        style={{
+                            flex: 2,
+                            padding: '14px',
+                            backgroundColor: '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                    >
+                        수정하기
+                    </button>
+                </div>
             </div>
         </div>
     );

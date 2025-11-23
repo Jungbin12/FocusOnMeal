@@ -10,6 +10,7 @@ import Terms from './pages/member/TermsContent';
 import Privacy from './pages/member/PrivacyContent';
 import FindId from './pages/member/findId';
 import FindPw from './pages/member/findPassword';
+import MemberDelete from './pages/member/MemberDelete';
 // ✅ 추가: 비밀번호 재설정 페이지
 import ResetPassword from './pages/member/ResetPassword';
 
@@ -57,6 +58,7 @@ function App() {
         <Route path="/member/findId" element={<FindId />} />
         <Route path="/member/findPassword" element={<FindPw />} />
         <Route path="/member/resetPassword" element={<ResetPassword />} />
+        <Route path="/member/delete" element={<MemberDelete />} />
 
         {/* 마이페이지 관련 */}
         <Route path="/mypage" element={
