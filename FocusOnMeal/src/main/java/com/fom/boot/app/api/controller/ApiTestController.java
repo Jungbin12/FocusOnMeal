@@ -569,21 +569,51 @@ public class ApiTestController {
 
     /**
      * 식품안전정보원 API 원본 응답 조회
-     * GET /api/test/food-safety/raw?start=1&end=10
+     * GET /api/test/food-safety/raw?days=7&start=1&end=10
      */
     @GetMapping("/food-safety/raw")
     public ResponseEntity<String> testFoodSafetyRaw(
+            @RequestParam(defaultValue = "7") int days,
             @RequestParam(defaultValue = "1") int start,
             @RequestParam(defaultValue = "10") int end
     ) {
-        log.info("식품안전정보원 API 원본 응답 조회 - start: {}, end: {}", start, end);
+        log.info("식품안전정보원 API 원본 응답 조회 - days: {}, start: {}, end: {}", days, start, end);
 
         try {
-            String rawResponse = foodSafetyApiService.getRawResponse(start, end);
+            String rawResponse = foodSafetyApiService.getRawResponse(days, start, end);
             return ResponseEntity.ok(rawResponse);
         } catch (Exception e) {
             log.error("식품안전정보원 API 원본 응답 조회 실패", e);
             return ResponseEntity.ok("ERROR: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 식품안전정보원 API totalCount 조회
+     * GET /api/test/food-safety/count?days=365
+     */
+    @GetMapping("/food-safety/count")
+    public ResponseEntity<Map<String, Object>> testFoodSafetyCount(
+            @RequestParam(defaultValue = "365") int days
+    ) {
+        log.info("식품안전정보원 totalCount 조회 - days: {}", days);
+
+        try {
+            int totalCount = foodSafetyApiService.getTotalCount(days);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "days", days,
+                    "totalCount", totalCount,
+                    "message", String.format("최근 %d일 동안 총 %d건의 위험 공표 정보가 있습니다.", days, totalCount)
+            ));
+
+        } catch (Exception e) {
+            log.error("totalCount 조회 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
         }
     }
 
@@ -715,17 +745,14 @@ public class ApiTestController {
     
     // [추가] Raw Response 확인용 임시 엔드포인트
     @GetMapping("/raw")
-    public String getRawApi(int start, int end) {
-        log.info("Raw API response requested: start={}, end={}", start, end);
-        
-        // **중요: 기간을 1년으로 넓힌 버전으로 호출해야 정확한 테스트가 됩니다.**
-        // getRawResponse의 내부 로직이 7일로 고정되어 있다면, 그 코드를 수정해야 합니다.
-        // 현재 FoodSafetyApiServiceImpl의 getRawResponse는 7일로 되어 있습니다.
-        
-        // 임시로 getRawResponse 내부 코드를 1년으로 변경하거나,
-        // 아래처럼 Service에 별도의 1년 조회 메서드를 임시로 만들어 사용해야 합니다.
-        
-        return foodSafetyApiService.getRawResponse(start, end);
+    public String getRawApi(
+            @RequestParam(defaultValue = "365") int days,
+            @RequestParam(defaultValue = "1") int start,
+            @RequestParam(defaultValue = "100") int end
+    ) {
+        log.info("Raw API response requested: days={}, start={}, end={}", days, start, end);
+
+        return foodSafetyApiService.getRawResponse(days, start, end);
     }
 }
 

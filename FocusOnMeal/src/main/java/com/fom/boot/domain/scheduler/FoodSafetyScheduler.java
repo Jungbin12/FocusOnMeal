@@ -16,18 +16,20 @@ public class FoodSafetyScheduler {
 	private final FoodSafetyDataSyncService foodSafetyDataSyncService;
     
     /**
-     * 매일 오전 9시에 자동 실행
+     * 매일 오전 9시에 자동 실행 (현재 비활성화 - 서버 시작 시 동기화로 대체)
      * cron: 초 분 시 일 월 요일
+     *
+     * 스케줄러 방식이 필요하면 주석 해제하세요.
      */
-    @Scheduled(cron = "${food.safety.batch.cron:0 0 9 * * ?}")
+    // @Scheduled(cron = "${food.safety.batch.cron:0 0 9 * * ?}")
     public void scheduledFetchSafetyAlerts() {
         log.info("=== 식품안전정보 자동 배치 시작 ===");
-        
+
         try {
             int savedCount = foodSafetyDataSyncService.syncRecentAlerts();
-            
+
             log.info("=== 식품안전정보 자동 배치 완료: {} 건 저장 ===", savedCount);
-            
+
         } catch (Exception e) {
             log.error("=== 식품안전정보 자동 배치 실패 ===", e);
         }

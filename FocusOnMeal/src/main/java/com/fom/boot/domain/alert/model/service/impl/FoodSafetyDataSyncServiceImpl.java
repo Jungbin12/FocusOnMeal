@@ -34,18 +34,39 @@ public class FoodSafetyDataSyncServiceImpl implements FoodSafetyDataSyncService 
     @Override
     @Transactional
     public int syncRecentAlerts() {
-        log.info("최근 식품안전정보 동기화 시작 (최근 7일)");
-        
+        log.info("최근 식품안전정보 동기화 시작 (최근 3일)");
+
         try {
-            // FoodSafetyApiService의 fetchRecentSafetyAlerts(7)이 최대 100건을 가져온다고 가정
-            List<SafetyAlert> alerts = foodSafetyApiService.fetchRecentSafetyAlerts(7);
-            
-            // API에서 가져온 데이터 처리 및 DB 저장
-            return saveAlerts(alerts);
-            
+            // 1. 먼저 totalCount 확인
+            int totalCount = foodSafetyApiService.getTotalCount(3);
+            log.info("최근 3일 전체 데이터 개수: {}", totalCount);
+
+            if (totalCount == 0) {
+                log.info("동기화할 데이터가 없습니다.");
+                return 0;
+            }
+
+            // 2. 페이징 처리하여 전체 데이터 가져오기
+            int totalSaved = 0;
+            int pageSize = MAX_PER_PAGE;
+
+            for (int startIdx = 1; startIdx <= totalCount; startIdx += pageSize) {
+                int endIdx = Math.min(startIdx + pageSize - 1, totalCount);
+
+                log.info("페이지 조회 중: {}-{} / {}", startIdx, endIdx, totalCount);
+
+                List<SafetyAlert> alerts = foodSafetyApiService.fetchSafetyAlerts(3, startIdx, endIdx);
+                int saved = saveAlerts(alerts);
+                totalSaved += saved;
+
+                log.info("페이지 저장 완료: {} 건 저장", saved);
+            }
+
+            log.info("최근 3일 동기화 완료 - 총 {} 건 저장", totalSaved);
+            return totalSaved;
+
         } catch (Exception e) {
             log.error("최근 식품안전정보 동기화 실패", e);
-            // 트랜잭션 롤백 유도
             throw new RuntimeException("Recent alert sync failed", e);
         }
     }
@@ -53,14 +74,37 @@ public class FoodSafetyDataSyncServiceImpl implements FoodSafetyDataSyncService 
     @Override
     @Transactional
     public int syncAllAlerts() {
-        log.warn("전체 식품안전정보 동기화 시작 (주의: API 전체 페이지를 순회해야 함)");
-        
-        // **TODO: API 총 건수를 조회하여 페이지를 순회하는 로직 추가 필요**
-        // 현재는 일단 1페이지 (100건)만 조회하도록 유지 (2.A 문제 해결을 위한 임시 조치)
+        log.info("전체 식품안전정보 동기화 시작 (최근 30일)");
+
         try {
-            List<SafetyAlert> alerts = foodSafetyApiService.fetchSafetyAlerts(1, MAX_PER_PAGE);
-            return saveAlerts(alerts);
-            
+            // 1. 먼저 totalCount 확인 (최근 30일)
+            int totalCount = foodSafetyApiService.getTotalCount(30);
+            log.info("최근 30일 전체 데이터 개수: {}", totalCount);
+
+            if (totalCount == 0) {
+                log.info("동기화할 데이터가 없습니다.");
+                return 0;
+            }
+
+            // 2. 페이징 처리하여 전체 데이터 가져오기
+            int totalSaved = 0;
+            int pageSize = MAX_PER_PAGE;
+
+            for (int startIdx = 1; startIdx <= totalCount; startIdx += pageSize) {
+                int endIdx = Math.min(startIdx + pageSize - 1, totalCount);
+
+                log.info("페이지 조회 중: {}-{} / {}", startIdx, endIdx, totalCount);
+
+                List<SafetyAlert> alerts = foodSafetyApiService.fetchSafetyAlerts(30, startIdx, endIdx);
+                int saved = saveAlerts(alerts);
+                totalSaved += saved;
+
+                log.info("페이지 저장 완료: {} 건 저장", saved);
+            }
+
+            log.info("전체 동기화 완료 (30일) - 총 {} 건 저장", totalSaved);
+            return totalSaved;
+
         } catch (Exception e) {
             log.error("전체 식품안전정보 동기화 실패", e);
             throw new RuntimeException("All alert sync failed", e);
@@ -93,12 +137,13 @@ public class FoodSafetyDataSyncServiceImpl implements FoodSafetyDataSyncService 
     @Override
     @Transactional
     public int syncAlertsByRange(int startIdx, int endIdx) {
-        log.info("식품안전정보 동기화 - startIdx: {}, endIdx: {}", startIdx, endIdx);
-        
+        log.info("식품안전정보 범위별 동기화 - startIdx: {}, endIdx: {}", startIdx, endIdx);
+
         try {
-            List<SafetyAlert> alerts = foodSafetyApiService.fetchSafetyAlerts(startIdx, endIdx);
+            // 기본적으로 최근 30일 데이터에서 범위 조회
+            List<SafetyAlert> alerts = foodSafetyApiService.fetchSafetyAlerts(30, startIdx, endIdx);
             return saveAlerts(alerts);
-            
+
         } catch (Exception e) {
             log.error("범위별 식품안전정보 동기화 실패", e);
             throw new RuntimeException("Range sync failed", e);
@@ -148,21 +193,35 @@ public class FoodSafetyDataSyncServiceImpl implements FoodSafetyDataSyncService 
         try {
             // MyBatis의 selectKey 대신, Service에서 미리 PK를 생성하지 않고, Mapper에서 시퀀스를 사용하도록 처리
             savedCount = alertMapper.insertBatchSafetyAlert(alertsToInsert);
-            
-            // 4. 알림 발송 (Batch 삽입 후, DB에 실제로 저장된 데이터에 대해서만 발송)
+
+            // 4. 배치 삽입 후 생성된 Alert ID 조회 및 알림 발송
+            int notificationSentCount = 0;
             for (SafetyAlert savedAlert : alertsToInsert) {
-                // 식재료가 매핑되었고 (ingredientId > 0), DB에 성공적으로 저장된 경우에만 알림 발송
-                // **주의: 현재 배치 삽입 후 alertId가 VO에 다시 담기는 로직이 없으므로, 알림 발송은 제한적으로만 가능함**
-                // (일단 알림 발송은 alertId가 필요한 alertService.createSafetyAlertNotifications(alertId) 대신 로그만 남기는 것으로 대체)
-                if (savedAlert.getIngredientId() > 0) {
-                     // TODO: Batch INSERT 후 생성된 Alert ID를 가져오는 추가 쿼리 또는 로직이 필요함.
-                     // 현재는 임시로 로그만 남기거나, 단일 건 삽입으로 되돌리는 것을 고려해야 함.
-                     // (일단 알림 발송 로직은 주석 처리하고, DB 저장 건수만 반환합니다.)
-                     // alertService.createSafetyAlertNotifications(savedAlert.getAlertId()); 
-                     log.debug("알림 발송 대상 확인 - title: {}", savedAlert.getTitle());
+                try {
+                    // 복합 키를 사용하여 DB에서 생성된 Alert ID 조회
+                    Integer alertId = alertMapper.findAlertIdByComplexKey(savedAlert);
+
+                    if (alertId != null) {
+                        savedAlert.setAlertId(alertId); // VO에 ID 설정
+
+                        // 식재료가 매핑된 경우에만 알림 발송
+                        if (savedAlert.getIngredientId() > 0) {
+                            alertService.createSafetyAlertNotifications(alertId);
+                            notificationSentCount++;
+                            log.debug("알림 발송 완료 - alertId: {}, title: {}", alertId, savedAlert.getTitle());
+                        }
+                    } else {
+                        log.warn("Alert ID 조회 실패 - title: {}", savedAlert.getTitle());
+                    }
+
+                } catch (Exception e) {
+                    log.error("Alert ID 조회 또는 알림 발송 실패 - title: {}", savedAlert.getTitle(), e);
+                    // 개별 알림 발송 실패는 전체 트랜잭션을 롤백하지 않음
                 }
             }
-            
+
+            log.info("알림 발송 완료 - {} 건 / {} 건", notificationSentCount, alertsToInsert.size());
+
         } catch (Exception e) {
             log.error("위험 공표 배치 저장 실패", e);
             // Batch 실패 시 트랜잭션 롤백

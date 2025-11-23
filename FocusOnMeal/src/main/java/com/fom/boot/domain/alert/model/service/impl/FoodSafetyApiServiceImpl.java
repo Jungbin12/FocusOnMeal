@@ -117,16 +117,51 @@ public class FoodSafetyApiServiceImpl implements FoodSafetyApiService {
     }
     
     @Override
-    public List<SafetyAlert> fetchSafetyAlerts(int startIdx, int endIdx) {
-        List<SafetyAlert> alerts = new ArrayList<>();
-        
+    public int getTotalCount(int days) {
         try {
             LocalDate endDate = LocalDate.now();
-            LocalDate startDate = endDate.minusDays(30);
-            
+            LocalDate startDate = endDate.minusDays(days);
+
             String bgnde = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             String endde = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            
+
+            String url = UriComponentsBuilder.fromUriString(apiUrl + "/" + responseType)
+                    .queryParam("apiKey", apiKey)
+                    .queryParam("bgnde", bgnde)
+                    .queryParam("endde", endde)
+                    .queryParam("startIndex", 1)
+                    .queryParam("endIndex", 1)  // 최소 요청으로 totalCount만 확인
+                    .build()
+                    .toUriString();
+
+            log.info("식품안전정보원 totalCount 조회 - days: {}, bgnde: {}, endde: {}", days, bgnde, endde);
+
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                String responseBody = response.getBody();
+                return extractTotalCount(responseBody);
+            }
+
+            return 0;
+
+        } catch (Exception e) {
+            log.error("totalCount 조회 실패", e);
+            return 0;
+        }
+    }
+
+    @Override
+    public List<SafetyAlert> fetchSafetyAlerts(int days, int startIdx, int endIdx) {
+        List<SafetyAlert> alerts = new ArrayList<>();
+
+        try {
+            LocalDate endDate = LocalDate.now();
+            LocalDate startDate = endDate.minusDays(days);
+
+            String bgnde = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String endde = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
             String url = UriComponentsBuilder.fromUriString(apiUrl + "/" + responseType)
                     .queryParam("apiKey", apiKey)
                     .queryParam("bgnde", bgnde)
@@ -135,24 +170,24 @@ public class FoodSafetyApiServiceImpl implements FoodSafetyApiService {
                     .queryParam("endIndex", endIdx)
                     .build()
                     .toUriString();
-            
-            log.info("식품안전정보원 API 호출: bgnde={}, endde={}, startIdx={}, endIdx={}", 
-                    bgnde, endde, startIdx, endIdx);
+
+            log.info("식품안전정보원 API 호출: days={}, bgnde={}, endde={}, startIdx={}, endIdx={}",
+                    days, bgnde, endde, startIdx, endIdx);
             log.debug("요청 URL: {}", url);
-            
+
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            
+
             if (response.getStatusCode().is2xxSuccessful()) {
                 String responseBody = response.getBody();
                 alerts = parseResponse(responseBody);
-                
+
                 log.info("식품안전정보원 API 조회 완료: {} 건", alerts.size());
             }
-            
+
         } catch (Exception e) {
             log.error("식품안전정보원 API 호출 실패", e);
         }
-        
+
         return alerts;
     }
     
@@ -196,14 +231,14 @@ public class FoodSafetyApiServiceImpl implements FoodSafetyApiService {
     }
     
     @Override
-    public String getRawResponse(int startIdx, int endIdx) {
+    public String getRawResponse(int days, int startIdx, int endIdx) {
         try {
             LocalDate endDate = LocalDate.now();
-            LocalDate startDate = endDate.minusDays(7);
-            
+            LocalDate startDate = endDate.minusDays(days);
+
             String bgnde = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             String endde = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            
+
             String url = UriComponentsBuilder.fromUriString(apiUrl + "/" + responseType)
                     .queryParam("apiKey", apiKey)
                     .queryParam("bgnde", bgnde)
@@ -212,13 +247,46 @@ public class FoodSafetyApiServiceImpl implements FoodSafetyApiService {
                     .queryParam("endIndex", endIdx)
                     .build()
                     .toUriString();
-            
+
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             return response.getBody();
-            
+
         } catch (Exception e) {
             log.error("원본 응답 조회 실패", e);
             return "ERROR: " + e.getMessage();
+        }
+    }
+
+    /**
+     * 응답에서 totalCount 추출
+     */
+    private int extractTotalCount(String responseBody) {
+        try {
+            if ("json".equalsIgnoreCase(responseType)) {
+                JsonNode root = objectMapper.readTree(responseBody);
+                JsonNode totalCountNode = root.path("totalCount");
+                if (!totalCountNode.isMissingNode()) {
+                    return totalCountNode.asInt();
+                }
+            } else {
+                // XML 응답 처리 - XML은 대문자 필드명 사용
+                JsonNode root = xmlMapper.readTree(responseBody);
+
+                // NFSI-FOODINFO 구조: <TOTAL_COUNT>값</TOTAL_COUNT>
+                JsonNode totalCountNode = root.path("TOTAL_COUNT");
+                if (!totalCountNode.isMissingNode()) {
+                    int count = totalCountNode.asInt();
+                    log.info("totalCount 추출 성공: {}", count);
+                    return count;
+                }
+            }
+
+            log.warn("totalCount 필드를 찾을 수 없습니다. 응답: {}", responseBody.substring(0, Math.min(300, responseBody.length())));
+            return 0;
+
+        } catch (Exception e) {
+            log.error("totalCount 추출 실패", e);
+            return 0;
         }
     }
     
@@ -230,23 +298,24 @@ public class FoodSafetyApiServiceImpl implements FoodSafetyApiService {
             if ("json".equalsIgnoreCase(responseType)) {
                 JsonNode root = objectMapper.readTree(responseBody);
                 JsonNode items = root.path("data");
-                
+
                 if (items.isArray()) {
                     return items.size();
                 }
             } else {
+                // XML 응답 처리
                 JsonNode root = xmlMapper.readTree(responseBody);
-                JsonNode items = root.path("data").path("item");
-                
+                JsonNode items = root.path("ITEMS").path("ITEM");
+
                 if (items.isArray()) {
                     return items.size();
                 } else if (!items.isMissingNode()) {
                     return 1;
                 }
             }
-            
+
             return 0;
-            
+
         } catch (Exception e) {
             log.error("응답 카운트 파싱 실패", e);
             return -1;
@@ -258,18 +327,20 @@ public class FoodSafetyApiServiceImpl implements FoodSafetyApiService {
      */
     private List<SafetyAlert> parseResponse(String responseBody) {
         List<SafetyAlert> alerts = new ArrayList<>();
-        
+
         try {
             JsonNode items;
-            
+
             if ("json".equalsIgnoreCase(responseType)) {
                 JsonNode root = objectMapper.readTree(responseBody);
                 items = root.path("data");
             } else {
+                // XML 응답 처리
                 JsonNode root = xmlMapper.readTree(responseBody);
-                items = root.path("data").path("item");
+                // <NFSI-FOODINFO><ITEMS><ITEM>...</ITEM></ITEMS></NFSI-FOODINFO>
+                items = root.path("ITEMS").path("ITEM");
             }
-            
+
             if (items.isArray()) {
                 for (JsonNode item : items) {
                     SafetyAlert alert = parseItem(item);
@@ -283,11 +354,11 @@ public class FoodSafetyApiServiceImpl implements FoodSafetyApiService {
                     alerts.add(alert);
                 }
             }
-            
+
         } catch (Exception e) {
             log.error("응답 파싱 실패", e);
         }
-        
+
         return alerts;
     }
     

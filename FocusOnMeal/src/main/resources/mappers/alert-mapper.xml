@@ -134,11 +134,9 @@
     </select>
     
     <!-- 안전 위험 공표 정보 배치 등록 (D. 배치 삽입 문제 해결) -->
-    <insert id="insertBatchSafetyAlert" 
+    <insert id="insertBatchSafetyAlert"
             parameterType="java.util.List">
-        INSERT ALL
-        <foreach collection="list" item="alert" separator=" ">
-        INTO SAFETY_ALERT_MASTER (
+        INSERT INTO SAFETY_ALERT_MASTER (
             ALERT_ID,
             INGREDIENT_ID,
             NATION,
@@ -147,18 +145,29 @@
             DESCRIPTION,
             PUBLICATION_DATE,
             ORIGINAL_URL
-        ) VALUES (
-            SEQ_SAFETY_ALERT_MASTER.NEXTVAL,
-            #{alert.ingredientId},
-            #{alert.nation},
-            #{alert.hazardType},
-            #{alert.title},
-            #{alert.description},
-            #{alert.publicationDate, jdbcType=TIMESTAMP},
-            #{alert.originalUrl}
         )
-        </foreach>
-        SELECT * FROM DUAL
+        SELECT
+            SEQ_SAFETY_ALERT_MASTER.NEXTVAL,
+            INGREDIENT_ID,
+            NATION,
+            HAZARD_TYPE,
+            TITLE,
+            DESCRIPTION,
+            PUBLICATION_DATE,
+            ORIGINAL_URL
+        FROM (
+            <foreach collection="list" item="alert" separator=" UNION ALL ">
+            SELECT
+                #{alert.ingredientId, jdbcType=NUMERIC} AS INGREDIENT_ID,
+                #{alert.nation, jdbcType=VARCHAR} AS NATION,
+                #{alert.hazardType, jdbcType=VARCHAR} AS HAZARD_TYPE,
+                #{alert.title, jdbcType=VARCHAR} AS TITLE,
+                #{alert.description, jdbcType=CLOB} AS DESCRIPTION,
+                #{alert.publicationDate, jdbcType=TIMESTAMP} AS PUBLICATION_DATE,
+                #{alert.originalUrl, jdbcType=VARCHAR} AS ORIGINAL_URL
+            FROM DUAL
+            </foreach>
+        )
     </insert>
     
     <!-- 복합 키로 중복 체크 (C. 중복 체크 취약 문제 해결) -->
@@ -169,5 +178,15 @@
           AND NATION = #{nation}
           AND PUBLICATION_DATE = #{publicationDate, jdbcType=TIMESTAMP}
     </select>
-  
+
+    <!-- 복합 키로 Alert ID 조회 (배치 삽입 후 ID 조회용) -->
+    <select id="findAlertIdByComplexKey" resultType="int">
+        SELECT ALERT_ID
+        FROM SAFETY_ALERT_MASTER
+        WHERE TITLE = #{title}
+          AND NATION = #{nation}
+          AND PUBLICATION_DATE = #{publicationDate, jdbcType=TIMESTAMP}
+          AND ROWNUM = 1
+    </select>
+
   </mapper>

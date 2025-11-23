@@ -128,4 +128,11 @@ public interface AlertMapper {
      * @return 중복 건수
      */
     int countByComplexKey(SafetyAlert safetyAlert);
+
+    /**
+     * 제목, 국가, 공표일 복합 키로 Alert ID 조회 (배치 삽입 후 ID 조회용)
+     * @param safetyAlert 공표 정보 (title, nation, publicationDate 사용)
+     * @return Alert ID (없으면 null)
+     */
+    Integer findAlertIdByComplexKey(SafetyAlert safetyAlert);
 }
