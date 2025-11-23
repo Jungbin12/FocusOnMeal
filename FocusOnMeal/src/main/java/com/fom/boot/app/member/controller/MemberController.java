@@ -2,6 +2,7 @@ package com.fom.boot.app.member.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
@@ -28,7 +29,7 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/member")
+@RequestMapping("/api/member")  // ✅ 수정: /member → /api/member
 public class MemberController {
 
     private final BCryptPasswordEncoder bcrypt;
@@ -438,15 +439,49 @@ public class MemberController {
         return hasDigit && hasSpecial;
     }
     
-    // 랜덤 닉네임 생성
+    // ✅ 수정: 랜덤 닉네임 생성 API - 로그 추가
     @GetMapping("/random-nickname")
     public ResponseEntity<RandomNicknameResponse> getRandomNickname() {
         try {
+            log.info("🎲 랜덤 닉네임 생성 요청");
             String nickname = mService.generateRandomNickname();
+            log.info("🎲 생성된 닉네임: {}", nickname);
             return ResponseEntity.ok(new RandomNicknameResponse(nickname));
         } catch (Exception e) {
-            log.error("랜덤 닉네임 생성 오류", e);
+            log.error("❌ 랜덤 닉네임 생성 오류", e);
             return ResponseEntity.status(500).build();
+        }
+    }
+    
+    // 회원 탈퇴
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteMember(
+            @RequestBody Map<String, String> request,
+            Authentication authentication) {
+        try {
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401)
+                        .body(Map.of("message", "로그인이 필요합니다."));
+            }
+
+            String memberId = authentication.getName();
+            String password = request.get("password");
+
+            log.info("회원 탈퇴 요청: memberId={}", memberId);
+
+            boolean success = mService.deleteMember(memberId, password);
+
+            if (success) {
+                log.info("회원 탈퇴 성공: memberId={}", memberId);
+                return ResponseEntity.ok(Map.of("message", "회원 탈퇴가 완료되었습니다."));
+            } else {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "비밀번호가 일치하지 않습니다."));
+            }
+        } catch (Exception e) {
+            log.error("회원 탈퇴 오류", e);
+            return ResponseEntity.status(500)
+                    .body(Map.of("message", "서버 오류가 발생했습니다."));
         }
     }
     
