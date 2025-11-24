@@ -1,7 +1,7 @@
 // src/services/authService.js
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/member';
+const API_BASE_URL = 'http://localhost:8080/api/member';
 
 // axios 인스턴스 생성
 const apiClient = axios.create({

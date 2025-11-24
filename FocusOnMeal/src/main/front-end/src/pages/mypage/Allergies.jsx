@@ -52,7 +52,8 @@ const Allergies = () => {
             }
             
             const res = await axios.get(`${API_BASE_URL}/api/mypage/allergies`, {
-                headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true
             });
             
             console.log("📥 사용자 알레르기 응답:", res.data);
@@ -112,9 +113,13 @@ const Allergies = () => {
             
             console.log("📤 저장 요청:", checked);
             
-            await axios.post(`${API_BASE_URL}/api/mypage/allergies`, 
-                { allergyIds: checked },
-                { headers: { Authorization: `Bearer ${token}` } }
+            await axios.post(
+            "http://localhost:8080/api/mypage/allergies",
+            { allergyIds: checked },
+            {
+                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true
+            }
             );
             
             alert("알레르기 정보가 저장되었습니다!");

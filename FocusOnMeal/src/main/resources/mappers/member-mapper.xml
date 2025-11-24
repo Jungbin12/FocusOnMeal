@@ -137,8 +137,9 @@
 	    DELETE FROM meal_plan WHERE member_id = #{memberId}
 	</delete>
 	
-	<delete id="deleteUserFavorites" parameterType="String">
-	    DELETE FROM favorite_ingredient WHERE member_id = #{memberId}
+	<delete id="deleteUserFavorites" parameterType="string">
+	    DELETE FROM FAVORITE
+	    WHERE MEMBER_ID = #{memberId}
 	</delete>
 	
 	<!-- 회원 삭제 -->
