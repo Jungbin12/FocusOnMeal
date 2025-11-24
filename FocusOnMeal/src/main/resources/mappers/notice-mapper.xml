@@ -104,7 +104,8 @@
 	        NOTICE_CONTENT,
 	        NOTICE_CREATEAT,
 	        NOTICE_ISNEW,
-	        NOTICE_IMPORTANT
+	        NOTICE_IMPORTANT,
+	        VIEW_COUNT
 	    FROM NOTICE
 	    WHERE NOTICE_NO = #{noticeNo}
 	      AND IS_DELETED = 'N'
