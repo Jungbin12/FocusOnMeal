@@ -420,9 +420,7 @@
 
 .chartArea {
     width: 100%;
-    height: 150px; 
-    background-color: #ffffff;
-    border: 1px solid #eee;
+    height: 300px; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -458,4 +456,55 @@
     color: #333;
     width: 140px; 
     flex-shrink: 0;
+}
+
+/* 가격 변동 정보 표시 */
+.priceChangeInfo {
+    display: flex;
+    gap: 20px;
+    margin: 15px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.changeBox {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.changeLabel {
+    font-size: 0.85em;
+    color: #666;
+    font-weight: 500;
+}
+
+.changeValue {
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.priceUp {
+    color: #dc3545;
+}
+
+.priceDown {
+    color: #007aff;
+}
+
+.priceStable {
+    color: #757575;
+}
+
+.priceDiffSmall {
+    font-size: 0.85em;
+    opacity: 0.8;
+    margin-left: 4px;
+}
+
+/* 차트 영역 개선 */
+.chartArea {
+    margin-top: 20px;
 }

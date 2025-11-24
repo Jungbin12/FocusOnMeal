@@ -19,6 +19,7 @@ import com.fom.boot.app.pricehistory.dto.PriceChangeRate;
 import com.fom.boot.app.pricehistory.dto.PriceDataPoint;
 import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
 import com.fom.boot.domain.ingredient.model.mapper.IngredientMapper;
+import com.fom.boot.domain.ingredient.model.mapper.IngredientPriceHistoryMapper;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
 import com.fom.boot.domain.pricehistory.model.mapper.PriceHistoryMapper;
@@ -35,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PriceHistoryServiceImpl implements PriceHistoryService {
 	
-	private final PriceHistoryMapper priceHistoryMapper;
+	private final IngredientPriceHistoryMapper priceHistoryMapper;
     private final IngredientMapper ingredientMapper;
     
     @Override

@@ -2,6 +2,91 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './detail.module.css';
+import {
+    LineChart,
+    Line,
+    CartesianGrid,
+    XAxis,
+    YAxis,
+    Tooltip,
+    Legend,
+    ResponsiveContainer
+} from 'recharts';
+
+// Y축 도메인 계산 (컴포넌트 외부로 분리)
+const calculateYAxisDomain = (dataPoints) => {
+    if (!dataPoints || dataPoints.length === 0) return [0, 10000];
+    
+    const prices = dataPoints.map(point => point.price);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    
+    const range = maxPrice - minPrice;
+    const unit = range > 5000 ? 500 : 100;
+    
+    const paddedMin = Math.floor(minPrice / unit) * unit - unit;
+    const paddedMax = Math.ceil(maxPrice / unit) * unit + unit;
+    
+    return [Math.max(0, paddedMin), paddedMax];
+};
+
+// 변동률 표시 컴포넌트 (외부로 분리)
+const PriceChangeDisplay = ({ changeRate }) => {
+    if (!changeRate) return null;
+
+    return (
+        <div className={styles.priceChangeInfo}>
+            <div className={styles.changeBox}>
+                <span className={styles.changeLabel}>현재 가격</span>
+                <span className={styles.changeValue}>
+                    {changeRate.currentPrice?.toLocaleString() || 'N/A'}원
+                </span>
+            </div>
+            
+            {changeRate.weeklyChange != null && (
+                <div className={styles.changeBox}>
+                    <span className={styles.changeLabel}>주간 변동</span>
+                    <span className={`${styles.changeValue} ${
+                        changeRate.weeklyChange > 0 ? styles.priceUp : 
+                        changeRate.weeklyChange < 0 ? styles.priceDown : 
+                        styles.priceStable
+                    }`}>
+                        {changeRate.weeklyChange > 0 ? '↑' : 
+                         changeRate.weeklyChange < 0 ? '↓' : '→'} 
+                        {Math.abs(changeRate.weeklyChange).toFixed(2)}%
+                        {changeRate.weeklyPriceDiff != null && (
+                            <span className={styles.priceDiffSmall}>
+                                {' '}({changeRate.weeklyPriceDiff > 0 ? '+' : ''}
+                                {changeRate.weeklyPriceDiff.toLocaleString()}원)
+                            </span>
+                        )}
+                    </span>
+                </div>
+            )}
+            
+            {changeRate.monthlyChange != null && (
+                <div className={styles.changeBox}>
+                    <span className={styles.changeLabel}>월간 변동</span>
+                    <span className={`${styles.changeValue} ${
+                        changeRate.monthlyChange > 0 ? styles.priceUp : 
+                        changeRate.monthlyChange < 0 ? styles.priceDown : 
+                        styles.priceStable
+                    }`}>
+                        {changeRate.monthlyChange > 0 ? '↑' : 
+                         changeRate.monthlyChange < 0 ? '↓' : '→'} 
+                        {Math.abs(changeRate.monthlyChange).toFixed(2)}%
+                        {changeRate.monthlyPriceDiff != null && (
+                            <span className={styles.priceDiffSmall}>
+                                {' '}({changeRate.monthlyPriceDiff > 0 ? '+' : ''}
+                                {changeRate.monthlyPriceDiff.toLocaleString()}원)
+                            </span>
+                        )}
+                    </span>
+                </div>
+            )}
+        </div>
+    );
+};
 
 function IngredientDetail() {
     const { id } = useParams();
@@ -11,94 +96,103 @@ function IngredientDetail() {
     const [priceHistory, setPriceHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isWished, setIsWished] = useState(false);
-    const [isAlertEnabled, setIsAlertEnabled] = useState(false); // 안전 알림 상태
-    const [isPriceAlertEnabled, setIsPriceAlertEnabled] = useState(false); // 가격 알림 상태 
+    const [isAlertEnabled, setIsAlertEnabled] = useState(false);
+    const [isPriceAlertEnabled, setIsPriceAlertEnabled] = useState(false);
+    const [priceList, setPriceList] = useState([]);
+    const [priceTrendData, setPriceTrendData] = useState(null);
 
     useEffect(() => {
         const fetchDetail = async () => {
             try {
+                const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+                
+                // 1. 기본 상세 정보
                 const response = await axios.get(`/ingredient/api/detail/${id}`);
                 const info = response.data.info || null;
                 const history = response.data.history || [];
                 
                 // 가격 정보 추가 처리
                 if (info && history.length > 0) {
-                    // 최신 가격
                     const latestPrice = history[0];
                     info.currentPrice = latestPrice.priceValue;
                     info.collectedDate = latestPrice.collectedDate;
                     info.pricePer100g = Math.floor(latestPrice.priceValue / 10);
                     
-                    // ✅ [수정] 복잡한 날짜 계산 제거 -> 배열의 두 번째 요소(history[1])가 바로 직전 데이터임
                     const previousPriceData = history.length > 1 ? history[1] : null;
                     
                     if (previousPriceData) {
                         info.previousPrice = previousPriceData.priceValue;
-                        info.previousCollectedDate = previousPriceData.collectedDate; // 날짜도 저장
+                        info.previousCollectedDate = previousPriceData.collectedDate;
                         
-                        // 변동률 계산 (프론트에서 계산)
                         if (info.currentPrice && info.previousPrice > 0) {
                             const changePercent = ((info.currentPrice - info.previousPrice) / info.previousPrice) * 100;
-                            // 소수점 1자리까지 계산해서 저장
                             info.priceChangePercent = Number(changePercent.toFixed(1));
                         } else {
                             info.priceChangePercent = 0;
                         }
                     } else {
-                        // 이전 데이터 없음
                         info.previousPrice = 0;
                         info.priceChangePercent = 0;
                     }
                 }
                 
-                // TODO: 실제 안전도 로직 구현 필요
                 info.safetyStatus = ['safe', 'warning', 'danger'][Math.floor(Math.random() * 3)];
                 
                 setItemInfo(info); 
                 setPriceHistory(history);
                 
-                const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-
-                // 찜 상태 확인 (MyPageController 경로 사용)
+                // 2. 로그인 사용자 전용 데이터
                 if (token) {
-
+                    // 가격 추이 데이터
                     try {
-                        // 기존: '/ingredient/api/favorites' -> 변경: '/api/mypage/favorites'
-                        const favoriteResponse = await axios.get('/api/mypage/favorites');
+                        const trendResponse = await axios.get(
+                            `/api/mypage/price-chart/${id}?days=30`,
+                            { headers: { Authorization: `Bearer ${token}` } }
+                        );
+                        setPriceTrendData(trendResponse.data);
+                    } catch (error) {
+                        console.error('가격 추이 데이터 로드 실패:', error);
+                    }
 
+                    // 찜 상태 확인
+                    try {
+                        const favoriteResponse = await axios.get('/api/mypage/favorites');
                         if (favoriteResponse.data && Array.isArray(favoriteResponse.data)) {
-                            // 현재 보고 있는 상세 페이지의 ID가 찜 목록에 있는지 확인
                             const isFavorited = favoriteResponse.data.some(fav => fav.ingredientId === parseInt(id));
                             setIsWished(isFavorited);
                         }
-                    } catch{
-                        // 비로그인 상태 등 에러 발생 시 찜 안 된 상태로 유지
-                        // console.log("찜 상태 확인 실패 (로그인 필요):", favError);
+                    } catch {
+                        // 무시
                     }
 
-                    // 안전 알림 상태 확인
+                    // 안전 알림 상태
                     try {
                         const alertResponse = await axios.get(`/ingredient/api/${id}/alert`, {
                             headers: { Authorization: `Bearer ${token}` }
                         });
-                        const enabled = alertResponse.data.isEnabled || false;
-                        setIsAlertEnabled(enabled);
+                        setIsAlertEnabled(alertResponse.data.isEnabled || false);
                     } catch {
-                        // 비로그인 또는 오류 시 알림 OFF 상태
                         setIsAlertEnabled(false);
                     }
 
-                    // 가격 알림 상태 확인 (별도)
+                    // 가격 알림 상태
                     try {
                         const priceAlertResponse = await axios.get(`/ingredient/api/${id}/price-alert`, {
                             headers: { Authorization: `Bearer ${token}` }
                         });
-                        const priceEnabled = priceAlertResponse.data.isEnabled || false;
-                        setIsPriceAlertEnabled(priceEnabled);
+                        setIsPriceAlertEnabled(priceAlertResponse.data.isEnabled || false);
                     } catch {
-                        // 비로그인 또는 오류 시 알림 OFF 상태
                         setIsPriceAlertEnabled(false);
                     }
+                }
+
+                // 차트용 데이터 변환
+                if (history && history.length > 0) {
+                    const mapped = history.map(h => ({
+                        date: h.collectedDate,
+                        price: h.priceValue
+                    }));
+                    setPriceList(mapped.reverse());
                 }
 
             } catch (error) {
@@ -107,16 +201,16 @@ function IngredientDetail() {
                 setLoading(false);
             }
         };
+        
         fetchDetail();
     }, [id]);
 
+    // 찜하기 핸들러
     const handleWishClick = async () => {
         try {
-            // 찜 등록/해제는 여전히 IngredientController 사용
             const response = await axios.post(`/ingredient/detail/${id}/favorite`);
             if (response.data.success) {
                 setIsWished(response.data.isFavorite);
-                // alert(response.data.message); // 너무 자주 뜨면 주석 처리 추천
             }
         } catch (error) {
             if (error.response?.status === 401) {
@@ -127,6 +221,7 @@ function IngredientDetail() {
         }
     };
 
+    // 안전 알림 핸들러
     const handleAlertClick = async () => {
         const token = sessionStorage.getItem('token') || localStorage.getItem('token');
 
@@ -141,8 +236,7 @@ function IngredientDetail() {
             });
 
             if (response.data.success) {
-                const newState = response.data.isEnabled;
-                setIsAlertEnabled(newState);
+                setIsAlertEnabled(response.data.isEnabled);
             }
         } catch (error) {
             if (error.response?.status === 401) {
@@ -153,6 +247,7 @@ function IngredientDetail() {
         }
     };
 
+    // 가격 알림 핸들러
     const handlePriceAlertClick = async () => {
         const token = sessionStorage.getItem('token') || localStorage.getItem('token');
 
@@ -167,8 +262,7 @@ function IngredientDetail() {
             });
 
             if (response.data.success) {
-                const newState = response.data.isEnabled;
-                setIsPriceAlertEnabled(newState);
+                setIsPriceAlertEnabled(response.data.isEnabled);
             }
         } catch (error) {
             if (error.response?.status === 401) {
@@ -179,8 +273,12 @@ function IngredientDetail() {
         }
     };
 
-    if (loading) return <div className={styles.container}>로딩 중...</div>;
+    // 로딩 중
+    if (loading) {
+        return <div className={styles.container}>로딩 중...</div>;
+    }
     
+    // 데이터 없음
     if (!itemInfo) {
         return (
             <div className={styles.container}>
@@ -193,18 +291,16 @@ function IngredientDetail() {
         );
     }
 
-    // 템플릿 변수 계산
+    // 안전 상태 표시
     const safetyText = itemInfo.safetyStatus === 'safe' ? '안전'
-                        : itemInfo.safetyStatus === 'warning' ? '주의'
-                        : '위험';
+                     : itemInfo.safetyStatus === 'warning' ? '주의'
+                     : '위험';
     const safetyClass = itemInfo.safetyStatus === 'safe' ? styles.safe 
-                        : itemInfo.safetyStatus === 'warning' ? styles.warning 
-                        : styles.danger;
+                      : itemInfo.safetyStatus === 'warning' ? styles.warning 
+                      : styles.danger;
     
-    // 가격 변동 정보
-    const hasPriceChange = itemInfo.priceChangePercent !== null && itemInfo.priceChangePercent !== undefined;
+    const hasPriceChange = itemInfo.priceChangePercent != null;
     
-    // 정상 렌더링
     return (
         <div className={styles.container}>
             <h2 className={styles.pageTitle}>식품성분표 상세 페이지</h2>
@@ -215,13 +311,10 @@ function IngredientDetail() {
             
             <div className={styles.mainContent}>
                 
-                {/* 1. 왼쪽 컬럼: 영양 성분 */}
+                {/* 왼쪽: 영양 성분 */}
                 <div className={styles.leftColumn}>
-                    
-                    {/* 영양 성분 섹션 */}
                     <div className={styles.nutritionSection}>
                         <h3 className={styles.sectionTitle}>영양 성분 표</h3>
-                        
                         <div className={styles.nutritionTablePlaceholder}>
                             <table className={styles.nutritionTable}>
                                 <thead>
@@ -241,7 +334,7 @@ function IngredientDetail() {
                     </div>
                 </div>
 
-                {/* 2. 오른쪽 컬럼: 정보 박스들 */}
+                {/* 오른쪽: 정보 */}
                 <div className={styles.rightColumn}>
                     <h1 className={styles.itemTitle}>
                         {itemInfo.name}
@@ -250,18 +343,20 @@ function IngredientDetail() {
                         </span>
                     </h1>
                     
-                    {/* 2-1. 상단 요약 박스 (가격, 안전, 찜하기) */}
+                    {/* 상단 요약 */}
                     <div className={styles.infoBoxTop}>
                         <div className={styles.itemSummary}>
-                            
-                            {/* 가격 정보 */}
                             <div className={styles.priceLine}>
                                 <strong>가격</strong>
                                 <span style={{marginLeft: '10px', color: '#666', fontSize: '0.9em', fontWeight: 'normal'}}>
-                                    ({itemInfo.standardUnit && !itemInfo.standardUnit.startsWith('1') ? '1' + itemInfo.standardUnit : itemInfo.standardUnit}):
+                                    ({itemInfo.standardUnit && !itemInfo.standardUnit.startsWith('1') 
+                                        ? '1' + itemInfo.standardUnit 
+                                        : itemInfo.standardUnit}):
                                 </span>
                                 <span className={styles.currentPriceValue}>
-                                    {itemInfo.currentPrice ? `${itemInfo.currentPrice.toLocaleString()}원` : '정보 없음'}
+                                    {itemInfo.currentPrice 
+                                        ? `${itemInfo.currentPrice.toLocaleString()}원` 
+                                        : '정보 없음'}
                                 </span>
                                 
                                 {itemInfo.pricePer100g > 0 && ( 
@@ -271,29 +366,23 @@ function IngredientDetail() {
                                 )}
                             </div>
                             
-                            {/* 전일 대비 가격 변동 */}
+                            {/* 가격 변동 표시 */}
                             {hasPriceChange && (
                                 <div style={{fontSize: '0.9em', marginTop: '10px', marginBottom: '10px'}}>
-                                    
-                                    {/* 1. 변동 없음 */}
-                                    {itemInfo.priceChangePercent === 0 && (
+                                    {itemInfo.priceChangePercent === 0 ? (
                                         <span style={{color: '#666'}}>
                                             - 전일 대비 변동 없음
                                         </span>
-                                    )}
-
-                                    {/* 2. 상승/하락 표시 (색상 + 소수점 적용) */}
-                                    {itemInfo.priceChangePercent !== 0 && (
+                                    ) : (
                                         <span style={{
                                             color: itemInfo.priceChangePercent > 0 ? '#dc3545' : '#007aff', 
                                             fontWeight: 'bold'
                                         }}>
-                                            {/* toFixed(1)을 사용하여 소수점 첫째 자리까지 표시 */}
-                                            전일 대비 {itemInfo.priceChangePercent > 0 ? '▲' : '▼'} {Math.abs(itemInfo.priceChangePercent).toFixed(1)}%
+                                            전일 대비 {itemInfo.priceChangePercent > 0 ? '▲' : '▼'} 
+                                            {Math.abs(itemInfo.priceChangePercent).toFixed(1)}%
                                         </span>
                                     )}
 
-                                    {/* 3. 직전 가격 및 날짜 (흐리게 표시) */}
                                     {itemInfo.previousPrice > 0 && itemInfo.previousCollectedDate && (
                                         <span style={{marginLeft: '8px', color: '#999'}}>
                                             (직전: {itemInfo.previousPrice.toLocaleString()}원, 
@@ -308,15 +397,22 @@ function IngredientDetail() {
                                 </div>
                             )}
 
-                            {/* 이전 데이터가 아예 없는 경우 (신규) */}
+                            {/* 신규 데이터 표시 */}
                             {!hasPriceChange && itemInfo.currentPrice && (
                                 <div style={{fontSize: '0.9em', color: '#999', marginTop: '10px', marginBottom: '10px'}}>
-                                    <span style={{background:'#ffc107', color:'#fff', padding:'2px 6px', borderRadius:'4px', marginRight:'5px', fontSize:'0.9em'}}>NEW</span>
+                                    <span style={{
+                                        background:'#ffc107', 
+                                        color:'#fff', 
+                                        padding:'2px 6px', 
+                                        borderRadius:'4px', 
+                                        marginRight:'5px', 
+                                        fontSize:'0.9em'
+                                    }}>NEW</span>
                                     최근 데이터 기준
                                 </div>
                             )}
 
-                            {/* 안전 위험도 + 툴팁 */}
+                            {/* 안전 위험도 */}
                             <div className={styles.safetyLine}>
                                 <strong>안전 위험도:</strong> 
                                 <span className={safetyClass}>{safetyText}</span>
@@ -347,12 +443,13 @@ function IngredientDetail() {
                                 </span>
                             </div>
                         </div>
+                        
+                        {/* 액션 버튼들 */}
                         <div className={styles.topActions}>
                             <button 
                                 onClick={handleWishClick} 
                                 className={`${styles.wishButton} ${isWished ? styles.wished : ''}`}
                             >
-                                {/* SVG 하트 아이콘 */}
                                 <svg 
                                     width="20" 
                                     height="20" 
@@ -384,53 +481,127 @@ function IngredientDetail() {
                         </div>
                     </div>
                     
-                    {/* 2-2. 가격 변동 추이 그래프 박스 */}
+                    {/* 가격 변동 추이 그래프 */}
                     <div className={styles.infoBox}>
-                        <h3 className={styles.boxTitle}>가격 변동 추이 그래프</h3>
+                        <h3 className={styles.boxTitle}>가격 변동 추이 그래프 (최근 일주일)</h3>
                         
+                        {priceTrendData?.changeRate && (
+                            <PriceChangeDisplay changeRate={priceTrendData.changeRate} />
+                        )}
+
                         <div className={styles.chartArea}>
-                            {priceHistory.length > 0 ? (
-                                <div style={{padding: '20px', textAlign: 'center'}}>
-                                    <p>총 {priceHistory.length}개의 가격 데이터</p>
-                                    <p style={{fontSize: '0.9em', color: '#666'}}>
-                                        최근: {new Date(priceHistory[0].collectedDate).toLocaleDateString('ko-KR')} - {priceHistory[0].priceValue.toLocaleString()}원
-                                    </p>
-                                    <p style={{fontSize: '0.9em', color: '#999', marginTop: '10px'}}>
-                                        [차트 라이브러리 연동 필요]
-                                    </p>
-                                </div>
+                            {priceTrendData?.dataPoints?.length > 0 ? (
+                                <ResponsiveContainer width="100%" height={350}>
+                                    <LineChart 
+                                        data={priceTrendData.dataPoints}
+                                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                                        
+                                        <XAxis
+                                            dataKey="date"
+                                            tickFormatter={(v) =>
+                                                new Date(v).toLocaleDateString("ko-KR", {
+                                                    month: "short",
+                                                    day: "numeric"
+                                                })
+                                            }
+                                            stroke="#666"
+                                        />
+
+                                        <YAxis
+                                            domain={calculateYAxisDomain(priceTrendData.dataPoints)}
+                                            tickFormatter={(v) => `${v.toLocaleString()}`}
+                                            label={{ 
+                                                value: '가격 (원)', 
+                                                angle: -90, 
+                                                position: 'insideLeft',
+                                                style: { textAnchor: 'middle' }
+                                            }}
+                                            stroke="#666"
+                                        />
+
+                                        <Tooltip
+                                            formatter={(value) => [`${value.toLocaleString()}원`, '가격']}
+                                            labelFormatter={(label) =>
+                                                new Date(label).toLocaleDateString("ko-KR", {
+                                                    year: "numeric",
+                                                    month: "2-digit",
+                                                    day: "2-digit",
+                                                })
+                                            }
+                                            contentStyle={{ 
+                                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                                border: '1px solid #ccc',
+                                                borderRadius: '4px',
+                                                padding: '10px'
+                                            }}
+                                        />
+                                        <Legend />
+
+                                        <Line
+                                            type="monotone"
+                                            dataKey="price"
+                                            stroke="#4F75FF"
+                                            strokeWidth={2.5}
+                                            name="가격 (원)"
+                                            dot={{ r: 4, fill: '#4F75FF' }}
+                                            activeDot={{ r: 6, fill: '#3A5BC7' }}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
                             ) : (
-                                '[가격 변동 그래프 영역 - 데이터 없음]'
+                                <div style={{textAlign: 'center', color: '#aaa', padding: '50px 0'}}>
+                                    📊 가격 추이 데이터가 없습니다
+                                </div>
                             )}
                         </div>
                         
-                        <div className={styles.priceChangeSummary}>
-                            <p style={{color: '#999'}}>1주일 전 대비: 구현 예정</p>
-                            <p style={{color: '#999'}}>1개월 전 대비: 구현 예정</p>
-                        </div>
+                        {priceTrendData && (
+                            <div style={{
+                                marginTop: '10px', 
+                                fontSize: '0.85em', 
+                                color: '#666', 
+                                textAlign: 'center'
+                            }}>
+                                📅 조회 기간: {priceTrendData.startDate} ~ {priceTrendData.endDate}
+                            </div>
+                        )}
                     </div>
                     
-                    {/* 2-3. 식자재 정보 박스 */}
+                    {/* 식자재 정보 */}
                     <div className={styles.infoBox}>
                         <h3 className={styles.boxTitle}>식자재 정보</h3>
                         <div className={styles.specInfo}>
-                            <div className={styles.specRow}><span>카테고리:</span> {itemInfo.category || '-'}</div>
+                            <div className={styles.specRow}>
+                                <span>카테고리:</span> {itemInfo.category || '-'}
+                            </div>
                             <div className={styles.specRow}>
                                 <span>기준 단위:</span> 
-                                {itemInfo.standardUnit ? (!itemInfo.standardUnit.startsWith('1') ? '1' + itemInfo.standardUnit : itemInfo.standardUnit) : '-'}
+                                {itemInfo.standardUnit 
+                                    ? (!itemInfo.standardUnit.startsWith('1') 
+                                        ? '1' + itemInfo.standardUnit 
+                                        : itemInfo.standardUnit) 
+                                    : '-'}
                             </div>
-                            <div className={styles.specRow}><span>KAMIS 품목코드:</span> {itemInfo.kamisItemCode || '-'}</div>
-                            <div className={styles.specRow}><span>KAMIS 품종코드:</span> {itemInfo.kamisKindCode || '-'}</div>
+                            <div className={styles.specRow}>
+                                <span>KAMIS 품목코드:</span> {itemInfo.kamisItemCode || '-'}
+                            </div>
+                            <div className={styles.specRow}>
+                                <span>KAMIS 품종코드:</span> {itemInfo.kamisKindCode || '-'}
+                            </div>
                             <div className={styles.specRow}>
                                 <span>최근 수집일:</span> 
-                                {itemInfo.collectedDate ? new Date(itemInfo.collectedDate).toLocaleString('ko-KR', {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    hour12: false
-                                }).replace(/\. /g, '-').replace('.', '') : '-'}
+                                {itemInfo.collectedDate 
+                                    ? new Date(itemInfo.collectedDate).toLocaleString('ko-KR', {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false
+                                    }).replace(/\. /g, '-').replace('.', '') 
+                                    : '-'}
                             </div>
                         </div>
                     </div>
