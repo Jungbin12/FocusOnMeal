@@ -9,6 +9,8 @@ const EditProfile = () => {
         phone: ''
     });
     
+    const [originalPhone, setOriginalPhone] = useState(''); // ✅ 추가: 원본 전화번호 저장
+    
     const [formData, setFormData] = useState({
         nickname: '',
         currentPassword: '',
@@ -45,6 +47,7 @@ const EditProfile = () => {
             });
 
             setUserData(res.data);
+            setOriginalPhone(res.data.phone || ''); // ✅ 추가: 원본 전화번호 저장
             setFormData({
                 nickname: res.data.nickname || '',
                 currentPassword: '',
@@ -63,7 +66,6 @@ const EditProfile = () => {
     const generateRandomNickname = async () => {
         setNicknameSpinning(true);
         
-        // ✅ 수정: 백엔드와 동일한 풍부한 닉네임 조합 (Join.jsx와 동일한 배열 사용)
         const adjectives = [
             '따뜻한', '포근한', '신비한', '강한', '귀여운', '용감한', '슬기로운', 
             '활발한', '조용한', '차분한', '빛나는', '달콤한', '상냥한', '깜찍한', 
@@ -86,7 +88,6 @@ const EditProfile = () => {
         const spinCount = 10;
         const spinInterval = 100;
         
-        // ✅ 슬롯머신 애니메이션: 백엔드와 비슷한 닉네임 조합 보여주기
         for (let i = 0; i < spinCount; i++) {
             await new Promise(resolve => setTimeout(resolve, spinInterval));
             const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
@@ -96,7 +97,6 @@ const EditProfile = () => {
             setFormData(prev => ({ ...prev, nickname: tempNickname }));
         }
         
-        // ✅ 최종 닉네임 API 호출
         try {
             const res = await axios.get(`${API_BASE_URL}/api/member/random-nickname`);
             setFormData(prev => ({ ...prev, nickname: res.data.nickname }));
@@ -234,7 +234,9 @@ const EditProfile = () => {
             }
         }
 
-        if (formData.phone && !validations.phone.valid) {
+        // ✅ 수정: 전화번호가 변경되었을 때만 유효성 검사
+        const phoneChanged = formData.phone !== originalPhone;
+        if (phoneChanged && formData.phone && !validations.phone.valid) {
             alert('올바른 휴대폰 번호를 입력해주세요.');
             return;
         }
@@ -587,7 +589,8 @@ const EditProfile = () => {
                         }}
                         placeholder="010-0000-0000"
                     />
-                    {validations.phone.message && (
+                    {/* ✅ 수정: 전화번호가 변경되었을 때만 에러 메시지 표시 */}
+                    {formData.phone !== originalPhone && validations.phone.message && (
                         <p style={{
                             fontSize: '13px',
                             color: validations.phone.valid ? '#10b981' : '#ef4444',
@@ -601,7 +604,7 @@ const EditProfile = () => {
                     </p>
                 </div>
 
-                    {/* 수정/탈퇴 버튼 */}
+                {/* 수정/탈퇴 버튼 */}
                 <div style={{ display: 'flex', gap: '10px' }}>
                     <button
                         onClick={() => window.location.href = '/member/delete'}
