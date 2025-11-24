@@ -23,18 +23,19 @@ const Allergies = () => {
     };
 
     const loadAllergyList = async () => {
-        try {
-            console.log(`📤 요청: ${API_BASE_URL}/api/mypage/allergy/list`);
-            
-            const token = localStorage.getItem('token');
-            const res = await axios.get(`${API_BASE_URL}/api/mypage/allergy/list`, {
-                headers: token ? { Authorization: `Bearer ${token}` } : {}
-            });
-            
-            console.log("📥 알레르기 응답:", res.data);
-            setAllergies(res.data || []);
-        } catch (error) {
-            console.error("❌ 알레르기 목록 조회 오류:", error);
+    try {
+        console.log(`📤 요청: ${API_BASE_URL}/api/mypage/allergy/list`);
+        
+        const token = localStorage.getItem('token');
+        const res = await axios.get(`${API_BASE_URL}/api/mypage/allergy/list`, {
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true
+        });
+        
+        console.log("📥 알레르기 전체 목록:", res.data);
+        setAllergies(res.data || []);
+    } catch (error) {
+        console.error("❌ 알레르기 목록 조회 오류:", error);
             console.error("상태:", error.response?.status);
             console.error("응답:", error.response?.data);
         }
@@ -52,7 +53,8 @@ const Allergies = () => {
             }
             
             const res = await axios.get(`${API_BASE_URL}/api/mypage/allergies`, {
-                headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true
             });
             
             console.log("📥 사용자 알레르기 응답:", res.data);
@@ -112,9 +114,13 @@ const Allergies = () => {
             
             console.log("📤 저장 요청:", checked);
             
-            await axios.post(`${API_BASE_URL}/api/mypage/allergies`, 
-                { allergyIds: checked },
-                { headers: { Authorization: `Bearer ${token}` } }
+            await axios.post(
+            "http://localhost:8080/api/mypage/allergies",
+            { allergyIds: checked },
+            {
+                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true
+            }
             );
             
             alert("알레르기 정보가 저장되었습니다!");
