@@ -20,11 +20,14 @@ import ResetPassword from './pages/member/ResetPassword';
 import Dashboard from './pages/mypage/Dashboard';
 import ProtectedRoute from './components/mypage/ProtectedRoute';
 import MyMeal from './pages/mypage/MyMeal';
+import PriceAlert from './pages/mypage/priceAlert';
+
 // 알레르기 정보 관리 및 수정
 import Allergies from './pages/mypage/Allergies';
 // 개인 정보 수정
 import EditProfile from "./pages/mypage/EditProfile";
 import SafetyAlert from './pages/mypage/SafetyAlert';
+import FavoriteIngredients from './pages/mypage/FavoriteIngredients';
 
 // 식재료
 import IngredientSearch from './pages/ingredient/list';
@@ -79,6 +82,16 @@ function App() {
         <Route path="/mypage/setting/safetyAlert" element={
           <ProtectedRoute>
             <SafetyAlert />
+          </ProtectedRoute>} 
+        />
+        <Route path="/mypage/setting/priceAlert" element={
+          <ProtectedRoute>
+            <PriceAlert />
+          </ProtectedRoute>} 
+        />
+        <Route path="/mypage/ingredients/favorite" element={
+          <ProtectedRoute>
+            <FavoriteIngredients />
           </ProtectedRoute>} 
         />
 
