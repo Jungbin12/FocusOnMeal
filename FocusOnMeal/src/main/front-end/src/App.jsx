@@ -2,6 +2,8 @@ import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Header from "./components/common/Header";
 
+import MainPage from './pages/main/MainPage';
+
 // 회원
 import Login from './pages/member/Login'
 import Join from './pages/member/Join';
@@ -47,7 +49,7 @@ function App() {
       <Header />
       <Routes>
         {/* 메인페이지 */}
-        <Route path="/" element={<div>홈페이지</div>} />
+        <Route path="/" element={<MainPage />} />
 
         {/* 회원 관련 */}
         <Route path="/member/login" element={<Login />} />
