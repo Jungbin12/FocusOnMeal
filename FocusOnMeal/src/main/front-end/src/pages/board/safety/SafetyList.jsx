@@ -6,8 +6,9 @@ import styles from './SafetyList.module.css';
 const SafetyAlertList = () => {
     const [alertList, setAlertList] = useState([]);
     const [pageInfo, setPageInfo] = useState(null);
-
     const [searchParams, setSearchParams] = useSearchParams();
+    const [keyword, setKeyword] = useState(searchParams.get('keyword') || '');
+    const [searchType, setSearchType] = useState(searchParams.get('type') || 'all');
     const currentPage = parseInt(searchParams.get('page') || '1');
 
     // 정렬 파라미터 (기본값 설정)
@@ -27,6 +28,8 @@ const SafetyAlertList = () => {
                 console.log(data);
                 setAlertList(data.list || []);
                 setPageInfo(data.pi);
+                setKeyword(searchParams.get('keyword') || '');
+                setSearchType(searchParams.get('type') || 'all');
             })
             .catch(err => console.log(err))
         }
@@ -36,33 +39,47 @@ const SafetyAlertList = () => {
 
     const changePage = page => {
         setSearchParams(prev => {
-            prev.set('page', page.toString());
-            return prev;
+            const Params = new URLSearchParams(prev);
+            Params.set('page', page.toString());
+            return Params;
         }, { replace: true });
     };
 
     const handleSearch = (e) => {
         e.preventDefault();
         setSearchParams(prev => {
-            prev.set('page', '1');
-            return prev;
+            const Params = new URLSearchParams(prev);
+            Params.set('type', searchType); // 로컬 state 값 사용
+            Params.set('keyword', keyword); // 로컬 state 값 사용
+            Params.set('page', '1');
+            return Params;
         }, { replace: true });
+    };
+
+        const handleKeywordChange = (e) => {
+        setKeyword(e.target.value);
+    };
+
+    const handleTypeChange = (e) => {
+        setSearchType(e.target.value);
     };
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
         setSearchParams(prev => {
-            prev.set(name, value);
-            prev.set('page', '1');
-            return prev;
+            const Params = new URLSearchParams(prev);
+            Params.set(name, value);
+            Params.set('page', '1');
+            return Params;
         }, { replace: true });
     };
 
     // 컬럼 정렬 핸들러
     const handleSort = (column) => {
         setSearchParams(prev => {
-            const currentSort = prev.get('sortColumn');
-            const currentOrder = prev.get('sortOrder') || 'desc';
+            const Params = new URLSearchParams(prev);
+            const currentSort = Params.get('sortColumn');
+            const currentOrder = Params.get('sortOrder') || 'desc';
 
             let newOrder = 'asc';
 
@@ -72,11 +89,11 @@ const SafetyAlertList = () => {
                 newOrder = 'desc'; 
             }
 
-            prev.set('sortColumn', column);
-            prev.set('sortOrder', newOrder);
-            prev.set('page', '1');
+            Params.set('sortColumn', column);
+            Params.set('sortOrder', newOrder);
+            Params.set('page', '1'); // 정렬 변경 시 1페이지로 이동
 
-            return prev;
+            return Params;
         });
     };
 
@@ -102,8 +119,8 @@ const SafetyAlertList = () => {
                 <form onSubmit={handleSearch} className={styles.searchBox}>
                     <select 
                         name="type"
-                        value={searchParams.get('type') || 'all'}
-                        onChange={handleSearchChange}
+                        value={searchType}
+                        onChange={handleTypeChange}
                     >
                         <option value="all">전체</option>
                         <option value="title">제목</option>
@@ -114,8 +131,8 @@ const SafetyAlertList = () => {
                         type="text" 
                         name="keyword" 
                         placeholder="검색어를 입력하세요."
-                        value={searchParams.get('keyword') || ''}
-                        onChange={handleSearchChange}
+                        value={keyword}
+                        onChange={handleKeywordChange}
                         className={styles.input}
                     />
                     <button type="submit" className={styles.searchBtn}>🔍</button>
