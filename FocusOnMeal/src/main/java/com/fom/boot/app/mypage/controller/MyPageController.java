@@ -62,18 +62,12 @@ public class MyPageController {
 	    return ResponseEntity.ok(dashboard);
 	}
 
-	// 특정 식자재의 물가 추이 그래프 조회
+	// 특정 식자재의 물가 추이 그래프 조회 (전체 공개 - 로그인 불필요)
     @GetMapping("/price-chart/{ingredientId}")
     public ResponseEntity<?> getPriceChart(
             @PathVariable int ingredientId,
-            @RequestParam(defaultValue = "30") int days,
-            Authentication authentication) {
-        
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("message", "로그인이 필요합니다."));
-        }
-        
+            @RequestParam(defaultValue = "30") int days) {
+
         try {
             PriceTrendResponse chartData = mService.getPriceChartData(ingredientId, days);
             return ResponseEntity.ok(chartData);

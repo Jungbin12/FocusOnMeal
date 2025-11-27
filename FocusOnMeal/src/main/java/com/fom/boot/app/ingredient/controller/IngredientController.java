@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fom.boot.app.ingredient.dto.IngredientDTO;
+import com.fom.boot.app.ingredient.dto.PricePredictionDTO;
 import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.domain.alert.model.service.AlertService;
 import com.fom.boot.domain.ingredient.model.service.IngredientService;
+import com.fom.boot.domain.ingredient.model.service.PricePredictionService;
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
@@ -31,6 +33,7 @@ public class IngredientController {
 
 	private final IngredientService iService;
 	private final AlertService alertService;
+	private final PricePredictionService pricePredictionService;
 	
     // --- [API 1] React 리스트 페이지용 ---
     @GetMapping("/api/list")
@@ -287,6 +290,29 @@ public class IngredientController {
             Map<String, String> error = new HashMap<>();
             error.put("message", "오류가 발생했습니다: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
+    // 가격 예측 API
+    @GetMapping("/api/{ingredientId}/price-prediction")
+    @ResponseBody
+    public ResponseEntity<?> getPricePrediction(@PathVariable("ingredientId") int ingredientId,
+                                                Authentication authentication) {
+        try {
+            // 로그인 여부 확인
+            boolean isAuthenticated = authentication != null && authentication.isAuthenticated();
+
+            // 예측 일수 (기본 3일)
+            int days = 3;
+
+            PricePredictionDTO prediction = pricePredictionService.predictPrice(ingredientId, days, isAuthenticated);
+
+            return ResponseEntity.ok(prediction);
+
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "가격 예측 조회 실패: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 }

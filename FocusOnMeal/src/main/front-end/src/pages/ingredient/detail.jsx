@@ -90,8 +90,8 @@ const PriceChangeDisplay = ({ changeRate }) => {
 
 function IngredientDetail() {
     const { id } = useParams();
-    const navigate = useNavigate(); 
-    
+    const navigate = useNavigate();
+
     const [itemInfo, setItemInfo] = useState(null);
     const [priceHistory, setPriceHistory] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -100,6 +100,8 @@ function IngredientDetail() {
     const [isPriceAlertEnabled, setIsPriceAlertEnabled] = useState(false);
     const [priceList, setPriceList] = useState([]);
     const [priceTrendData, setPriceTrendData] = useState(null);
+    const [pricePrediction, setPricePrediction] = useState(null); // 가격 예측 데이터
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -141,19 +143,19 @@ function IngredientDetail() {
                 setItemInfo(info); 
                 setPriceHistory(history);
                 
-                // 2. 로그인 사용자 전용 데이터
-                if (token) {
-                    // 가격 추이 데이터
-                    try {
-                        const trendResponse = await axios.get(
-                            `/api/mypage/price-chart/${id}?days=30`,
-                            { headers: { Authorization: `Bearer ${token}` } }
-                        );
-                        setPriceTrendData(trendResponse.data);
-                    } catch (error) {
-                        console.error('가격 추이 데이터 로드 실패:', error);
-                    }
+                // 2. 가격 추이 데이터 (로그인 여부 무관 - 모든 사용자 접근 가능)
+                try {
+                    const trendResponse = await axios.get(
+                        `/api/mypage/price-chart/${id}?days=30`,
+                        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+                    );
+                    setPriceTrendData(trendResponse.data);
+                } catch (error) {
+                    console.error('가격 추이 데이터 로드 실패:', error);
+                }
 
+                // 3. 로그인 사용자 전용 데이터
+                if (token) {
                     // 찜 상태 확인
                     try {
                         const favoriteResponse = await axios.get('/api/mypage/favorites');
@@ -195,13 +197,22 @@ function IngredientDetail() {
                     setPriceList(mapped.reverse());
                 }
 
+                // 4. 가격 예측 데이터 조회 (로그인 여부 무관 - 권한에 따라 다른 데이터 제공)
+                try {
+                    const predictionResponse = await axios.get(`/ingredient/api/${id}/price-prediction`);
+                    setPricePrediction(predictionResponse.data);
+                    setIsLoggedIn(predictionResponse.data.hasAccess || false);
+                } catch (error) {
+                    console.error('가격 예측 데이터 로드 실패:', error);
+                }
+
             } catch (error) {
                 console.error("상세 정보 로딩 실패:", error);
             } finally {
                 setLoading(false);
             }
         };
-        
+
         fetchDetail();
     }, [id]);
 
@@ -483,88 +494,169 @@ function IngredientDetail() {
                     
                     {/* 가격 변동 추이 그래프 */}
                     <div className={styles.infoBox}>
-                        <h3 className={styles.boxTitle}>가격 변동 추이 그래프 (최근 일주일)</h3>
-                        
+                        <h3 className={styles.boxTitle}>가격 변동 추이 및 예측 그래프</h3>
+
                         {priceTrendData?.changeRate && (
                             <PriceChangeDisplay changeRate={priceTrendData.changeRate} />
                         )}
 
-                        <div className={styles.chartArea}>
-                            {priceTrendData?.dataPoints?.length > 0 ? (
-                                <ResponsiveContainer width="100%" height={350}>
-                                    <LineChart 
-                                        data={priceTrendData.dataPoints}
-                                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                                        
-                                        <XAxis
-                                            dataKey="date"
-                                            tickFormatter={(v) =>
-                                                new Date(v).toLocaleDateString("ko-KR", {
-                                                    month: "short",
-                                                    day: "numeric"
-                                                })
-                                            }
-                                            stroke="#666"
-                                        />
+                        <div className={styles.chartWrapper}>
+                            <div className={styles.chartArea}>
+                                {priceTrendData?.dataPoints?.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height={350}>
+                                        <LineChart
+                                            data={(() => {
+                                                // 실제 가격 데이터
+                                                const actualData = priceTrendData.dataPoints.map(p => ({
+                                                    date: p.date,
+                                                    actual: p.price,
+                                                    forecast: null
+                                                }));
 
-                                        <YAxis
-                                            domain={calculateYAxisDomain(priceTrendData.dataPoints)}
-                                            tickFormatter={(v) => `${v.toLocaleString()}`}
-                                            label={{ 
-                                                value: '가격 (원)', 
-                                                angle: -90, 
-                                                position: 'insideLeft',
-                                                style: { textAnchor: 'middle' }
-                                            }}
-                                            stroke="#666"
-                                        />
+                                                // 예측 데이터 추가
+                                                if (pricePrediction?.prediction?.forecast) {
+                                                    // 로그인: 실제 예측값
+                                                    pricePrediction.prediction.forecast.forEach(f => {
+                                                        actualData.push({
+                                                            date: f.date,
+                                                            actual: null,
+                                                            forecast: f.price
+                                                        });
+                                                    });
+                                                } else if (pricePrediction?.preview) {
+                                                    // 비로그인: 더미 데이터 (블러용)
+                                                    const lastPrice = actualData[actualData.length - 1].actual;
+                                                    for (let i = 1; i <= 3; i++) {
+                                                        const date = new Date();
+                                                        date.setDate(date.getDate() + i);
+                                                        actualData.push({
+                                                            date: date.toISOString().split('T')[0],
+                                                            actual: null,
+                                                            forecast: lastPrice + (Math.random() * 200 - 100)
+                                                        });
+                                                    }
+                                                }
 
-                                        <Tooltip
-                                            formatter={(value) => [`${value.toLocaleString()}원`, '가격']}
-                                            labelFormatter={(label) =>
-                                                new Date(label).toLocaleDateString("ko-KR", {
-                                                    year: "numeric",
-                                                    month: "2-digit",
-                                                    day: "2-digit",
-                                                })
-                                            }
-                                            contentStyle={{ 
-                                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                                border: '1px solid #ccc',
-                                                borderRadius: '4px',
-                                                padding: '10px'
-                                            }}
-                                        />
-                                        <Legend />
+                                                return actualData;
+                                            })()}
+                                            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
 
-                                        <Line
-                                            type="monotone"
-                                            dataKey="price"
-                                            stroke="#4F75FF"
-                                            strokeWidth={2.5}
-                                            name="가격 (원)"
-                                            dot={{ r: 4, fill: '#4F75FF' }}
-                                            activeDot={{ r: 6, fill: '#3A5BC7' }}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div style={{textAlign: 'center', color: '#aaa', padding: '50px 0'}}>
-                                    📊 가격 추이 데이터가 없습니다
+                                            <XAxis
+                                                dataKey="date"
+                                                tickFormatter={(v) => {
+                                                    const date = new Date(v);
+                                                    return `${date.getMonth() + 1}/${date.getDate()}`;
+                                                }}
+                                                stroke="#666"
+                                                tick={{ fontSize: 11 }}
+                                                interval="preserveStartEnd"
+                                            />
+
+                                            <YAxis
+                                                domain={calculateYAxisDomain(priceTrendData.dataPoints)}
+                                                tickFormatter={(v) => `${v.toLocaleString()}`}
+                                                label={{
+                                                    value: '가격 (원)',
+                                                    angle: -90,
+                                                    position: 'insideLeft',
+                                                    style: { textAnchor: 'middle' }
+                                                }}
+                                                stroke="#666"
+                                            />
+
+                                            <Tooltip
+                                                formatter={(value, name) => {
+                                                    if (!isLoggedIn && name === '예측') {
+                                                        return ['로그인 후 확인', name];
+                                                    }
+                                                    return [`${value?.toLocaleString() || 'N/A'}원`, name];
+                                                }}
+                                                labelFormatter={(label) =>
+                                                    new Date(label).toLocaleDateString("ko-KR", {
+                                                        year: "numeric",
+                                                        month: "2-digit",
+                                                        day: "2-digit",
+                                                    })
+                                                }
+                                                contentStyle={{
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '4px',
+                                                    padding: '10px'
+                                                }}
+                                                wrapperStyle={{
+                                                    zIndex: 100
+                                                }}
+                                            />
+                                            <Legend />
+
+                                            {/* 실제 가격 라인 */}
+                                            <Line
+                                                type="monotone"
+                                                dataKey="actual"
+                                                stroke="#4F75FF"
+                                                strokeWidth={2.5}
+                                                name="실제"
+                                                dot={{ r: 4, fill: '#4F75FF' }}
+                                                activeDot={{ r: 6, fill: '#3A5BC7' }}
+                                                connectNulls={false}
+                                            />
+
+                                            {/* 예측 가격 라인 (점선) */}
+                                            {pricePrediction && (
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="forecast"
+                                                    stroke="#FF6B6B"
+                                                    strokeWidth={2}
+                                                    strokeDasharray="5 5"
+                                                    name="예측"
+                                                    dot={{ r: 3, fill: '#FF6B6B' }}
+                                                    connectNulls={false}
+                                                />
+                                            )}
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div style={{textAlign: 'center', color: '#aaa', padding: '50px 0'}}>
+                                        📊 가격 추이 데이터가 없습니다
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* 비로그인 사용자 오버레이 */}
+                            {!isLoggedIn && pricePrediction?.preview && (
+                                <div className={styles.predictionOverlay}>
+                                    <div className={styles.blurLayer} />
+                                    <div className={styles.loginPrompt}>
+                                        <div className={styles.lockIcon}>🔒</div>
+                                        <p>로그인 후 확인 가능</p>
+                                        <button
+                                            onClick={() => navigate('/member/login')}
+                                            className={styles.loginButton}
+                                        >
+                                            로그인
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
-                        
+
                         {priceTrendData && (
                             <div style={{
-                                marginTop: '10px', 
-                                fontSize: '0.85em', 
-                                color: '#666', 
+                                marginTop: '10px',
+                                fontSize: '0.85em',
+                                color: '#666',
                                 textAlign: 'center'
                             }}>
                                 📅 조회 기간: {priceTrendData.startDate} ~ {priceTrendData.endDate}
+                                {pricePrediction?.prediction && (
+                                    <span style={{marginLeft: '10px', color: '#FF6B6B', fontWeight: 600}}>
+                                        | 🔮 예측: {pricePrediction.prediction.trend} ({pricePrediction.prediction.confidence}% 신뢰도)
+                                    </span>
+                                )}
                             </div>
                         )}
                     </div>
