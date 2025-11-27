@@ -127,8 +127,8 @@ const FavoriteIngredients = () => {
                                 <div className={styles.cardInfo}>
                                     <span className={styles.categoryBadge}>{item.category}</span>
                                     <h3 className={styles.cardTitle}>{item.ingredientName}</h3>
+                                    <p className={styles.cardPrice}>오늘의 가격 : {item.currentPrice} 원</p>
                                     <p className={styles.cardUnit}>기준: {item.standardUnit}</p>
-                                    <p className={styles.cardPrice}>오늘 가격 : {item.currentPrice} 원</p>
                                 </div>
                                 <button 
                                     className={styles.deleteBtn}
