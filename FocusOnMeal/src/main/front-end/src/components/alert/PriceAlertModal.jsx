@@ -98,14 +98,21 @@ const PriceAlertModal = ({ isOpen, onClose, ingredientId, ingredientName, curren
 
     // [수정됨] 1원 단위(일의 자리) 그대로 입력 반영
     const handleAddCustomAlert = async () => {
-        if (!customPrice || customPrice <= 0) {
-            alert('가격을 입력해주세요.');
+    // 1. 아무것도 입력하지 않았을 때
+        if (!customPrice) {
+            alert('설정할 목표 가격을 입력해주세요!');
+            return;
+        }
+
+        // 2. 0원이나 음수를 입력했을 때
+        if (Number(customPrice) <= 0) {
+            alert('1원 이상의 가격을 입력해주세요.');
             return;
         }
 
         const targetPrice = Number(customPrice); // 10원 단위 절삭 로직 제거
         await addAlert(targetPrice, customType);
-        setCustomPrice('');
+        setCustomPrice(''); // 입력 초기화
     };
 
     const handleDeleteAlert = async (alertId) => {
