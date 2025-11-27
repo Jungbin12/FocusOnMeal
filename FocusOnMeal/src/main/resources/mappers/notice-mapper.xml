@@ -9,6 +9,7 @@
 	    SELECT
 	        *
 	    FROM NOTICE
+	    WHERE IS_DELETED = 'N'
 	    ORDER BY NOTICE_CREATEAT DESC
 	</select>
 	
@@ -23,6 +24,13 @@
 	        IS_DELETED = #{isDeleted}
 	    WHERE NOTICE_NO = #{noticeNo}
 	</update>	
+	
+	<!-- 관리자 : 공지사항 삭제 -->
+	<update id="deleteNotice" parameterType="int">
+	UPDATE NOTICE
+		SET IS_DELETED = 'Y'
+		WHERE NOTICE_NO = #{noticeNo}
+	</update>
 	
 	<!-- 일반회원 : 필독공지 조희 -->
 	<select id="selectImportantNotices" resultType="com.fom.boot.domain.notice.model.vo.Notice">

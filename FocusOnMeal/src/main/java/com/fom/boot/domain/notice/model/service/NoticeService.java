@@ -12,6 +12,9 @@ public interface NoticeService {
 
 	// 관리자 공지사항 수정
 	int modifyNotice(Notice notice);
+	
+	// 관리자 공지사항 삭제
+	void deleteNotice(int noticeNo);
 
 	// 일반 공지사항 목록 조회
 	List<Notice> selectPublicNotices(PageInfo pageInfo, String type ,String keyword, String sortColumn, String sortOrderr);
@@ -24,5 +27,6 @@ public interface NoticeService {
 
 	// 필독 공지사항 목록
 	List<Notice> selectImportantNotices();
+
 
 }

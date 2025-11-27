@@ -51,6 +51,31 @@ const NoticeInfo = () => {
         .catch(err => console.error(err));
     };
 
+    // 공지 삭제
+    const handleDelete = (noticeNo) => {
+        if (!window.confirm("해당 공지사항을 삭제하시겠습니까?")) return;
+
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
+            return;
+        }
+
+        axios
+            .delete(`/api/admin/noticeInfo/${noticeNo}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then(() => {
+                // 삭제 성공 시, 화면 목록에서도 제거
+                setNoticeInfo((prev) => prev.filter((n) => n.noticeNo !== noticeNo));
+            })
+            .catch((err) => {
+                console.error(err);
+                alert("공지사항 삭제 중 오류가 발생했습니다.");
+            });
+    };
+
+
     useEffect(() => {
         const fetchNoticeInfo = () => {
             const token = sessionStorage.getItem("token");
@@ -212,7 +237,12 @@ const NoticeInfo = () => {
                                             >
                                                 수정
                                             </button>
-                                            <button className={styles.deleteBtn}>삭제</button>
+                                            <button
+                                                className={styles.deleteBtn}
+                                                onClick={() => handleDelete(notice.noticeNo)}
+                                            >
+                                                삭제
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

@@ -15,6 +15,9 @@ public interface NoticeMapper {
 
 	// 관리자 공지사항 수정용
 	int modifyNotice(Notice notice);
+
+	// 관리자 공지사항 삭제
+	int deleteNotice(int noticeNo);
 	
 	// 일반 공지사항 조회
 	List<Notice> selectPublicNotices(@Param("startRow") int startRow,
@@ -32,5 +35,6 @@ public interface NoticeMapper {
 
 	// 필독 공지사항 조회
 	List<Notice> selectImportantNotices();
+
 
 }

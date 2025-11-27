@@ -28,6 +28,17 @@ public class NoticeServiceImpl implements NoticeService {
 	public int modifyNotice(Notice notice) {	
 		return mapper.modifyNotice(notice);
 	}
+	
+	// 관리자 공지사항 삭제
+	@Override
+	public void deleteNotice(int noticeNo) {
+		int result = mapper.deleteNotice(noticeNo);
+
+        if (result == 0) {
+            throw new RuntimeException("해당 공지사항이 존재하지 않습니다.");
+        }
+		
+	}
 
 	// 일반 공지사항 조회
 	@Override
@@ -58,5 +69,6 @@ public class NoticeServiceImpl implements NoticeService {
 	public List<Notice> selectImportantNotices() {
 		return mapper.selectImportantNotices();
 	}
+	
 
 }
