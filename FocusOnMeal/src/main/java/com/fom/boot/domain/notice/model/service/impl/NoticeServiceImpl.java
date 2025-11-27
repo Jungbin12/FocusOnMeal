@@ -19,8 +19,15 @@ public class NoticeServiceImpl implements NoticeService {
 	
 	// 관리자 공지사항 목록 조회용
 	@Override
-	public List<Notice> selectAllNotices() {
-		return mapper.selectAllNotices();
+	public List<Notice> selectAllNotices(PageInfo pageInfo, String type ,String keyword, 
+										String sortColumn, String sortOrder, String filterType) {
+		return mapper.selectAllNotices(pageInfo.getStartRow(),
+	            pageInfo.getEndRow(),
+	            type,
+	            keyword,
+	            sortColumn,
+	            sortOrder,
+	            filterType);
 	}
 
 	// 관리자 공지사항 수정

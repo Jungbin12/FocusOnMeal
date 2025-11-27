@@ -8,7 +8,7 @@ import com.fom.boot.domain.notice.model.vo.Notice;
 public interface NoticeService {
 
 	// 관리자공지사항 목록 조회용
-	List<Notice> selectAllNotices();
+	List<Notice> selectAllNotices(PageInfo pageInfo, String type, String keyword, String sortColumn, String sortOrder, String filterType);
 
 	// 관리자 공지사항 수정
 	int modifyNotice(Notice notice);
