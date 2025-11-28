@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import DOMPurify from 'dompurify';
 import styles from "./SafetyDetail.module.css";
 
 const SafetyDetail = () => {
@@ -59,6 +60,12 @@ const SafetyDetail = () => {
         return styles.badgeDefault;
     };
 
+    // ✅ HTML을 안전하게 정제
+    const sanitizedDescription = DOMPurify.sanitize(alert.description, {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div'],
+        ALLOWED_ATTR: ['class', 'style']
+    });
+
     return (
         <div className={styles.container}>
             <div className={styles.detailWrapper}>
@@ -85,9 +92,11 @@ const SafetyDetail = () => {
                     </div>
                 </div>
 
-                <div className={styles.alertContent}>
-                    <p>{alert.description}</p>
-                </div>
+                {/* ✅ HTML 렌더링 적용 */}
+                <div 
+                    className={styles.alertContent}
+                    dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+                />
 
                 {/* 이전/다음 글 영역 */}
                 <div className={styles.actionButtons}>

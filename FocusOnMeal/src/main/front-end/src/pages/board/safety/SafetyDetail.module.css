@@ -181,3 +181,77 @@
     text-decoration: underline;
     color: #224e85;
 }
+
+/* SafetyDetail.css */
+.description-content {
+    background: #f9f9f9;
+    padding: 24px;
+    border-radius: 8px;
+    margin-top: 24px;
+}
+
+.description-content p {
+    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
+}
+
+/* 빈 p 태그 (&nbsp;) 처리 */
+.description-content p:empty,
+.description-content p:has(br:only-child) {
+    margin: 8px 0;
+    min-height: 8px;
+}
+
+/* 강조 텍스트 */
+.description-content p strong {
+    color: #d32f2f;
+    font-weight: 600;
+}
+
+/* 리스트 스타일 */
+.description-content ul,
+.description-content ol {
+    margin: 16px 0;
+    padding-left: 24px;
+}
+
+.description-content li {
+    margin: 8px 0;
+}
+
+/* HTML 렌더링 스타일 */
+.alertContent p {
+    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
+}
+
+.alertContent p:empty {
+    margin: 8px 0;
+    min-height: 8px;
+}
+
+.alertContent p:first-child {
+    font-weight: 600;
+    color: #d32f2f;
+    margin-bottom: 16px;
+}
+
+.alertContent strong {
+    color: #d32f2f;
+    font-weight: 600;
+}
+
+.alertContent ul,
+.alertContent ol {
+    margin: 16px 0;
+    padding-left: 24px;
+}
+
+.alertContent li {
+    margin: 8px 0;
+    line-height: 1.6;
+}
