@@ -3,6 +3,8 @@ package com.fom.boot.domain.alert.model.service;
 import java.util.List;
 import java.util.Map;
 
+import com.fom.boot.common.pagination.PageInfo;
+
 public interface AlertService {
 	/**
      * 회원의 알림 목록 조회 (제목 포함)
@@ -102,4 +104,30 @@ public interface AlertService {
      * @return 삭제된 행 수
      */
     int deletePriceAlert(String memberId, int ingredientId);
+
+    /**
+     * 마이페이지 : 검색 조건에 맞는 개인 알림 개수 조회
+     *
+     * @param searchMap 검색 조건(Map)
+     * @return 알림 개수
+     */
+	int getUserSafetyNotiCount(Map<String, Object> searchMap);
+	
+	/**
+	 * 마이페이지 : 검색 조건에 맞는 개인 알림 목록 조회 (페이징 포함)
+	 *
+	 * @param pi        페이지 정보(PageInfo)
+	 * @param searchMap 검색 조건(Map)
+	 * @return 알림 목록 리스트
+	 */
+	List<Map<String, Object>> getUserSafetyNotiList(PageInfo pi, Map<String, Object> searchMap);
+
+	/**
+	 * 마이페이지 : 안전 알림 삭제
+	 *
+	 * @param notificationId 알림 ID
+	 * @param memberId       회원 ID
+	 * @return 삭제 성공 여부
+	 */
+	boolean deleteSafetyAlert(int notificationId, String memberId);
 }

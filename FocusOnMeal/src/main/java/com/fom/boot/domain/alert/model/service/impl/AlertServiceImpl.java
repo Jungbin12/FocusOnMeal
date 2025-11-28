@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
+import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.domain.alert.model.mapper.AlertMapper;
 import com.fom.boot.domain.alert.model.mapper.PriceAlertMapper;
 import com.fom.boot.domain.alert.model.service.AlertService;
-import com.fom.boot.domain.alert.model.vo.NotificationLog;
 import com.fom.boot.domain.alert.model.vo.SafetyAlert;
 import com.fom.boot.domain.ingredient.model.mapper.IngredientMapper;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
@@ -303,6 +303,48 @@ public class AlertServiceImpl implements AlertService {
         } catch (Exception e) {
             log.error("가격 알림 해제 실패: memberId={}, ingredientId={}", memberId, ingredientId, e);
             throw new RuntimeException("가격 알림 해제에 실패했습니다.", e);
+        }
+    }
+    
+    // 검색 조건에 맞는 개인 안전 알림 개수 조회 (페이지네이션용)
+    @Override
+    public int getUserSafetyNotiCount(Map<String, Object> searchMap) {
+        try {
+            return alertMapper.selectUserSafetyNotiCount(searchMap);
+        } catch (Exception e) {
+            log.error("알림 개수 조회 실패: searchMap={}", searchMap, e);
+            return 0;
+        }
+    }
+
+    // 검색 조건에 맞는 개인 안전알림 목록 조회 (페이징 + 검색)
+    @Override
+    public List<Map<String, Object>> getUserSafetyNotiList(PageInfo pi, Map<String, Object> searchMap) {
+        try {
+            // 페이징 계산 (Oracle ROWNUM 기준)
+            int startRow = (pi.getCurrentPage() - 1) * pi.getBoardLimit() + 1;
+            int endRow = startRow + pi.getBoardLimit() - 1;
+
+            searchMap.put("startRow", startRow);
+            searchMap.put("endRow", endRow);
+
+            return alertMapper.selectUserSafetyNotiList(searchMap);
+        } catch (Exception e) {
+            log.error("알림 목록 조회 실패: searchMap={}", searchMap, e);
+            throw new RuntimeException("알림 목록 조회에 실패했습니다.", e);
+        }
+    }
+
+    // 마이페이지 개인 안전 알림 삭제 (물리 삭제)
+    @Override
+    @Transactional
+    public boolean deleteSafetyAlert(int notificationId, String memberId) {
+        try {
+            int result = alertMapper.deleteNotification(notificationId, memberId);
+            return result > 0;
+        } catch (Exception e) {
+            log.error("알림 삭제 실패: notificationId={}, memberId={}", notificationId, memberId, e);
+            throw new RuntimeException("알림 삭제에 실패했습니다.", e);
         }
     }
 }

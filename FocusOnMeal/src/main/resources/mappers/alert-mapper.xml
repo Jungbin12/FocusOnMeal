@@ -226,5 +226,99 @@
         FROM MEMBER_INGREDIENT_ALERT
         ORDER BY INGREDIENT_ID
     </select>
+    
+    <!-- 마이페이지: 알림내역수 조회 -->
+    <select id="selectUserSafetyNotiCount" resultType="int">
+    SELECT COUNT(*)
+    FROM NOTIFICATION_LOG nl
+	    LEFT JOIN SAFETY_ALERT_MASTER sam
+	        ON nl.ALERT_ID = sam.ALERT_ID
+	    WHERE nl.MEMBER_ID = #{memberId}
+	      AND nl.TYPE = '위험공표'
+	      
+	    <if test="readStatus != null and readStatus != 'all'">
+            AND nl.IS_READ = #{readStatus}
+       	</if>
+	    
+	    <!-- 검색 -->
+	    <if test="keyword != null and keyword != ''">
+	        AND (
+	            nl.MESSAGE LIKE '%' || #{keyword} || '%'
+	            OR sam.TITLE LIKE '%' || #{keyword} || '%'
+	            OR sam.NATION LIKE '%' || #{keyword} || '%'
+	            OR sam.HAZARD_TYPE LIKE '%' || #{keyword} || '%'
+	        )
+	    </if>
+	</select>
+
+	<!-- 마이페이지: 알림내역목록 조회 -->
+    <select id="selectUserSafetyNotiList" resultType="map">
+	SELECT * FROM (
+	    SELECT 
+	        ROW_NUMBER() OVER (
+	            ORDER BY
+	            <choose>
+	                <!-- 지원하는 정렬 컬럼 -->
+	                <when test="sortColumn == 'sentAt'">nl.SENT_AT</when>
+	                <when test="sortColumn == 'title'">sam.TITLE</when>
+	                <when test="sortColumn == 'nation'">sam.NATION</when>
+	                <when test="sortColumn == 'hazardType'">sam.HAZARD_TYPE</when>
+	                <when test="sortColumn == 'alertId'">nl.ALERT_ID</when>
+	
+	                <!-- 기본값: 최신 알림 먼저 -->
+	                <otherwise>nl.SENT_AT</otherwise>
+	            </choose>
+	            
+	            <choose>
+	                <when test="sortOrder == 'asc'">ASC</when>
+	                <otherwise>DESC</otherwise>
+	            </choose>
+	        ) AS rn,
+	        
+	        nl.NOTIFICATION_ID AS "notificationId",
+	        nl.MEMBER_ID AS "memberId",
+	        nl.IS_READ AS "isRead",
+	        TO_CHAR(nl.SENT_AT, 'YYYY-MM-DD"T"HH24:MI:SS') AS "sentAt",
+	        
+	        nl.MESSAGE AS "message",
+	        nl.ALERT_ID AS "alertId",
+	        
+	        sam.TITLE AS "title",
+	        sam.NATION AS "nation",
+	        sam.HAZARD_TYPE AS "hazardType",
+	        TO_CHAR(sam.PUBLICATION_DATE, 'YYYY-MM-DD"T"HH24:MI:SS') AS "publicationDate",
+	        sam.ORIGINAL_URL AS "originalUrl"
+	
+	    FROM NOTIFICATION_LOG nl
+	    LEFT JOIN SAFETY_ALERT_MASTER sam
+	        ON nl.ALERT_ID = sam.ALERT_ID
+	    
+	    WHERE nl.MEMBER_ID = #{memberId}
+	      AND nl.TYPE = '위험공표'
+	      
+	    <if test="readStatus != null and readStatus != 'all'">
+            AND nl.IS_READ = #{readStatus}
+        </if>
+	    
+	    <!-- 검색 -->
+	    <if test="keyword != null and keyword != ''">
+	        AND (
+	            nl.MESSAGE LIKE '%' || #{keyword} || '%'
+	            OR sam.TITLE LIKE '%' || #{keyword} || '%'
+	            OR sam.NATION LIKE '%' || #{keyword} || '%'
+	            OR sam.HAZARD_TYPE LIKE '%' || #{keyword} || '%'
+	        )
+	    </if>
+	
+	) WHERE rn BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<!-- 마이페이지: 안전정보알림 삭제 -->
+	<delete id="deleteNotification">
+        DELETE FROM NOTIFICATION_LOG
+        WHERE NOTIFICATION_ID = #{notificationId}
+          AND MEMBER_ID = #{memberId}
+    </delete>
+
 
   </mapper>

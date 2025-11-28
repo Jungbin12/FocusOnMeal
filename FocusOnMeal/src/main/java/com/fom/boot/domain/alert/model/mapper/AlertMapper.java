@@ -168,4 +168,29 @@ public interface AlertMapper {
      * @return 식재료 ID 목록
      */
     List<Integer> selectAllAlertIngredientIds();
+    
+    /**
+     * 마이페이지: 검색 조건에 맞는 회원의 안전 알림 개수 조회
+     *
+     * @param searchMap 검색 조건(Map)
+     * @return 알림 개수
+     */
+    int selectUserSafetyNotiCount(Map<String, Object> searchMap);
+    
+    /**
+     * 마이페이지: 검색 조건에 맞는 회원의 안전 알림 목록 조회
+     *
+     * @param searchMap 검색 조건(Map)
+     * @return 알림 목록 리스트
+     */
+    List<Map<String, Object>> selectUserSafetyNotiList(Map<String, Object> searchMap);
+    
+    /**
+     * 마이페이지: 특정 알림 삭제 (회원 본인 알림만 삭제 가능)
+     *
+     * @param notificationId 알림 ID
+     * @param memberId       회원 ID
+     * @return 삭제된 행 수
+     */
+    int deleteNotification(@Param("notificationId") int notificationId, @Param("memberId") String memberId);
 }
