@@ -20,6 +20,14 @@ public interface AlertService {
     boolean markNotificationAsRead(int notificationId, String memberId);
     
     /**
+     * 알림 삭제
+     * @param notificationId 알림 ID
+     * @param memberId 회원 ID
+     * @return 성공 여부
+     */
+    boolean deleteNotification(int notificationId, String memberId);
+    
+    /**
      * 읽지 않은 알림 개수 조회
      * @param memberId 회원 ID
      * @return 읽지 않은 알림 개수
@@ -102,4 +110,19 @@ public interface AlertService {
      * @return 삭제된 행 수
      */
     int deletePriceAlert(String memberId, int ingredientId);
+    
+    /**
+     * 회원의 모든 읽지 않은 알림을 읽음 처리
+     * @param memberId 회원 ID
+     * @return 처리된 알림 개수
+     */
+    int markAllNotificationsAsRead(String memberId);
+
+    /**
+     * 회원의 특정 유형 읽지 않은 알림을 읽음 처리
+     * @param memberId 회원 ID
+     * @param type 알림 유형
+     * @return 처리된 알림 개수
+     */
+    int markAllNotificationsAsReadByType(String memberId, String type);
 }
