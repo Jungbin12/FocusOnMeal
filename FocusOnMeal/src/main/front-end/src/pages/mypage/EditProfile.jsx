@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Sidebar from "../../components/mypage/Sidebar"
 
 const EditProfile = () => {
     const [loading, setLoading] = useState(true);
@@ -300,362 +301,368 @@ const EditProfile = () => {
 
     return (
         <div style={{
-            minHeight: '100vh',
-            backgroundColor: '#f9fafb',
-            padding: '40px 20px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
+            display: "flex",
+            minHeight: "100vh",
+            backgroundColor: "#f9fafb"
         }}>
+        <Sidebar />
             <div style={{
-                maxWidth: '600px',
-                width: '100%',
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                border: '3px solid #3b82f6',
-                padding: '40px',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                flex: 1,
+                padding: "40px 20px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
             }}>
-                <h2 style={{
-                    fontSize: '28px',
-                    fontWeight: 'bold',
-                    color: '#1f2937',
-                    marginBottom: '30px',
-                    textAlign: 'center'
+                <div style={{
+                    maxWidth: '600px',
+                    width: '100%',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    border: '3px solid #3b82f6',
+                    padding: '40px',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                 }}>
-                    회원정보 수정
-                </h2>
-
-                {/* 아이디 (고정) */}
-                <div style={{ marginBottom: '25px' }}>
-                    <label style={{
-                        display: 'block',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#374151',
-                        marginBottom: '8px'
+                    <h2 style={{
+                        fontSize: '28px',
+                        fontWeight: 'bold',
+                        color: '#1f2937',
+                        marginBottom: '30px',
+                        textAlign: 'center'
                     }}>
-                        아이디
-                    </label>
-                    <input
-                        type="text"
-                        value={userData.memberId}
-                        disabled
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            border: '2px solid #e5e7eb',
-                            borderRadius: '8px',
-                            fontSize: '15px',
-                            backgroundColor: '#f3f4f6',
-                            color: '#6b7280',
-                            cursor: 'not-allowed'
-                        }}
-                    />
-                    <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                        아이디는 변경할 수 없습니다.
-                    </p>
-                </div>
+                        회원정보 수정
+                    </h2>
 
-                {/* 닉네임 (랜덤 버튼만) */}
-                <div style={{ marginBottom: '25px' }}>
-                    <label style={{
-                        display: 'block',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#374151',
-                        marginBottom: '8px'
-                    }}>
-                        닉네임
-                    </label>
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    {/* 아이디 (고정) */}
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#374151',
+                            marginBottom: '8px'
+                        }}>
+                            아이디
+                        </label>
                         <input
                             type="text"
-                            value={formData.nickname}
+                            value={userData.memberId}
                             disabled
                             style={{
-                                flex: 1,
+                                width: '100%',
                                 padding: '12px',
                                 border: '2px solid #e5e7eb',
                                 borderRadius: '8px',
                                 fontSize: '15px',
                                 backgroundColor: '#f3f4f6',
-                                color: '#374151',
+                                color: '#6b7280',
                                 cursor: 'not-allowed'
                             }}
-                            placeholder="랜덤 버튼을 눌러 닉네임을 생성하세요"
                         />
-                        <button
-                            onClick={generateRandomNickname}
-                            disabled={nicknameSpinning}
+                        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
+                            아이디는 변경할 수 없습니다.
+                        </p>
+                    </div>
+
+                    {/* 닉네임 (랜덤 버튼만) */}
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#374151',
+                            marginBottom: '8px'
+                        }}>
+                            닉네임
+                        </label>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <input
+                                type="text"
+                                value={formData.nickname}
+                                disabled
+                                style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    border: '2px solid #e5e7eb',
+                                    borderRadius: '8px',
+                                    fontSize: '15px',
+                                    backgroundColor: '#f3f4f6',
+                                    color: '#374151',
+                                    cursor: 'not-allowed'
+                                }}
+                                placeholder="랜덤 버튼을 눌러 닉네임을 생성하세요"
+                            />
+                            <button
+                                onClick={generateRandomNickname}
+                                disabled={nicknameSpinning}
+                                style={{
+                                    padding: '12px 20px',
+                                    backgroundColor: nicknameSpinning ? '#9ca3af' : '#8b5cf6',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontSize: '15px',
+                                    fontWeight: '600',
+                                    cursor: nicknameSpinning ? 'not-allowed' : 'pointer',
+                                    transition: 'background-color 0.2s',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {nicknameSpinning ? '🎲 굴리는 중...' : '🎲 랜덤'}
+                            </button>
+                        </div>
+                        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
+                            닉네임은 랜덤 버튼으로만 변경할 수 있습니다.
+                        </p>
+                    </div>
+
+                    <div style={{
+                        height: '1px',
+                        backgroundColor: '#e5e7eb',
+                        margin: '30px 0'
+                    }} />
+
+                    {/* 기존 비밀번호 */}
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#374151',
+                            marginBottom: '8px'
+                        }}>
+                            기존 비밀번호
+                        </label>
+                        <input
+                            type="password"
+                            value={formData.currentPassword}
+                            onChange={(e) => handleChange('currentPassword', e.target.value)}
                             style={{
-                                padding: '12px 20px',
-                                backgroundColor: nicknameSpinning ? '#9ca3af' : '#8b5cf6',
+                                width: '100%',
+                                padding: '12px',
+                                border: '2px solid #d1d5db',
+                                borderRadius: '8px',
+                                fontSize: '15px',
+                                outline: 'none'
+                            }}
+                            placeholder="비밀번호를 변경하려면 입력하세요"
+                        />
+                        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
+                            비밀번호를 변경하지 않으려면 비워두세요.
+                        </p>
+                    </div>
+
+                    {/* 새 비밀번호 */}
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#374151',
+                            marginBottom: '8px'
+                        }}>
+                            새 비밀번호
+                        </label>
+                        <input
+                            type="password"
+                            value={formData.newPassword}
+                            onChange={(e) => handleChange('newPassword', e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                border: `2px solid ${
+                                    !formData.newPassword ? '#d1d5db' :
+                                    validations.newPassword.valid ? '#10b981' : '#ef4444'
+                                }`,
+                                borderRadius: '8px',
+                                fontSize: '15px',
+                                outline: 'none'
+                            }}
+                            placeholder="새 비밀번호 (영문, 숫자, 특수문자 포함 8자 이상)"
+                        />
+                        {formData.newPassword && (
+                            <>
+                                <div style={{
+                                    marginTop: '10px',
+                                    padding: '8px',
+                                    backgroundColor: '#f3f4f6',
+                                    borderRadius: '6px'
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        marginBottom: '8px'
+                                    }}>
+                                        <span style={{ fontSize: '13px', color: '#6b7280' }}>비밀번호 강도:</span>
+                                        <span style={{
+                                            fontSize: '13px',
+                                            fontWeight: '600',
+                                            color: passwordStrength.color
+                                        }}>
+                                            {passwordStrength.text}
+                                        </span>
+                                    </div>
+                                    <div style={{
+                                        height: '6px',
+                                        backgroundColor: '#e5e7eb',
+                                        borderRadius: '3px',
+                                        overflow: 'hidden'
+                                    }}>
+                                        <div style={{
+                                            width: `${(passwordStrength.score / 6) * 100}%`,
+                                            height: '100%',
+                                            backgroundColor: passwordStrength.color,
+                                            transition: 'width 0.3s, background-color 0.3s'
+                                        }} />
+                                    </div>
+                                </div>
+                                {validations.newPassword.message && (
+                                    <p style={{
+                                        fontSize: '13px',
+                                        color: validations.newPassword.valid ? '#10b981' : '#ef4444',
+                                        marginTop: '8px'
+                                    }}>
+                                        {validations.newPassword.message}
+                                    </p>
+                                )}
+                            </>
+                        )}
+                    </div>
+
+                    {/* 새 비밀번호 확인 */}
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#374151',
+                            marginBottom: '8px'
+                        }}>
+                            새 비밀번호 확인
+                        </label>
+                        <input
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                border: `2px solid ${
+                                    !formData.confirmPassword ? '#d1d5db' :
+                                    validations.confirmPassword.valid ? '#10b981' : '#ef4444'
+                                }`,
+                                borderRadius: '8px',
+                                fontSize: '15px',
+                                outline: 'none'
+                            }}
+                            placeholder="새 비밀번호를 다시 입력하세요"
+                        />
+                        {validations.confirmPassword.message && (
+                            <p style={{
+                                fontSize: '13px',
+                                color: validations.confirmPassword.valid ? '#10b981' : '#ef4444',
+                                marginTop: '8px'
+                            }}>
+                                {validations.confirmPassword.message}
+                            </p>
+                        )}
+                    </div>
+
+                    <div style={{
+                        height: '1px',
+                        backgroundColor: '#e5e7eb',
+                        margin: '30px 0'
+                    }} />
+
+                    {/* 휴대폰 번호 */}
+                    <div style={{ marginBottom: '30px' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#374151',
+                            marginBottom: '8px'
+                        }}>
+                            휴대폰 번호
+                        </label>
+                        <input
+                            type="tel"
+                            value={formData.phone}
+                            onChange={handlePhoneInput}
+                            maxLength={13}
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                border: `2px solid ${
+                                    !formData.phone ? '#d1d5db' :
+                                    validations.phone.valid ? '#10b981' : '#ef4444'
+                                }`,
+                                borderRadius: '8px',
+                                fontSize: '15px',
+                                outline: 'none'
+                            }}
+                            placeholder="010-0000-0000"
+                        />
+                        {/* ✅ 수정: 전화번호가 변경되었을 때만 에러 메시지 표시 */}
+                        {formData.phone !== originalPhone && validations.phone.message && (
+                            <p style={{
+                                fontSize: '13px',
+                                color: validations.phone.valid ? '#10b981' : '#ef4444',
+                                marginTop: '8px'
+                            }}>
+                                {validations.phone.message}
+                            </p>
+                        )}
+                        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
+                            변경하지 않으려면 그대로 두세요.
+                        </p>
+                    </div>
+
+                    {/* 수정/탈퇴 버튼 */}
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button
+                            onClick={() => window.location.href = '/member/delete'}
+                            style={{
+                                flex: 1,
+                                padding: '14px',
+                                backgroundColor: '#ef4444',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '8px',
-                                fontSize: '15px',
+                                fontSize: '16px',
                                 fontWeight: '600',
-                                cursor: nicknameSpinning ? 'not-allowed' : 'pointer',
-                                transition: 'background-color 0.2s',
-                                whiteSpace: 'nowrap'
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s'
                             }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
                         >
-                            {nicknameSpinning ? '🎲 굴리는 중...' : '🎲 랜덤'}
+                            회원 탈퇴
+                        </button>
+                        <button
+                            onClick={handleSubmit}
+                            style={{
+                                flex: 2,
+                                padding: '14px',
+                                backgroundColor: '#3b82f6',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '16px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                        >
+                            수정하기
                         </button>
                     </div>
-                    <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                        닉네임은 랜덤 버튼으로만 변경할 수 있습니다.
-                    </p>
-                </div>
-
-                <div style={{
-                    height: '1px',
-                    backgroundColor: '#e5e7eb',
-                    margin: '30px 0'
-                }} />
-
-                {/* 기존 비밀번호 */}
-                <div style={{ marginBottom: '25px' }}>
-                    <label style={{
-                        display: 'block',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#374151',
-                        marginBottom: '8px'
-                    }}>
-                        기존 비밀번호
-                    </label>
-                    <input
-                        type="password"
-                        value={formData.currentPassword}
-                        onChange={(e) => handleChange('currentPassword', e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            border: '2px solid #d1d5db',
-                            borderRadius: '8px',
-                            fontSize: '15px',
-                            outline: 'none'
-                        }}
-                        placeholder="비밀번호를 변경하려면 입력하세요"
-                    />
-                    <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                        비밀번호를 변경하지 않으려면 비워두세요.
-                    </p>
-                </div>
-
-                {/* 새 비밀번호 */}
-                <div style={{ marginBottom: '25px' }}>
-                    <label style={{
-                        display: 'block',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#374151',
-                        marginBottom: '8px'
-                    }}>
-                        새 비밀번호
-                    </label>
-                    <input
-                        type="password"
-                        value={formData.newPassword}
-                        onChange={(e) => handleChange('newPassword', e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            border: `2px solid ${
-                                !formData.newPassword ? '#d1d5db' :
-                                validations.newPassword.valid ? '#10b981' : '#ef4444'
-                            }`,
-                            borderRadius: '8px',
-                            fontSize: '15px',
-                            outline: 'none'
-                        }}
-                        placeholder="새 비밀번호 (영문, 숫자, 특수문자 포함 8자 이상)"
-                    />
-                    {formData.newPassword && (
-                        <>
-                            <div style={{
-                                marginTop: '10px',
-                                padding: '8px',
-                                backgroundColor: '#f3f4f6',
-                                borderRadius: '6px'
-                            }}>
-                                <div style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    marginBottom: '8px'
-                                }}>
-                                    <span style={{ fontSize: '13px', color: '#6b7280' }}>비밀번호 강도:</span>
-                                    <span style={{
-                                        fontSize: '13px',
-                                        fontWeight: '600',
-                                        color: passwordStrength.color
-                                    }}>
-                                        {passwordStrength.text}
-                                    </span>
-                                </div>
-                                <div style={{
-                                    height: '6px',
-                                    backgroundColor: '#e5e7eb',
-                                    borderRadius: '3px',
-                                    overflow: 'hidden'
-                                }}>
-                                    <div style={{
-                                        width: `${(passwordStrength.score / 6) * 100}%`,
-                                        height: '100%',
-                                        backgroundColor: passwordStrength.color,
-                                        transition: 'width 0.3s, background-color 0.3s'
-                                    }} />
-                                </div>
-                            </div>
-                            {validations.newPassword.message && (
-                                <p style={{
-                                    fontSize: '13px',
-                                    color: validations.newPassword.valid ? '#10b981' : '#ef4444',
-                                    marginTop: '8px'
-                                }}>
-                                    {validations.newPassword.message}
-                                </p>
-                            )}
-                        </>
-                    )}
-                </div>
-
-                {/* 새 비밀번호 확인 */}
-                <div style={{ marginBottom: '25px' }}>
-                    <label style={{
-                        display: 'block',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#374151',
-                        marginBottom: '8px'
-                    }}>
-                        새 비밀번호 확인
-                    </label>
-                    <input
-                        type="password"
-                        value={formData.confirmPassword}
-                        onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            border: `2px solid ${
-                                !formData.confirmPassword ? '#d1d5db' :
-                                validations.confirmPassword.valid ? '#10b981' : '#ef4444'
-                            }`,
-                            borderRadius: '8px',
-                            fontSize: '15px',
-                            outline: 'none'
-                        }}
-                        placeholder="새 비밀번호를 다시 입력하세요"
-                    />
-                    {validations.confirmPassword.message && (
-                        <p style={{
-                            fontSize: '13px',
-                            color: validations.confirmPassword.valid ? '#10b981' : '#ef4444',
-                            marginTop: '8px'
-                        }}>
-                            {validations.confirmPassword.message}
-                        </p>
-                    )}
-                </div>
-
-                <div style={{
-                    height: '1px',
-                    backgroundColor: '#e5e7eb',
-                    margin: '30px 0'
-                }} />
-
-                {/* 휴대폰 번호 */}
-                <div style={{ marginBottom: '30px' }}>
-                    <label style={{
-                        display: 'block',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#374151',
-                        marginBottom: '8px'
-                    }}>
-                        휴대폰 번호
-                    </label>
-                    <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={handlePhoneInput}
-                        maxLength={13}
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            border: `2px solid ${
-                                !formData.phone ? '#d1d5db' :
-                                validations.phone.valid ? '#10b981' : '#ef4444'
-                            }`,
-                            borderRadius: '8px',
-                            fontSize: '15px',
-                            outline: 'none'
-                        }}
-                        placeholder="010-0000-0000"
-                    />
-                    {/* ✅ 수정: 전화번호가 변경되었을 때만 에러 메시지 표시 */}
-                    {formData.phone !== originalPhone && validations.phone.message && (
-                        <p style={{
-                            fontSize: '13px',
-                            color: validations.phone.valid ? '#10b981' : '#ef4444',
-                            marginTop: '8px'
-                        }}>
-                            {validations.phone.message}
-                        </p>
-                    )}
-                    <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                        변경하지 않으려면 그대로 두세요.
-                    </p>
-                </div>
-
-                {/* 수정/탈퇴 버튼 */}
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button
-                        onClick={() => window.location.href = '/member/delete'}
-                        style={{
-                            flex: 1,
-                            padding: '14px',
-                            backgroundColor: '#ef4444',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '16px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'background-color 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
-                    >
-                        회원 탈퇴
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        style={{
-                            flex: 2,
-                            padding: '14px',
-                            backgroundColor: '#3b82f6',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '16px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'background-color 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
-                    >
-                        수정하기
-                    </button>
                 </div>
             </div>
         </div>
-    );
+            );
 };
 
 export default EditProfile;

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Sidebar from "../../components/mypage/Sidebar"
 
 const Allergies = () => {
     const [allergies, setAllergies] = useState([]);
@@ -179,138 +180,143 @@ const Allergies = () => {
 
     return (
         <div style={{
-            minHeight: '100vh',
-            backgroundColor: '#f9fafb',
-            padding: '40px 20px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
+            display: "flex",
+            minHeight: "100vh",
+            backgroundColor: "#f9fafb"
         }}>
+        <Sidebar/>
             <div style={{
-                maxWidth: '800px',
-                width: '100%',
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                border: '3px solid #3b82f6',
-                padding: '40px',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                flex: 1,
+                padding: "40px 20px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
             }}>
-                
-                <h2 style={{
-                    fontSize: '28px',
-                    fontWeight: 'bold',
-                    color: '#1f2937',
-                    marginBottom: '30px'
-                }}>
-                    알레르기 정보
-                </h2>
-
                 <div style={{
-                    backgroundColor: '#f3f4f6',
-                    padding: '10px',
-                    borderRadius: '6px',
-                    marginBottom: '20px',
-                    fontSize: '12px',
-                    color: '#6b7280'
+                    maxWidth: '800px',
+                    width: '100%',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    border: '3px solid #3b82f6',
+                    padding: '40px',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                 }}>
-                    <p>📊 총 알레르기: {allergies.length}개</p>
-                    <p>✅ 선택됨: {checked.length}개</p>
-                </div>
-
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(5, 1fr)',
-                    gap: '15px 20px',
-                    marginBottom: '40px'
-                }}>
-                    {allergies.map((allergy) => {
-                        const allergyId = allergy.allergyId;
-                        const allergyName = allergy.allergyName;
-                        
-                        return (
-                            <label
-                                key={allergyId}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    cursor: 'pointer',
-                                    fontSize: '15px',
-                                    color: '#374151',
-                                    userSelect: 'none',
-                                    padding: '8px',
-                                    borderRadius: '6px',
-                                    backgroundColor: checked.includes(allergyId) ? '#dbeafe' : 'transparent',
-                                    transition: 'background-color 0.2s'
-                                }}
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={checked.includes(allergyId)}
-                                    onChange={() => toggleCheck(allergyId)}
-                                    style={{
-                                        width: '18px',
-                                        height: '18px',
-                                        marginRight: '8px',
-                                        cursor: 'pointer',
-                                        accentColor: '#3b82f6',
-                                        flexShrink: 0
-                                    }}
-                                />
-                                <span style={{ lineHeight: '1.3' }}>{allergyName}</span>
-                            </label>
-                        );
-                    })}
-                </div>
-
-                {checked.length > 0 && (
-                    <div style={{
-                        backgroundColor: '#f3f4f6',
-                        padding: '15px',
-                        borderRadius: '8px',
+                    
+                    <h2 style={{
+                        fontSize: '28px',
+                        fontWeight: 'bold',
+                        color: '#1f2937',
                         marginBottom: '30px'
                     }}>
-                        <p style={{ 
-                            fontSize: '14px', 
-                            color: '#6b7280', 
-                            marginBottom: '8px',
-                            fontWeight: '600'
-                        }}>
-                            선택된 알레르기 ({checked.length}개):
-                        </p>
-                        <p style={{ 
-                            fontSize: '14px', 
-                            color: '#374151',
-                            lineHeight: '1.6'
-                        }}>
-                            {allergies
-                                .filter(a => checked.includes(a.allergyId))
-                                .map(a => a.allergyName)
-                                .join(', ')}
-                        </p>
+                        알레르기 정보
+                    </h2>
+
+                    <div style={{
+                        backgroundColor: '#f3f4f6',
+                        padding: '10px',
+                        borderRadius: '6px',
+                        marginBottom: '20px',
+                        fontSize: '12px',
+                        color: '#6b7280'
+                    }}>
+                        <p>📊 총 알레르기: {allergies.length}개</p>
+                        <p>✅ 선택됨: {checked.length}개</p>
                     </div>
-                )}
 
-                <div style={{ textAlign: 'right' }}>
-                    <button
-                        onClick={handleSave}
-                        style={{
-                            padding: '12px 40px',
-                            backgroundColor: '#84cc16',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '6px',
-                            fontSize: '16px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'background-color 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#65a30d'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = '#84cc16'}
-                    >
-                        확인
-                    </button>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(5, 1fr)',
+                        gap: '15px 20px',
+                        marginBottom: '40px'
+                    }}>
+                        {allergies.map((allergy) => {
+                            const allergyId = allergy.allergyId;
+                            const allergyName = allergy.allergyName;
+                            
+                            return (
+                                <label
+                                    key={allergyId}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        cursor: 'pointer',
+                                        fontSize: '15px',
+                                        color: '#374151',
+                                        userSelect: 'none',
+                                        padding: '8px',
+                                        borderRadius: '6px',
+                                        backgroundColor: checked.includes(allergyId) ? '#dbeafe' : 'transparent',
+                                        transition: 'background-color 0.2s'
+                                    }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={checked.includes(allergyId)}
+                                        onChange={() => toggleCheck(allergyId)}
+                                        style={{
+                                            width: '18px',
+                                            height: '18px',
+                                            marginRight: '8px',
+                                            cursor: 'pointer',
+                                            accentColor: '#3b82f6',
+                                            flexShrink: 0
+                                        }}
+                                    />
+                                    <span style={{ lineHeight: '1.3' }}>{allergyName}</span>
+                                </label>
+                            );
+                        })}
+                    </div>
+
+                    {checked.length > 0 && (
+                        <div style={{
+                            backgroundColor: '#f3f4f6',
+                            padding: '15px',
+                            borderRadius: '8px',
+                            marginBottom: '30px'
+                        }}>
+                            <p style={{ 
+                                fontSize: '14px', 
+                                color: '#6b7280', 
+                                marginBottom: '8px',
+                                fontWeight: '600'
+                            }}>
+                                선택된 알레르기 ({checked.length}개):
+                            </p>
+                            <p style={{ 
+                                fontSize: '14px', 
+                                color: '#374151',
+                                lineHeight: '1.6'
+                            }}>
+                                {allergies
+                                    .filter(a => checked.includes(a.allergyId))
+                                    .map(a => a.allergyName)
+                                    .join(', ')}
+                            </p>
+                        </div>
+                    )}
+
+                    <div style={{ textAlign: 'right' }}>
+                        <button
+                            onClick={handleSave}
+                            style={{
+                                padding: '12px 40px',
+                                backgroundColor: '#84cc16',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '16px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#65a30d'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = '#84cc16'}
+                        >
+                            확인
+                        </button>
+                    </div>
                 </div>
-
             </div>
         </div>
     );
