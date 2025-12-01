@@ -8,11 +8,13 @@ import com.fom.boot.domain.ingredient.model.service.KamisDataSyncService;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
 import com.fom.boot.domain.meal.model.service.KamisApiService;
+import com.fom.boot.domain.alert.model.service.PriceAlertService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +31,7 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
     private final IngredientMapper ingredientMapper;
     private final IngredientPriceHistoryMapper priceHistoryMapper;
     private final ObjectMapper objectMapper;
+    private final PriceAlertService priceAlertService;
 
     @Override
     @Transactional
@@ -414,6 +417,17 @@ public class KamisDataSyncServiceImpl implements KamisDataSyncService {
                     if (saved > 0) {
                         savedCount++;
                         log.debug("Price saved - item: {}, price: {} KRW", itemName, price);
+
+                        // 지정가 알림 체크 및 발송
+                        try {
+                            priceAlertService.checkAndNotifyPrice(
+                                ingredient.getIngredientId(),
+                                itemName,
+                                BigDecimal.valueOf(price)
+                            );
+                        } catch (Exception alertEx) {
+                            log.warn("Price alert check failed for item: {}", itemName, alertEx);
+                        }
                     }
 
                 } catch (Exception e) {

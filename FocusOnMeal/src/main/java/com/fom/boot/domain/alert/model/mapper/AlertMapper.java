@@ -206,6 +206,20 @@ public interface AlertMapper {
      * @param type 알림 유형
      * @return 업데이트된 행 수
      */
-    int updateAllNotificationsReadStatusByType(@Param("memberId") String memberId, 
+    int updateAllNotificationsReadStatusByType(@Param("memberId") String memberId,
                                                @Param("type") String type);
+
+    /**
+     * 마이페이지: 검색 조건에 맞는 회원의 가격 알림 개수 조회
+     * @param searchMap 검색 조건(Map)
+     * @return 알림 개수
+     */
+    int selectUserPriceNotiCount(Map<String, Object> searchMap);
+
+    /**
+     * 마이페이지: 검색 조건에 맞는 회원의 가격 알림 목록 조회
+     * @param searchMap 검색 조건(Map)
+     * @return 알림 목록 리스트
+     */
+    List<Map<String, Object>> selectUserPriceNotiList(Map<String, Object> searchMap);
 }

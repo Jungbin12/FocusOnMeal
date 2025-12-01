@@ -137,4 +137,25 @@
           AND INGREDIENT_ID = #{ingredientId}
     </delete>
 
+    <!-- 사용자의 모든 지정가 알림 설정 조회 (마이페이지용) -->
+    <select id="selectAllAlertsByMember" resultType="map">
+        SELECT
+            pas.ALERT_ID AS "alertId",
+            pas.INGREDIENT_ID AS "ingredientId",
+            im.NAME AS "ingredientName",
+            pas.THRESHOLD_PRICE AS "targetPrice",
+            pas.NOTIFICATION_ENABLED AS "notificationEnabled",
+            (
+                SELECT ph.PRICE_VALUE
+                FROM PRICE_HISTORY ph
+                WHERE ph.INGREDIENT_ID = pas.INGREDIENT_ID
+                ORDER BY ph.COLLECTED_DATE DESC
+                FETCH FIRST 1 ROW ONLY
+            ) AS "currentPrice"
+        FROM PRICE_ALERT_SETTING pas
+        LEFT JOIN INGREDIENT_MASTER im ON pas.INGREDIENT_ID = im.INGREDIENT_ID
+        WHERE pas.MEMBER_ID = #{memberId}
+        ORDER BY im.NAME, pas.THRESHOLD_PRICE
+    </select>
+
   </mapper>

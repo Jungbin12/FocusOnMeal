@@ -408,4 +408,33 @@ public class AlertServiceImpl implements AlertService {
             throw new RuntimeException("특정 유형 알림 읽음 처리에 실패했습니다.", e);
         }
     }
+
+    // 검색 조건에 맞는 개인 가격 알림 개수 조회 (페이지네이션용)
+    @Override
+    public int getUserPriceNotiCount(Map<String, Object> searchMap) {
+        try {
+            return alertMapper.selectUserPriceNotiCount(searchMap);
+        } catch (Exception e) {
+            log.error("가격 알림 개수 조회 실패: searchMap={}", searchMap, e);
+            return 0;
+        }
+    }
+
+    // 검색 조건에 맞는 개인 가격 알림 목록 조회 (페이징 + 검색)
+    @Override
+    public List<Map<String, Object>> getUserPriceNotiList(PageInfo pi, Map<String, Object> searchMap) {
+        try {
+            // 페이징 계산 (Oracle ROWNUM 기준)
+            int startRow = (pi.getCurrentPage() - 1) * pi.getBoardLimit() + 1;
+            int endRow = startRow + pi.getBoardLimit() - 1;
+
+            searchMap.put("startRow", startRow);
+            searchMap.put("endRow", endRow);
+
+            return alertMapper.selectUserPriceNotiList(searchMap);
+        } catch (Exception e) {
+            log.error("가격 알림 목록 조회 실패: searchMap={}", searchMap, e);
+            throw new RuntimeException("가격 알림 목록 조회에 실패했습니다.", e);
+        }
+    }
 }

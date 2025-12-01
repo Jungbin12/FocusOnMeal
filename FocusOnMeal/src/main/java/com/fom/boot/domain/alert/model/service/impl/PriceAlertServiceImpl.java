@@ -2,6 +2,7 @@ package com.fom.boot.domain.alert.model.service.impl;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,14 +112,25 @@ public class PriceAlertServiceImpl implements PriceAlertService {
             return;
         }
         
-        log.info("가격 알림 대상 발견: 재료={}, 현재가={}, 대상자수={}", 
+        log.info("가격 알림 대상 발견: 재료={}, 현재가={}, 대상자수={}",
                  ingredientName, currentPrice, targets.size());
-        
-        String message = String.format("[%s] 가격이 %s원으로 변동되었습니다!", 
+
+        String message = String.format("[%s] 지정가에 도달했습니다! (현재가: %s원)",
                                      ingredientName, currentPrice.toString());
-        
+
+        // ✅ 형식: "메시지내용||ingredientId"
+        String messageWithMetadata = String.format("%s||%d", message, ingredientId);
+
         for (String memberId : targets) {
-            alertMapper.insertNotificationLog(memberId, "가격변동", message, null);
+            alertMapper.insertNotificationLog(memberId, "가격변동", messageWithMetadata, null);
         }
+    }
+
+    /**
+     * 사용자의 모든 지정가 알림 설정 조회 (마이페이지용)
+     */
+    @Override
+    public List<Map<String, Object>> getAllAlertsByMember(String memberId) {
+        return priceAlertMapper.selectAllAlertsByMember(memberId);
     }
 }

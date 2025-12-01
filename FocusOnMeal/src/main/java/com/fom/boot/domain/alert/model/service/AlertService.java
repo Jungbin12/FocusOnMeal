@@ -153,4 +153,19 @@ public interface AlertService {
      * @return 처리된 알림 개수
      */
     int markAllNotificationsAsReadByType(String memberId, String type);
+
+    /**
+     * 마이페이지: 검색 조건에 맞는 가격 알림 개수 조회
+     * @param searchMap 검색 조건(Map)
+     * @return 알림 개수
+     */
+    int getUserPriceNotiCount(Map<String, Object> searchMap);
+
+    /**
+     * 마이페이지: 검색 조건에 맞는 가격 알림 목록 조회 (페이징 포함)
+     * @param pi 페이지 정보(PageInfo)
+     * @param searchMap 검색 조건(Map)
+     * @return 알림 목록 리스트
+     */
+    List<Map<String, Object>> getUserPriceNotiList(PageInfo pi, Map<String, Object> searchMap);
 }

@@ -28,6 +28,7 @@ import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
 import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.common.pagination.Pagination;
 import com.fom.boot.domain.alert.model.service.AlertService;
+import com.fom.boot.domain.alert.model.service.PriceAlertService;
 import com.fom.boot.domain.alert.model.vo.SafetyAlert;
 import com.fom.boot.domain.ingredient.model.service.IngredientService;
 import com.fom.boot.domain.member.model.service.MemberService;
@@ -53,7 +54,9 @@ public class MyPageController {
 	private final SafetyService sService;
 	
 	private final AlertService aService;
-	
+
+	private final PriceAlertService pService;
+
 	// 마이페이지 대시보드 이동
 	@GetMapping("/dashboard")
 	public ResponseEntity<?> getDashboard(Authentication authentication) {
@@ -509,5 +512,94 @@ public class MyPageController {
         boolean result = aService.markNotificationAsRead(notificationId, memberId);
         return ResponseEntity.ok(Map.of("success", result));
     }
-    
+
+    // ====== 가격 알림 관련 ======
+
+    // 마이페이지 가격 알림 내역 및 지정가 설정 조회
+    @GetMapping("/settings/priceAlert")
+    public ResponseEntity<?> getPriceAlerts(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "sentAt") String sortColumn,
+            @RequestParam(defaultValue = "desc") String sortOrder,
+            @RequestParam(defaultValue = "all") String readStatus,
+            Authentication authentication) {
+
+        // 로그인 확인
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "로그인이 필요합니다."));
+        }
+
+        String memberId = authentication.getName();
+
+        // 검색 조건 구성
+        Map<String, Object> searchMap = new HashMap<>();
+        searchMap.put("memberId", memberId);
+        searchMap.put("keyword", keyword.trim());
+        searchMap.put("sortColumn", sortColumn);
+        searchMap.put("sortOrder", sortOrder);
+        searchMap.put("readStatus", readStatus);
+
+        // 전체 개수 조회
+        int total = aService.getUserPriceNotiCount(searchMap);
+
+        // 페이징 생성
+        PageInfo pi = Pagination.getPageInfo(page, total);
+
+        // 가격 알림 내역 목록 조회
+        List<Map<String, Object>> alertList = aService.getUserPriceNotiList(pi, searchMap);
+
+        // 지정가 알림 설정 목록 조회
+        List<Map<String, Object>> watchedIngredients = pService.getAllAlertsByMember(memberId);
+
+        // 유저 알림 설정
+        Map<String, Object> setting = aService.getSafetyAlertSettings(memberId);
+
+        // 응답 데이터 구성
+        Map<String, Object> response = new HashMap<>();
+        response.put("alertList", alertList);
+        response.put("pageInfo", pi);
+        response.put("watchedIngredients", watchedIngredients);
+        response.put("userSetting", setting.get("notificationEnabled"));
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 마이페이지 가격 알림 삭제
+    @DeleteMapping("/settings/priceAlert/{notificationId}")
+    public ResponseEntity<?> deletePriceNotification(
+            @PathVariable int notificationId,
+            Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String memberId = authentication.getName();
+
+        boolean result = aService.deleteSafetyAlert(notificationId, memberId);
+
+        if (result) {
+            return ResponseEntity.ok(Map.of("message", "삭제되었습니다."));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "삭제 실패"));
+        }
+    }
+
+    // 마이페이지 가격 알림 읽음 처리
+    @PatchMapping("/settings/priceAlert/{notificationId}/read")
+    public ResponseEntity<?> readPriceNotification(
+            @PathVariable int notificationId,
+            Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String memberId = authentication.getName();
+
+        boolean result = aService.markNotificationAsRead(notificationId, memberId);
+        return ResponseEntity.ok(Map.of("success", result));
+    }
+
 }

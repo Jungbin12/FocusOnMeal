@@ -56,10 +56,10 @@ const Header = () => {
                     navigate(`/board/safety/detail/${notification.alertId}`);
                 } else {
                     console.error("❌ alertId가 없습니다. 메시지:", notification.message);
-                    // ✅ alertId가 없어도 메시지로 검색 페이지로 이동 (임시 대응)
                     alert("해당 알림의 상세 정보를 찾을 수 없습니다.");
                 }
-            } else if (notification.type === "가격정보") {
+            } else if (notification.type === "가격정보" || notification.type === "가격변동") {
+                // 가격정보(일일 변동) + 가격변동(지정가 도달) 모두 처리
                 if (notification.ingredientId) {
                     console.log("✅ 식재료 페이지 이동:", notification.ingredientId);
                     navigate(`/ingredient/detail/${notification.ingredientId}`);
@@ -99,7 +99,19 @@ const Header = () => {
     };
 
     const getTypeLabel = (type) => {
-        return type === "위험공표" ? "위험공표" : "가격정보";
+        if (type === "위험공표") return "위험공표";
+        if (type === "가격변동") return "지정가 도달";
+        return "가격정보";
+    };
+
+    // 탭 필터 함수: "가격정보" 탭은 "가격정보"와 "가격변동" 둘 다 포함
+    const filterByTab = (notification) => {
+        if (activeTab === "위험공표") {
+            return notification.type === "위험공표";
+        } else {
+            // "가격정보" 탭: 가격정보 + 가격변동 (지정가 도달)
+            return notification.type === "가격정보" || notification.type === "가격변동";
+        }
     };
 
     const formatTime = (sentAt) => {
@@ -305,7 +317,7 @@ const Header = () => {
                                                 </div>
 
                                                 {/* 읽음 처리 버튼 */}
-                                                {notifications.filter(n => n.type === activeTab && n.isRead === 'N').length > 0 && (
+                                                {notifications.filter(n => filterByTab(n) && n.isRead === 'N').length > 0 && (
                                                     <div className="notification-action-bar">
                                                         <button 
                                                             className="mark-all-read-btn"
@@ -318,11 +330,11 @@ const Header = () => {
 
                                                 {/* 탭 콘텐츠 */}
                                                 <div className="notification-content">
-                                                    {notifications.filter(n => n.type === activeTab).length === 0 ? (
+                                                    {notifications.filter(filterByTab).length === 0 ? (
                                                         <div className="notification-empty">알림이 없습니다.</div>
                                                     ) : (
                                                         notifications
-                                                            .filter(n => n.type === activeTab)
+                                                            .filter(filterByTab)
                                                             .map((notif, index) => (  // ✅ index 추가
                                                                 <div
                                                                     key={`${notif.notificationId}-${index}`}  // ✅ 복합 키 사용

@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import com.fom.boot.domain.alert.model.vo.PriceAlert;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface PriceAlertMapper {
@@ -84,6 +85,11 @@ public interface PriceAlertMapper {
     /**
      * 특정 재료의 모든 알림 삭제 (다중 알림용)
      */
-    void deleteAllAlerts(@Param("memberId") String memberId, 
+    void deleteAllAlerts(@Param("memberId") String memberId,
                          @Param("ingredientId") int ingredientId);
+
+    /**
+     * 사용자의 모든 지정가 알림 설정 조회 (마이페이지용)
+     */
+    List<Map<String, Object>> selectAllAlertsByMember(@Param("memberId") String memberId);
 }

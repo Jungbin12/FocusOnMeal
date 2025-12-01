@@ -354,4 +354,56 @@
 	      AND IS_READ = 'N'
 	</update>
 
+	<!-- 마이페이지: 가격 알림 내역 개수 조회 -->
+	<select id="selectUserPriceNotiCount" resultType="int">
+	    SELECT COUNT(*)
+	    FROM NOTIFICATION_LOG nl
+	    WHERE nl.MEMBER_ID = #{memberId}
+	      AND nl.TYPE IN ('가격정보', '가격변동')
+	    <if test="readStatus != null and readStatus != 'all'">
+	        AND nl.IS_READ = #{readStatus}
+	    </if>
+	    <if test="keyword != null and keyword != ''">
+	        AND nl.MESSAGE LIKE '%' || #{keyword} || '%'
+	    </if>
+	</select>
+
+	<!-- 마이페이지: 가격 알림 내역 목록 조회 -->
+	<select id="selectUserPriceNotiList" resultType="map">
+	    SELECT * FROM (
+	        SELECT
+	            ROW_NUMBER() OVER (
+	                ORDER BY
+	                <choose>
+	                    <when test="sortColumn == 'sentAt'">nl.SENT_AT</when>
+	                    <otherwise>nl.SENT_AT</otherwise>
+	                </choose>
+	                <choose>
+	                    <when test="sortOrder == 'asc'">ASC</when>
+	                    <otherwise>DESC</otherwise>
+	                </choose>
+	            ) AS rn,
+	            nl.NOTIFICATION_ID AS "notificationId",
+	            nl.MEMBER_ID AS "memberId",
+	            nl.TYPE AS "type",
+	            nl.MESSAGE AS "message",
+	            nl.IS_READ AS "isRead",
+	            TO_CHAR(nl.SENT_AT, 'YYYY-MM-DD"T"HH24:MI:SS') AS "sentAt",
+	            CASE
+	                WHEN nl.MESSAGE LIKE '%||%' THEN
+	                    TO_NUMBER(SUBSTR(nl.MESSAGE, INSTR(nl.MESSAGE, '||') + 2))
+	                ELSE NULL
+	            END AS "ingredientId"
+	        FROM NOTIFICATION_LOG nl
+	        WHERE nl.MEMBER_ID = #{memberId}
+	          AND nl.TYPE IN ('가격정보', '가격변동')
+	        <if test="readStatus != null and readStatus != 'all'">
+	            AND nl.IS_READ = #{readStatus}
+	        </if>
+	        <if test="keyword != null and keyword != ''">
+	            AND nl.MESSAGE LIKE '%' || #{keyword} || '%'
+	        </if>
+	    ) WHERE rn BETWEEN #{startRow} AND #{endRow}
+	</select>
+
   </mapper>

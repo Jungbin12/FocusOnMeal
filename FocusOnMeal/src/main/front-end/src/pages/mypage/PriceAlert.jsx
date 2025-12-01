@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import styles from './priceAlert.module.css';
 import Sidebar from '../../components/mypage/Sidebar';
 import Pagination from '../../components/common/Pagination';
@@ -47,11 +48,12 @@ const PriceAlert = () => {
         const newValue = !isNotificationEnabled;
 
         try {
-            // API 요청 시뮬레이션
-            // await axios.patch("/api/mypage/setting/priceAlert/toggle", { enabled: newValue ? 'Y' : 'N' });
-            
+            await axios.patch("/api/mypage/settings/safetyAlert/toggle", {
+                notificationEnabled: newValue ? 'Y' : 'N'
+            });
+
             setIsNotificationEnabled(newValue);
-            
+
             if (newValue) {
                 alert("모든 가격 변동 알림을 수신합니다.");
             } else {
@@ -63,31 +65,83 @@ const PriceAlert = () => {
         }
     };
 
+    // 메시지 파싱 함수: "메시지||ingredientId" 형식에서 순수 메시지 추출
+    const parseMessage = (message) => {
+        if (!message) return { text: '', ingredientId: null };
+        const parts = message.split('||');
+        return {
+            text: parts[0] || '',
+            ingredientId: parts[1] ? parseInt(parts[1]) : null
+        };
+    };
+
+    // 알림 내역을 화면에 맞는 형식으로 변환
+    const transformAlertList = (alerts) => {
+        return alerts.map(alert => {
+            const parsed = parseMessage(alert.message);
+            // 메시지에서 식재료명 추출 (예: "[양파] ↑ 상승 5.00%...")
+            const nameMatch = parsed.text.match(/\[(.+?)\]/);
+            const ingredientName = nameMatch ? nameMatch[1] : '알 수 없음';
+
+            // 알림 유형 판단
+            let condition = alert.type || '가격정보';
+            if (parsed.text.includes('지정가')) condition = '지정가 도달';
+            else if (parsed.text.includes('상승')) condition = '가격 상승';
+            else if (parsed.text.includes('하락')) condition = '가격 하락';
+
+            return {
+                alertId: alert.notificationId,
+                ingredientName,
+                condition,
+                message: parsed.text.replace(/\[.+?\]\s*/, ''), // [식재료명] 제거
+                price: null, // API 응답에 가격이 포함되지 않음
+                alertDate: alert.sentAt,
+                link: parsed.ingredientId ? `/ingredient/detail/${parsed.ingredientId}` : '#',
+                isRead: alert.isRead
+            };
+        });
+    };
+
     // 데이터 조회
     useEffect(() => {
-        // API 호출 시뮬레이션 (가격 데이터용 Mock)
-        const mockData = {
-            userSetting: 'N', // 초기값: 전체 알림 꺼짐
-            watchedIngredients: [
-                { ingredientId: 10, name: '양파', targetPrice: 2500 },
-                { ingredientId: 22, name: '삼겹살', targetPrice: 20000 },
-                { ingredientId: 15, name: '계란(30구)', targetPrice: 6000 }
-            ],
-            alertList: [
-                { alertId: 205, ingredientName: "양파", condition: "지정가 도달", message: "목표가 2,500원 이하로 하락했습니다.", price: 2450, alertDate: "2025-11-21T10:00:00", link: "/ingredient/detail/10" },
-                { alertId: 204, ingredientName: "대파", condition: "급등 주의", message: "전일 대비 15% 급등했습니다.", price: 3200, alertDate: "2025-11-20T14:30:00", link: "/ingredient/detail/12" },
-                { alertId: 203, ingredientName: "시금치", condition: "최저가 갱신", message: "최근 3개월 내 최저가를 기록했습니다.", price: 1800, alertDate: "2025-11-19T09:00:00", link: "/ingredient/detail/33" },
-                { alertId: 202, ingredientName: "삼겹살", condition: "지정가 도달", message: "목표가 20,000원 이하로 하락했습니다.", price: 19800, alertDate: "2025-11-18T11:20:00", link: "/ingredient/detail/22" },
-                { alertId: 201, ingredientName: "사과", condition: "급락 주의", message: "전일 대비 10% 급락했습니다.", price: 25000, alertDate: "2025-11-15T16:45:00", link: "/ingredient/detail/5" },
-            ],
-            pageInfo: { currentPage: 1, maxPage: 5, startPage: 1, endPage: 5 }
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('/api/mypage/settings/priceAlert', {
+                    params: {
+                        page: currentPage,
+                        keyword: fetchSearchKeyword,
+                        sortColumn: sortColumn === 'alertId' ? 'sentAt' : sortColumn,
+                        sortOrder: sortOrder,
+                        readStatus: 'all'
+                    }
+                });
+
+                const data = response.data;
+
+                // 알림 내역 변환 및 설정
+                const transformedAlerts = transformAlertList(data.alertList || []);
+                setPriceAlertList(transformedAlerts);
+                setPageInfo(data.pageInfo);
+                setIsNotificationEnabled(data.userSetting === 'Y');
+
+                // 지정가 알림 설정 목록 변환
+                const watchedList = (data.watchedIngredients || []).map(item => ({
+                    ingredientId: item.ingredientId,
+                    name: item.ingredientName,
+                    targetPrice: item.targetPrice || 0
+                }));
+                setWatchedIngredients(watchedList);
+
+            } catch (err) {
+                console.error("데이터 조회 실패:", err);
+                // 에러 시 빈 상태로 설정
+                setPriceAlertList([]);
+                setPageInfo(null);
+                setWatchedIngredients([]);
+            }
         };
 
-        setPriceAlertList(mockData.alertList);
-        setPageInfo(mockData.pageInfo);
-        setIsNotificationEnabled(mockData.userSetting === 'Y');
-        setWatchedIngredients(mockData.watchedIngredients);
-
+        fetchData();
     }, [currentPage, fetchSearchType, fetchSearchKeyword, sortColumn, sortOrder]);
 
     return(
@@ -216,7 +270,7 @@ const PriceAlert = () => {
                                         </span>
                                     </td>
                                     <td className={styles.alignLeft}>{alert.message}</td>
-                                    <td>{alert.price.toLocaleString()}원</td>
+                                    <td>{alert.price ? `${alert.price.toLocaleString()}원` : "-"}</td>
                                     <td>{alert.alertDate ? new Date(alert.alertDate).toLocaleDateString("ko-KR") : "-"}</td>
                                     <td>
                                         <Link to={alert.link} className={styles.linkBtn}>상세</Link>
