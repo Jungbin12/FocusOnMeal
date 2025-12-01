@@ -235,7 +235,7 @@
 	
 	  <!-- 이전 글 -->
 	  <select id="selectPrevNotice" parameterType="int" resultType="map">
-		    SELECT NOTICE_NO AS noticeNo, NOTICE_SUBJECT AS noticeTitle
+		    SELECT NOTICE_NO AS "noticeNo", NOTICE_SUBJECT AS "noticeTitle"
 		    FROM NOTICE
 		    WHERE NOTICE_NO &lt; #{noticeNo}
 		      AND IS_DELETED = 'N'
@@ -246,7 +246,7 @@
 		
 		<!-- 다음 글 -->
 		<select id="selectNextNotice" parameterType="int" resultType="map">
-		    SELECT NOTICE_NO AS noticeNo, NOTICE_SUBJECT AS noticeTitle
+		    SELECT NOTICE_NO AS "noticeNo", NOTICE_SUBJECT AS "noticeTitle"
 		    FROM NOTICE
 		    WHERE NOTICE_NO &gt; #{noticeNo}
 		      AND IS_DELETED = 'N'

@@ -48,6 +48,19 @@ const NoticeDetail = () => {
         fetchNoticeDetail();
     }, [noticeNo]);
 
+    // 이전/다음 글 이동
+    const handlePrevClick = () => {
+        if (prev) {
+            navigate(`/board/notice/detail/${prev.noticeNo}`);
+        }
+    };
+
+    const handleNextClick = () => {
+        if (next) {
+            navigate(`/board/notice/detail/${next.noticeNo}`);
+        }
+    };
+
     if (loading) {
         return <div className={styles.loading}>공지사항을 불러오는 중...</div>;
     }
@@ -103,50 +116,29 @@ const NoticeDetail = () => {
                 {/* 이전/다음 글 영역 */}
                 <div className={styles.actionButtons}>
                     <div className={styles.prevNextWrapper}>
-                        <div className={styles.prevRow}>
+                        <div 
+                            className={`${styles.prevRow} ${!prev ? styles.disabled : ''}`}
+                            onClick={handlePrevClick}
+                            style={{ cursor: prev ? 'pointer' : 'default' }}
+                        >
                             <span className={styles.label}>이전글</span>
                             <span className={styles.separator}>|</span>
-
-                            {prev ? (
-                                <span
-                                    className={styles.title}
-                                    onClick={() => navigate(`/board/notice/detail/${prev.noticeNo}`)}
-                                    style={{ 
-                                        cursor: "pointer", 
-                                        color: "#007bff", 
-                                        textDecoration: "underline" 
-                                    }}
-                                >
-                                    {prev.noticeTitle}
-                                </span>
-                            ) : (
-                                <span className={styles.title} style={{ color: "#999" }}>
-                                    이전 글이 없습니다.
-                                </span>
-                            )}
+                            <span className={styles.noticeTitle}>
+                                {prev ? prev.noticeTitle : '이전글이 없습니다.'}
+                            </span>
                         </div>
 
-                        <div className={styles.nextRow}>
+                        {/* 다음글 */}
+                        <div
+                            className={`${styles.nextRow} ${!next ? styles.disabled : ''}`}
+                            onClick={handleNextClick}
+                            style={{ cursor: next ? 'pointer' : 'default' }}
+                        >
                             <span className={styles.label}>다음글</span>
                             <span className={styles.separator}>|</span>
-
-                            {next ? (
-                                <span
-                                    className={styles.title}
-                                    onClick={() => navigate(`/board/notice/detail/${next.noticeNo}`)}
-                                    style={{ 
-                                        cursor: "pointer", 
-                                        color: "#007bff", 
-                                        textDecoration: "underline" 
-                                    }}
-                                >
-                                    {next.noticeTitle}
-                                </span>
-                            ) : (
-                                <span className={styles.title} style={{ color: "#999" }}>
-                                    다음 글이 없습니다.
-                                </span>
-                            )}
+                            <span className={styles.noticeTitle}>
+                                {next ? next.noticeTitle : '다음글이 없습니다.'}
+                            </span>
                         </div>
                     </div>
                 </div>
