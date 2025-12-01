@@ -323,3 +323,14 @@
     border: none;
     cursor: pointer;
 }
+
+.subjectLink {
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.subjectLink:hover {
+    color: #056fb0;
+    text-decoration: underline;
+}
