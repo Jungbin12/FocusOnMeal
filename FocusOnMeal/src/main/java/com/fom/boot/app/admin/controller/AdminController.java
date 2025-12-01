@@ -362,7 +362,6 @@ public class AdminController {
 		}
 	}
 
-	// 식재료 이미지 변경 (서버 파일 덮어쓰기 방식)
 	// 식재료 이미지 변경 (상대 경로 -> 절대 경로 변환 로직 추가)
 	@PostMapping("/ingredient/image")
 	public ResponseEntity<?> updateIngredientImage(
@@ -418,6 +417,51 @@ public class AdminController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 저장 중 오류가 발생했습니다.");
 		}
 	}
+	
+    // [추가] 식재료 이미지 삭제 (파일 삭제 -> 기본 이미지로 복귀)
+    @DeleteMapping("/ingredient/image/{ingredientId}")
+    public ResponseEntity<?> deleteIngredientImage(
+            @PathVariable int ingredientId,
+            Authentication authentication) {
+
+        // 1. 관리자 권한 체크
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+        }
+        
+        String memberId = authentication.getName();
+        Member member = mService.findByMemberId(memberId);
+        
+        if (member == null || !"Y".equals(member.getAdminYn())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자 권한이 필요합니다.");
+        }
+
+        try {
+            // 2. 삭제할 파일 경로 설정 (업로드 경로와 동일하게 설정)
+            String fileName = ingredientId + ".jpg";
+            
+            // 프로젝트 루트 경로 + 설정된 업로드 폴더 경로 조합
+            File projectRoot = new File(System.getProperty("user.dir"));
+            File uploadPath = new File(projectRoot, uploadDir); 
+            File targetFile = new File(uploadPath, fileName);
+
+            // 3. 파일이 존재하면 삭제
+            if (targetFile.exists()) {
+                if (targetFile.delete()) {
+                    return ResponseEntity.ok("이미지가 삭제되었습니다. (기본 이미지로 변경됨)");
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 삭제에 실패했습니다.");
+                }
+            } else {
+                // 파일이 없으면 이미 기본 이미지가 보이는 상태이므로 성공 처리
+                return ResponseEntity.ok("삭제할 이미지가 없습니다. (이미 기본 이미지 상태)");
+            }
+
+        } catch (Exception e) {
+            log.error("이미지 삭제 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
 	
 	/**
      * 관리자 - 안전 정보 목록 조회
