@@ -242,9 +242,9 @@ const PriceAlert = () => {
                             <th className={styles.titleCol} onClick={() => handleSort("message")}>
                                 내용 <span className={styles.sortArrow}>{sortColumn === "message" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}</span>
                             </th>
-                            <th className={styles.priceCol} onClick={() => handleSort("price")}>
-                                당시 가격 <span className={styles.sortArrow}>{sortColumn === "price" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}</span>
-                            </th>
+                            {/*<th className={styles.priceCol} onClick={() => handleSort("price")}>*/}
+                            {/*    당시 가격 <span className={styles.sortArrow}>{sortColumn === "price" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}</span>*/}
+                            {/*</th>*/}
                             <th className={styles.dateCol} onClick={() => handleSort("alertDate")}>
                                 알림일 <span className={styles.sortArrow}>{sortColumn === "alertDate" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}</span>
                             </th>
@@ -269,8 +269,8 @@ const PriceAlert = () => {
                                             {alert.condition}
                                         </span>
                                     </td>
-                                    <td className={styles.alignLeft}>{alert.message}</td>
-                                    <td>{alert.price ? `${alert.price.toLocaleString()}원` : "-"}</td>
+                                    <td>{alert.message}</td>
+                                    {/*<td>{alert.price ? `${alert.price.toLocaleString()}원` : "-"}</td>*/}
                                     <td>{alert.alertDate ? new Date(alert.alertDate).toLocaleDateString("ko-KR") : "-"}</td>
                                     <td>
                                         <Link to={alert.link} className={styles.linkBtn}>상세</Link>
