@@ -1,6 +1,6 @@
 /* ========== SIDEBAR LAYOUT ========== */
 .sidebar {
-    width: 150px;
+    width: 180px;
     background: #fff;
     border-right: 1px solid #e0e0e0;
     padding: 40px 20px 60px;
@@ -33,6 +33,7 @@
     text-decoration: none;
     background: transparent;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .menuTitle:hover {
@@ -52,6 +53,7 @@
     transition: background 0.2s ease, color 0.2s ease;
     background: #d9e8c7;
     color: #4b6a1e;
+    white-space: nowrap;
 }
 
 /* 서브메뉴 기본 */
