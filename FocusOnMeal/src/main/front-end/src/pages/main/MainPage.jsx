@@ -21,6 +21,14 @@ const ParallaxPage = () => {
     const isSnapingRef = useRef(false);
     const lastScrollTimeRef = useRef(Date.now());
     const lastScrollTopRef = useRef(0);
+    const tickingRef = useRef(false);
+    // 🔥 첫 페이지 텍스트 움직임 및 페이드 상태
+    const textRef = useRef(null);
+    const [textParallax, setTextParallax] = useState(0);
+    const [textOpacity, setTextOpacity] = useState(1);
+    // 내부 갱신을 너무 자주 하지 않기 위한 최근값 저장용 ref
+    const lastTextParallaxRef = useRef(textParallax);
+    const lastTextOpacityRef = useRef(textOpacity);
 
     const sections = [
         {
@@ -101,12 +109,30 @@ const ParallaxPage = () => {
         }, 800);
     }, [sections, currentSection]);
 
+    const scrollToTop = () => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        isSnapingRef.current = true;    // ✔ 자동 스냅 잠금
+
+        container.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+
+        // ✔ 스크롤이 끝난 뒤 자동 스냅 다시 허용
+        setTimeout(() => {
+            isSnapingRef.current = false;
+        }, 900);
+    };
+
+
     /* 📌 스크롤 핸들러 (최적화) */
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
 
-        let ticking = false;
+
 
         const updateScroll = () => {
         const scrollTop = container.scrollTop;
@@ -118,6 +144,44 @@ const ParallaxPage = () => {
         sections.forEach(section => {
             totalHeight += container.clientHeight * section.height;
         });
+
+        // 🔥 ADD HERE inside updateScroll (after calculating scrollTop and before heavy logic)
+        // --- 텍스트 패럴랙스 계산 & 페이드 아웃 ---
+        // firstSectionHeight: 첫 섹션(섹션[0])의 실제 픽셀 높이
+        const firstSectionHeight = container.clientHeight * sections[0].height;
+
+        // localScroll: 첫 섹션 내에서의 스크롤 양 (0 ~ firstSectionHeight)
+        const localScrollFirst = Math.max(0, Math.min(scrollTop, firstSectionHeight));
+
+        // textParallax: 스크롤의 일부만 텍스트에 적용 (값은 px)
+        const newTextParallax = - localScrollFirst * 0.3; // 음수면 위로 이동. 0.3은 이동 비율(원하면 0.2~0.4 조정)
+
+        // 텍스트 페이드아웃 범위: firstSectionHeight * 0.4 ~ firstSectionHeight * 0.9 (조정 가능)
+        const fadeStart = firstSectionHeight * 0.4;
+        const fadeEnd = firstSectionHeight * 0.9;
+        let newTextOpacity = 1;
+        if (scrollTop <= fadeStart) {
+            newTextOpacity = 1;
+        } else if (scrollTop >= fadeEnd) {
+            newTextOpacity = 0;
+        } else {
+            const ratio = (scrollTop - fadeStart) / (fadeEnd - fadeStart);
+            newTextOpacity = 1 - ratio;
+        }
+
+        // 상태 갱신을 아주 작은 변화에 대해서는 하지 않음 (성능 향상)
+        const PARALLAX_EPS = 0.5; // px 단위 임계값
+        const OPACITY_EPS = 0.02; // opacity 단위 임계값
+
+        if (Math.abs(lastTextParallaxRef.current - newTextParallax) > PARALLAX_EPS) {
+            lastTextParallaxRef.current = newTextParallax;
+            setTextParallax(newTextParallax);
+        }
+        if (Math.abs(lastTextOpacityRef.current - newTextOpacity) > OPACITY_EPS) {
+            lastTextOpacityRef.current = newTextOpacity;
+            setTextOpacity(newTextOpacity);
+        }
+
         const scrollHeight = totalHeight - container.clientHeight;
 
         setScrollProgress((scrollTop / scrollHeight) * 100);
@@ -136,6 +200,7 @@ const ParallaxPage = () => {
         setCurrentSection(currentSec);
 
         // 🌿 수풀 확대 체크 - 자동 이동
+        if (isSnapingRef.current) return;
         if (currentSec === 0) {
             const sectionHeight = container.clientHeight * sections[0].height;
             const localScroll = scrollTop;
@@ -147,6 +212,7 @@ const ParallaxPage = () => {
         }
 
         // 🔙 2페이지에서 위로 스크롤 시 1페이지 맨 위로
+        if (isSnapingRef.current) return;
         if (currentSec === 1 && scrollDelta < 0 && !isSnapingRef.current) {
             const section1Start = container.clientHeight * sections[0].height;
             const distanceFromSection1 = Math.abs(scrollTop - section1Start);
@@ -158,6 +224,7 @@ const ParallaxPage = () => {
 
         // 자동 스냅 로직 (민감도 개선)
         const now = Date.now();
+        if (isSnapingRef.current) return;
         if (now - lastScrollTimeRef.current > 100 && !isSnapingRef.current) {
             let accHeight = 0;
             for (let i = 0; i < sections.length; i++) {
@@ -190,9 +257,9 @@ const ParallaxPage = () => {
         const handleScroll = () => {
         lastScrollTimeRef.current = Date.now();
         
-        if (!ticking) {
-            rafIdRef.current = requestAnimationFrame(updateScroll);
-            ticking = true;
+        if (!tickingRef.current) {
+        rafIdRef.current = requestAnimationFrame(updateScroll);
+        tickingRef.current = true;
         }
         };
 
@@ -435,22 +502,31 @@ const ParallaxPage = () => {
                     />
                 ))}
 
-                {/* 첫 화면 텍스트 */}
+                {/* 🔥 REPLACE THIS BLOCK: 첫 화면 텍스트 (패럴랙스 + 페이드 적용) */}
                 {index === 0 && (
                     <div
-                    style={{
-                        position: "absolute",
-                        top: "20%",
-                        left: "10%",
-                        textAlign: "left",
-                        color: "white",
-                        zIndex: 10,
-                    }}
+                        ref={textRef}
+                        style={{
+                            position: "absolute",
+                            top: "20%",
+                            left: "10%",
+                            textAlign: "left",
+                            color: "white",
+                            zIndex: 10,
+                            // will-change로 브라우저에 최적화 힌트 주기
+                            willChange: "transform, opacity",
+                            // transform/opacity은 상태로 제어
+                            transform: `translateY(${textParallax}px)`,
+                            opacity: textOpacity,
+                            transition: "opacity 120ms linear", // opacity는 부드럽게
+                        }}
                     >
-                    <h1 style={{ fontSize: "40px", marginBottom: "20px" }}>{section.title}</h1>
-                    <p style={{ fontSize: "16px" }}>{section.subtitle}</p>
+                        <h1 style={{ fontSize: "40px", marginBottom: "20px", lineHeight: 1 }}>{section.title}</h1>
+                        <p style={{ fontSize: "16px", marginTop: 4 }}>{section.subtitle}</p>
                     </div>
                 )}
+
+
 
                 {/* ⭐ 1번째 페이지 패럴랙스 이미지 */}
                 {index === 0 && section.hasParallax && (
