@@ -468,7 +468,7 @@ function Join() {
             
             if (response.data.success) {
                 alert('회원가입이 완료되었습니다!');
-                navigate('/login');
+                navigate('/member/login');
             }
         } catch (error) {
             console.error('회원가입 오류:', error);
