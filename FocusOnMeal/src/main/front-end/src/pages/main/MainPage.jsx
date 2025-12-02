@@ -3,20 +3,18 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Footer from "../../components/common/Footer.jsx";
 
-import cloudImg from "../../assets/parallax/cloud.png";
-import mountainImg from "../../assets/parallax/mountain.png";
-import cornImg from "../../assets/parallax/cornfield.png";
-import grassImg from "../../assets/parallax/grass.png";
-import bushImg from "../../assets/parallax/bush.png";
+import cloudImg from "../../assets/parallax/cloudzip.png";
+import mountainImg from "../../assets/parallax/mountainzip.png";
+import cornImg from "../../assets/parallax/cornfieldzip.png";
+import grassImg from "../../assets/parallax/grasszip.png";
+import bushImg from "../../assets/parallax/bushzip.png";
 
 const ParallaxPage = () => {
     const navigate = useNavigate();
     const [hoveredBox, setHoveredBox] = useState(null);
-    const [scrollProgress, setScrollProgress] = useState(0);
     const [currentSection, setCurrentSection] = useState(0);
     const [staticLeaves, setStaticLeaves] = useState([]);
     const [cursorParticles, setCursorParticles] = useState([]);
-    const [showOverlay, setShowOverlay] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [ingredientList, setIngredientList] = useState([]);
 
@@ -52,70 +50,64 @@ const ParallaxPage = () => {
         title: "Focus on Meal",
         subtitle: "메인에 들어가는 내용 왼쪽 상단에 들어갈 예정",
         bgColor: "linear-gradient(180deg, #38A7DF 0%, #6AB9E2 100%)",
-        height: 1.8,
+        height: 1.5, // 패럴랙스 효과를 위한 여유 공간
         hasParallax: true,
         },
-        { 
-        id: 2, 
-        bgColor: "linear-gradient(180deg, #67932A 0%, #99A237 100%)", 
+        {
+        id: 2,
+        bgColor: "linear-gradient(180deg, #67932A 0%, #99A237 100%)",
         height: 1,
         hasParallax: false,
         },
-        { 
-        id: 3, 
-        bgColor: "linear-gradient(180deg, #99A237 0%, #B6BE5C 100%)", 
-        height: 1.4,
+        {
+        id: 3,
+        bgColor: "linear-gradient(180deg, #99A237 0%, #B6BE5C 100%)",
+        height: 1,
         hasParallax: false,
         },
     ];
 
-    /* 💚 첫 장 정적 나뭇잎 */
-    useEffect(() => {
-        const leafColors = ['#F1F7AD', '#B6BE5C', '#99A237'];
+    /* 💚 첫 장 정적 나뭇잎 - 성능 테스트를 위해 주석처리 */
+    // useEffect(() => {
+    //     const leafColors = ['#F1F7AD', '#B6BE5C', '#99A237'];
 
-        const createStaticLeaves = () => {
-        const leafCount = Math.floor(Math.random() * 4) + 4;
-        const newLeaves = Array.from({ length: leafCount }, (_, i) => ({
-            id: Date.now() + i,
-            left: Math.random() * 25,
-            top: 10 + Math.random() * 40,
-            duration: 5 + Math.random() * 3,
-            size: 6 + Math.random() * 4,
-            rotation: -15 + Math.random() * 30,
-            delay: i * 0.25,
-            color: leafColors[Math.floor(Math.random() * leafColors.length)],
-        }));
-        setStaticLeaves(newLeaves);
-        };
+    //     const createStaticLeaves = () => {
+    //     const leafCount = Math.floor(Math.random() * 4) + 4;
+    //     const newLeaves = Array.from({ length: leafCount }, (_, i) => ({
+    //         id: Date.now() + i,
+    //         left: Math.random() * 25,
+    //         top: 10 + Math.random() * 40,
+    //         duration: 5 + Math.random() * 3,
+    //         size: 6 + Math.random() * 4,
+    //         rotation: -15 + Math.random() * 30,
+    //         delay: i * 0.25,
+    //         color: leafColors[Math.floor(Math.random() * leafColors.length)],
+    //     }));
+    //     setStaticLeaves(newLeaves);
+    //     };
 
-        if (currentSection === 0) {
-        createStaticLeaves();
-        const interval = setInterval(createStaticLeaves, 8000);
-        return () => clearInterval(interval);
-        }
-    }, [currentSection]);
+    //     if (currentSection === 0) {
+    //     createStaticLeaves();
+    //     const interval = setInterval(createStaticLeaves, 8000);
+    //     return () => clearInterval(interval);
+    //     }
+    // }, [currentSection]);
 
     /* 🎯 자동 스냅 함수 */
     const snapToSection = useCallback((targetSection) => {
         if (isSnapingRef.current) return;
-        
+
         const container = containerRef.current;
         if (!container) return;
 
         isSnapingRef.current = true;
         setIsTransitioning(true);
-        
-        // 페이지 전환 시 오버레이 표시
-        if (targetSection > 0 && currentSection === 0) {
-        setShowOverlay(true);
-        setTimeout(() => setShowOverlay(false), 800);
-        }
-        
+
         let targetScroll = 0;
         for (let i = 0; i < targetSection; i++) {
         targetScroll += window.innerHeight * sections[i].height;
         }
-        
+
         container.scrollTo({
         top: targetScroll,
         behavior: "smooth",
@@ -124,7 +116,7 @@ const ParallaxPage = () => {
         setTimeout(() => {
         isSnapingRef.current = false;
         setIsTransitioning(false);
-        }, 1000);
+        }, 1200);
     }, [sections, currentSection]);
 
     /* 📌 스크롤 핸들러 (최적화) */
@@ -139,15 +131,6 @@ const ParallaxPage = () => {
         const scrollDelta = scrollTop - lastScrollTopRef.current;
         lastScrollTopRef.current = scrollTop;
         
-        // 전체 높이 계산
-        let totalHeight = 0;
-        sections.forEach(section => {
-            totalHeight += container.clientHeight * section.height;
-        });
-        const scrollHeight = totalHeight - container.clientHeight;
-
-        setScrollProgress((scrollTop / scrollHeight) * 100);
-
         // 현재 섹션 계산
         let accumulatedHeight = 0;
         let currentSec = 0;
@@ -185,35 +168,43 @@ const ParallaxPage = () => {
         }
         };
 
-        // 🎯 휠 이벤트로 한 번에 페이지 넘기기
+        // 🎯 휠 이벤트로 페이지 전환
         const handleWheel = (e) => {
         if (isSnapingRef.current || isTransitioning) return;
 
         const container = containerRef.current;
         if (!container) return;
 
-        const scrollTop = container.scrollTop;
-        const sectionHeight = container.clientHeight * sections[0].height;
-
-        // 첫 페이지에서 아래로 스크롤
-        if (currentSection === 0 && e.deltaY > 0) {
+        // 1페이지: 패럴랙스 효과를 위해 자연스럽게 스크롤 허용
+        // 단, 일정 이상 스크롤되면 2페이지로 스냅
+        if (currentSection === 0) {
+            // 아래로 스크롤할 때만 체크
+            if (e.deltaY > 0) {
+            const scrollTop = container.scrollTop;
+            const sectionHeight = container.clientHeight * sections[0].height;
             const scrollProgress = scrollTop / sectionHeight;
-            
-            // 스크롤이 30% 이상 진행되었으면 바로 다음 페이지로
+
+            // 30% 이상 스크롤되면 2페이지로 (풀숲 효과 후)
             if (scrollProgress > 0.3) {
-            e.preventDefault();
-            snapToSection(1);
+                e.preventDefault();
+                snapToSection(1);
             }
+            }
+            return; // 1페이지에서는 자연스러운 스크롤 허용
         }
-        
-        // 2페이지에서 위로 스크롤
-        if (currentSection === 1 && e.deltaY < 0) {
-            const section1Start = container.clientHeight * sections[0].height;
-            const distanceFromSection1 = Math.abs(scrollTop - section1Start);
-            
-            if (distanceFromSection1 < 100) {
-            e.preventDefault();
-            snapToSection(0);
+
+        // 2페이지, 3페이지: 휠 시 바로 페이지 전환
+        e.preventDefault();
+
+        if (e.deltaY > 0) {
+            // 아래로 스크롤 → 다음 페이지
+            if (currentSection < sections.length - 1) {
+            snapToSection(currentSection + 1);
+            }
+        } else {
+            // 위로 스크롤 → 이전 페이지
+            if (currentSection > 0) {
+            snapToSection(currentSection - 1);
             }
         }
         };
@@ -261,35 +252,35 @@ const ParallaxPage = () => {
         };
     }, []);
 
-    /* ✨ 커서 파티클 */
-    useEffect(() => {
-        let lastSpawn = 0;
+    /* ✨ 커서 파티클 - 성능 테스트를 위해 주석처리 */
+    // useEffect(() => {
+    //     let lastSpawn = 0;
 
-        const handleMove = (e) => {
-        const now = Date.now();
-        if (now - lastSpawn < 40) return;
-        lastSpawn = now;
+    //     const handleMove = (e) => {
+    //     const now = Date.now();
+    //     if (now - lastSpawn < 150) return;
+    //     lastSpawn = now;
 
-        const newParticle = {
-            id: now + Math.random(),
-            x: e.clientX,
-            y: e.clientY,
-            size: 6 + Math.random() * 10,
-            lifespan: 700 + Math.random() * 400,
-        };
+    //     const newParticle = {
+    //         id: now + Math.random(),
+    //         x: e.clientX,
+    //         y: e.clientY,
+    //         size: 6 + Math.random() * 10,
+    //         lifespan: 700 + Math.random() * 400,
+    //     };
 
-        setCursorParticles((prev) => [...prev.slice(-20), newParticle]);
+    //     setCursorParticles((prev) => [...prev.slice(-20), newParticle]);
 
-        setTimeout(() => {
-            setCursorParticles((prev) =>
-            prev.filter((p) => p.id !== newParticle.id)
-            );
-        }, newParticle.lifespan);
-        };
+    //     setTimeout(() => {
+    //         setCursorParticles((prev) =>
+    //         prev.filter((p) => p.id !== newParticle.id)
+    //         );
+    //     }, newParticle.lifespan);
+    //     };
 
-        window.addEventListener("pointermove", handleMove);
-        return () => window.removeEventListener("pointermove", handleMove);
-    }, []);
+    //     window.addEventListener("pointermove", handleMove);
+    //     return () => window.removeEventListener("pointermove", handleMove);
+    // }, []);
 
     /* 🖼️ 1번째 섹션 패럴랙스 계산 - GPU 가속 */
     const getParallaxTransform = useCallback((speed, initialOffset = 0, shouldScale = false) => {
@@ -301,36 +292,36 @@ const ParallaxPage = () => {
         const localScroll = container.scrollTop - sectionTop;
 
         if (localScroll < 0) {
-        return { 
-            transform: shouldScale 
-            ? `translate3d(0, ${initialOffset}px, 0) scale(1)` 
+        return {
+            transform: shouldScale
+            ? `translate3d(0, ${initialOffset}px, 0) scale(1)`
             : `translate3d(0, ${initialOffset}px, 0)`,
-            willChange: "transform",
+            // willChange: "transform", // 성능 테스트를 위해 주석처리
         };
         }
 
         if (localScroll > sectionHeight) {
-        return { 
+        return {
             transform: shouldScale
             ? `translate3d(0, ${-sectionHeight * speed + initialOffset}px, 0) scale(2)`
             : `translate3d(0, ${-sectionHeight * speed + initialOffset}px, 0)`,
-            willChange: "transform",
+            // willChange: "transform", // 성능 테스트를 위해 주석처리
         };
         }
 
         const translateY = -localScroll * speed + initialOffset;
-        
+
         if (shouldScale) {
         const scale = 1 + (localScroll / sectionHeight) * 1.0;
-        return { 
+        return {
             transform: `translate3d(0, ${translateY}px, 0) scale(${scale})`,
-            willChange: "transform",
+            // willChange: "transform", // 성능 테스트를 위해 주석처리
         };
         }
-        
-        return { 
+
+        return {
         transform: `translate3d(0, ${translateY}px, 0)`,
-        willChange: "transform",
+        // willChange: "transform", // 성능 테스트를 위해 주석처리
         };
     }, [sections]);
 
@@ -505,8 +496,6 @@ const ParallaxPage = () => {
                         minHeight: "120vh",
                         objectFit: "cover",
                         ...getParallaxTransform(0.2, 100, false),
-                        opacity: isTransitioning ? 0 : 1,
-                        transition: "opacity 0.5s ease-out",
                         zIndex: 1,
                         }}
                     />
@@ -524,8 +513,6 @@ const ParallaxPage = () => {
                         minHeight: "120vh",
                         objectFit: "cover",
                         ...getParallaxTransform(0.45, 250, false),
-                        opacity: isTransitioning ? 0 : 1,
-                        transition: "opacity 0.5s ease-out",
                         zIndex: 2,
                         }}
                     />
@@ -543,8 +530,6 @@ const ParallaxPage = () => {
                         minHeight: "120vh",
                         objectFit: "cover",
                         ...getParallaxTransform(0.65, 350, false),
-                        opacity: isTransitioning ? 0 : 1,
-                        transition: "opacity 0.5s ease-out",
                         zIndex: 3,
                         }}
                     />
@@ -562,8 +547,6 @@ const ParallaxPage = () => {
                         minHeight: "120vh",
                         objectFit: "cover",
                         ...getParallaxTransform(0.85, 450, false),
-                        opacity: isTransitioning ? 0 : 1,
-                        transition: "opacity 0.5s ease-out",
                         zIndex: 4,
                         }}
                     />
