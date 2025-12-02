@@ -26,8 +26,19 @@ const AdminSafetyForm = () => {
     }, [alertId]);
 
     const fetchAlertDetail = async () => {
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            navigate('/admin/safetyInfo');
+            return;
+        }
+
         try {
-            const response = await axios.get(`/api/admin/safetyInfo/detail/${alertId}`);
+            const response = await axios.get(`/api/admin/safetyInfo/detail/${alertId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             setFormData({
                 nation: response.data.nation || '',
                 hazardType: response.data.hazardType || '',
@@ -89,6 +100,13 @@ const AdminSafetyForm = () => {
             return;
         }
 
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            navigate('/member/login');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -103,7 +121,8 @@ const AdminSafetyForm = () => {
                 url: url,
                 data: formData,
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -114,7 +133,11 @@ const AdminSafetyForm = () => {
         } catch (error) {
             console.error('저장 실패:', error);
             if (error.response) {
-                alert(`오류: ${error.response.data.error || '저장 중 오류가 발생했습니다.'}`);
+                if (error.response.status === 403) {
+                    alert('관리자 권한이 필요합니다.');
+                } else {
+                    alert(`오류: ${error.response.data.error || '저장 중 오류가 발생했습니다.'}`);
+                }
             } else {
                 alert('서버와의 통신에 실패했습니다.');
             }

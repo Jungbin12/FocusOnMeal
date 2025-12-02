@@ -464,15 +464,38 @@ public class AdminController {
 	/**
      * 관리자 - 안전 정보 목록 조회
      */
-    @GetMapping("/safetyInfo")
+    @GetMapping("/safetyInfo/list")
     public ResponseEntity<Map<String, Object>> getAlertList(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "type", required = false) String type,
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "sortColumn", defaultValue = "alertId") String sortColumn,
-            @RequestParam(value = "sortOrder", defaultValue = "desc") String sortOrder) {
+            @RequestParam(value = "sortColumn", defaultValue = "publicationDate") String sortColumn,
+            @RequestParam(value = "sortOrder", defaultValue = "desc") String sortOrder,
+            @RequestParam(value = "hazardFilter", required = false) String hazardFilter,
+            Authentication authentication) {
 
         log.info("[관리자] 안전 정보 목록 조회 - page: {}", page);
+
+        // ✅ 1. 토큰 인증 체크 추가
+        if (authentication == null || !authentication.isAuthenticated()) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", error));
+        }
+
+        System.out.println("Auth name = " + authentication.getName());
+        System.out.println("Auth authorities = " + authentication.getAuthorities());
+
+        // ✅ 2. 관리자 여부 확인 추가
+        String memberId = authentication.getName();
+        Member member = mService.findByMemberId(memberId);
+
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "관리자 아님"));
+        }
+        if (!"Y".equals(member.getAdminYn())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "관리자만 접근 가능합니다."));
+        }
 
         try {
             Map<String, Object> searchMap = new HashMap<>();
@@ -480,6 +503,11 @@ public class AdminController {
                 searchMap.put("type", type);
                 searchMap.put("keyword", keyword);
             }
+            
+            if (hazardFilter != null && !hazardFilter.trim().isEmpty()) {
+                searchMap.put("hazardFilter", hazardFilter);
+            }
+            
             searchMap.put("sortColumn", sortColumn);
             searchMap.put("sortOrder", sortOrder);
 
@@ -504,7 +532,8 @@ public class AdminController {
      * 관리자 - 안전 정보 상세 조회
      */
     @GetMapping("/safetyInfo/detail/{alertId}")
-    public ResponseEntity<?> getAlertDetail(@PathVariable("alertId") int alertId) {
+    public ResponseEntity<?> getAlertDetail(@PathVariable("alertId") int alertId,
+    		Authentication authentication) {
         
         log.info("[관리자] 안전 정보 상세 조회 - alertId: {}", alertId);
 
@@ -529,7 +558,8 @@ public class AdminController {
      * 관리자 - 안전 정보 등록
      */
     @PostMapping("/safetyInfo/register")
-    public ResponseEntity<?> registerAlert(@RequestBody SafetyAlert alert) {
+    public ResponseEntity<?> registerAlert(@RequestBody SafetyAlert alert,
+    		Authentication authentication) {
         
         log.info("[관리자] 안전 정보 등록 - title: {}", alert.getTitle());
 
@@ -557,7 +587,8 @@ public class AdminController {
     @PutMapping("/safetyInfo/update/{alertId}")
     public ResponseEntity<?> updateAlert(
             @PathVariable("alertId") int alertId,
-            @RequestBody SafetyAlert alert) {
+            @RequestBody SafetyAlert alert,
+            Authentication authentication) {
         
         log.info("[관리자] 안전 정보 수정 - alertId: {}", alertId);
 
@@ -583,7 +614,8 @@ public class AdminController {
      * 관리자 - 안전 정보 삭제 (다중 삭제)
      */
     @DeleteMapping("/safetyInfo/delete")
-    public ResponseEntity<?> deleteAlerts(@RequestBody Map<String, List<Integer>> request) {
+    public ResponseEntity<?> deleteAlerts(@RequestBody Map<String, List<Integer>> request,
+    		Authentication authentication) {
         
         List<Integer> alertIds = request.get("alertIds");
         log.info("[관리자] 안전 정보 삭제 - alertIds: {}", alertIds);
