@@ -560,10 +560,10 @@ function IngredientDetail() {
                         <div className={styles.itemSummary} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <div className={styles.priceLine}>
                                 <strong>가격</strong>
-                                <span style={{marginLeft: '10px', color: '#666', fontSize: '0.9em', fontWeight: 'normal'}}>
+                                <span style={{marginLeft: '5px', marginRight: '5px', color: '#666', fontSize: '0.9em', fontWeight: 'normal'}}>
                                     ({itemInfo.standardUnit && !itemInfo.standardUnit.startsWith('1') 
                                         ? '1' + itemInfo.standardUnit 
-                                        : itemInfo.standardUnit}):
+                                        : itemInfo.standardUnit}) : 
                                 </span>
                                 <span className={styles.currentPriceValue}>
                                     {itemInfo.currentPrice 
@@ -623,7 +623,7 @@ function IngredientDetail() {
                             )}
 
                             <div className={styles.safetyLine}>
-                                <strong>안전 위험도:</strong> 
+                                <strong>안전 위험도 &nbsp; : &nbsp;</strong> 
                                 <span className={safetyClass}>{safetyText}</span>
                                 
                                 <span className={styles.tooltipContainer}>
@@ -762,6 +762,7 @@ function IngredientDetail() {
                                                     value: '가격 (원)',
                                                     angle: -90,
                                                     position: 'insideLeft',
+                                                    offset: -5,
                                                     style: { textAnchor: 'middle' }
                                                 }}
                                                 stroke="#666"
@@ -878,12 +879,6 @@ function IngredientDetail() {
                                         ? '1' + itemInfo.standardUnit 
                                         : itemInfo.standardUnit) 
                                     : '-'}
-                            </div>
-                            <div className={styles.specRow}>
-                                <span>KAMIS 품목코드:</span> {itemInfo.kamisItemCode || '-'}
-                            </div>
-                            <div className={styles.specRow}>
-                                <span>KAMIS 품종코드:</span> {itemInfo.kamisKindCode || '-'}
                             </div>
                             <div className={styles.specRow}>
                                 <span>최근 수집일:</span> 

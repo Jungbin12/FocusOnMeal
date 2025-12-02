@@ -127,7 +127,7 @@
 
 .itemSummary strong {
     font-weight: 600;
-    margin-right: 10px;
+    margin-right: 0px;
 }
 
 /* 🚨 가격 및 안전 라인 (list.jsx 구조 반영) */
