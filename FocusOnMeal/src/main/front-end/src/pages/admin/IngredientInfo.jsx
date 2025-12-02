@@ -12,7 +12,9 @@ const CATEGORIES = [
 
 const IngredientInfo = () => {
     const [ingredientList, setIngredientList] = useState([]);
-    const [pageInfo, setPageInfo] = useState({ maxPage: 1 });
+    
+    // 백엔드 변수명(totalCount)에 맞춰 초기값 수정
+    const [pageInfo, setPageInfo] = useState({ maxPage: 1, totalCount: 0 });
     const [currentPage, setCurrentPage] = useState(1);
 
     // 검색 상태
@@ -31,10 +33,10 @@ const IngredientInfo = () => {
     const [showCategoryFilter, setShowCategoryFilter] = useState(false);
     const categoryFilterRef = useRef(null);
     
-    // [추가] 이미지 미리보기 모달 상태
-    const [previewImage, setPreviewImage] = useState(null);
-    
     const [imgRefreshKey, setImgRefreshKey] = useState(Date.now());
+    
+    // 이미지 미리보기 모달 상태
+    const [previewImage, setPreviewImage] = useState(null);
 
     // 외부 클릭 시 카테고리 필터 닫기
     useEffect(() => {
@@ -49,27 +51,6 @@ const IngredientInfo = () => {
         };
     }, [categoryFilterRef]);
 
-
-    // 상태 변경 (삭제 처리)
-    const handleToggleStatus = (ingredient) => {
-        if (!window.confirm("정말로 삭제하시겠습니까? (복구 불가)")) return;
-
-        const newStatus = ingredient.statusYn === "Y" ? "N" : "Y";
-
-        axios.patch(`/api/admin/ingredient/status`, null, {
-            params: { ingredientId: ingredient.ingredientId, statusYn: newStatus },
-            headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` }
-        })
-        .then(() => {
-             alert("삭제되었습니다.");
-             fetchIngredientList(); 
-        })
-        .catch(err => {
-            console.error(err);
-            alert("상태 변경 중 오류가 발생했습니다.");
-        });
-    };
-
     // 일반 검색 실행
     const handleSearch = () => {
         setCurrentPage(1);
@@ -83,6 +64,7 @@ const IngredientInfo = () => {
         if (e.key === 'Enter') handleSearch();
     };
 
+    // 카테고리 헤더에서 선택 시 실행되는 검색
     const handleCategoryFilter = (selectedCategory) => {
         setCurrentPage(1);
         setFetchSearchType('categoryName');
@@ -105,7 +87,6 @@ const IngredientInfo = () => {
         }
     };
     
-    // 이미지 변경 (업로드)
     const handleImageUpload = async (ingredientId, file) => {
         if (!file) return;
         const formData = new FormData();
@@ -126,37 +107,31 @@ const IngredientInfo = () => {
         }
     };
 
-    // [추가] 이미지 삭제 (기본 이미지로 변경)
     const handleImageDelete = async (ingredientId) => {
         if (!window.confirm("등록된 이미지를 삭제하시겠습니까? \n(기본 이미지로 변경됩니다)")) return;
 
         try {
-            // DELETE 메서드로 요청 (백엔드에 해당 매핑이 있어야 합니다)
-            // 만약 백엔드가 DELETE를 지원하지 않는다면 POST/PATCH로 null을 보내는 등 백엔드 로직에 맞춰야 합니다.
             await axios.delete(`/api/admin/ingredient/image/${ingredientId}`, {
                 headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` }
             });
             
             alert("이미지가 삭제되었습니다.");
-            setImgRefreshKey(Date.now()); // 이미지 새로고침 -> 404가 뜨면서 onError가 발동해 기본 이미지로 보임
+            setImgRefreshKey(Date.now()); 
         } catch (err) {
             console.error(err);
             alert("이미지 삭제 중 오류가 발생했습니다.");
         }
     };
 
-    const handleImageError = (e) => {
-        e.target.src = '/images/default_ingredient.png';
-        // 모달에서 에러난 경우 클릭 이벤트 제거 (미리보기 방지)
-        e.target.onclick = null;
-        e.target.style.cursor = 'default';
-    };
-
-    // [추가] 이미지 클릭 핸들러 (모달 열기)
     const handleImageClick = (src) => {
-        // 기본 이미지가 아닐 때만 확대 (선택 사항)
         if (src.includes('default_ingredient.png')) return;
         setPreviewImage(src);
+    };
+
+    const handleImageError = (e) => {
+        e.target.src = '/images/default_ingredient.png';
+        e.target.onclick = null;
+        e.target.style.cursor = 'default';
     };
 
     const handleNutritionEdit = (ingredientId) => {
@@ -204,7 +179,15 @@ const IngredientInfo = () => {
         <div className={styles.container}>
             <Sidebar />
             <main className={styles.main}>
-                <h2 className={styles.title}>식재료 관리</h2>
+                <h2 className={styles.title} style={{ marginBottom: '8px' }}>
+                    식재료 관리
+                </h2>
+                
+                <div style={{ marginBottom: '20px', fontSize: '14px', color: '#666' }}>
+                    총 <span style={{ fontWeight: '600', color: '#67932A' }}>
+                        {(pageInfo?.totalCount || 0).toLocaleString()}
+                    </span>건
+                </div>
                 
                 <div className={styles.searchBox}>
                     <select
@@ -302,16 +285,14 @@ const IngredientInfo = () => {
 
                             <th className={styles.nutritionCol}>영양성분</th>
                             
-                            <th className={styles.statusCol} onClick={() => handleSort("statusYn")} style={{cursor: 'pointer'}}>
-                                활성상태 {renderSortArrow("statusYn")}
-                            </th>
+                            {/* [삭제] 활성상태 컬럼 제거됨 */}
                         </tr>
                     </thead>
 
                     <tbody>
                         {ingredientList?.length === 0 ? (
                             <tr>
-                                <td colSpan="10" className={styles.emptyCell}>
+                                <td colSpan="9" className={styles.emptyCell}>
                                     검색 결과가 없습니다.
                                 </td>
                             </tr>
@@ -322,7 +303,6 @@ const IngredientInfo = () => {
                                     
                                     <td>
                                         <div className={styles.imageWrapper}>
-                                            {/* [수정] 이미지 클릭 시 미리보기 함수 호출 */}
                                             <img 
                                                 src={`/images/ingredients/${item.ingredientId}.jpg?t=${imgRefreshKey}`} 
                                                 alt={item.name || 'ingredient'} 
@@ -340,7 +320,6 @@ const IngredientInfo = () => {
                                                         onChange={(e) => handleImageUpload(item.ingredientId, e.target.files[0])}
                                                     />
                                                 </label>
-                                                {/* [추가] 삭제 버튼 */}
                                                 <button 
                                                     className={styles.deleteBtn} 
                                                     onClick={() => handleImageDelete(item.ingredientId)}
@@ -412,16 +391,7 @@ const IngredientInfo = () => {
                                         </button>
                                     </td>
                                     
-                                    <td>
-                                        <label className={styles.toggleSwitch}>
-                                            <input
-                                                type="checkbox"
-                                                checked={item.statusYn === "Y"}
-                                                onChange={() => handleToggleStatus(item)}
-                                            />
-                                            <span className={styles.slider}></span>
-                                        </label>
-                                    </td>
+                                    {/* [삭제] 활성상태 토글 버튼 제거됨 */}
                                 </tr>
                             ))
                         )}
@@ -435,7 +405,6 @@ const IngredientInfo = () => {
                 />
             </main>
 
-            {/* [추가] 이미지 미리보기 모달 */}
             {previewImage && (
                 <div className={styles.modalOverlay} onClick={() => setPreviewImage(null)}>
                     <div className={styles.modalContent} onClick={e => e.stopPropagation()}>

@@ -220,31 +220,35 @@
         <result property="sugarG" column="SUGAR_G"/>
     </resultMap>
 
+    <!-- [수정] WHERE 태그 제거하고 조건문만 남김 (쿼리 내에서 유연하게 사용) -->
     <sql id="searchFrag">
-        <where>
-            <if test="keyword != null and keyword != ''">
-                <choose>
-                    <when test="type == 'ingredientName'">
-                        AND I.NAME LIKE '%' || #{keyword} || '%'
-                    </when>
-                    <when test="type == 'categoryName'">
-                        AND I.CATEGORY LIKE '%' || #{keyword} || '%'
-                    </when>
-                    <otherwise>
-                        AND (I.NAME LIKE '%' || #{keyword} || '%' OR I.CATEGORY LIKE '%' || #{keyword} || '%')
-                    </otherwise>
-                </choose>
-            </if>
-        </where>
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="type == 'ingredientName'">
+                    AND I.NAME LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="type == 'categoryName'">
+                    AND I.CATEGORY LIKE '%' || #{keyword} || '%'
+                </when>
+                <otherwise>
+                    AND (I.NAME LIKE '%' || #{keyword} || '%' OR I.CATEGORY LIKE '%' || #{keyword} || '%')
+                </otherwise>
+            </choose>
+        </if>
     </sql>
 
+    <!-- [수정] 중복 제거된(이름당 1개) 카운트 조회 -->
     <select id="selectAdminTotalCount" resultType="int">
         SELECT COUNT(*)
-        FROM INGREDIENT_MASTER I
+        FROM (
+            SELECT I.*, ROW_NUMBER() OVER(PARTITION BY NAME ORDER BY KAMIS_KIND_CODE ASC) as NAME_RN
+            FROM INGREDIENT_MASTER I
+        ) I
+        WHERE I.NAME_RN = 1
         <include refid="searchFrag"/>
     </select>
 
-    <!-- [관리자] 식재료 목록 조회 -->
+    <!-- [수정] 관리자 식재료 목록 조회 (이름 중복 제거 로직 추가) -->
     <select id="selectAdminList" resultMap="AdminIngredientMap">
         SELECT * FROM (
             SELECT A.*, ROWNUM RNUM FROM (
@@ -286,13 +290,17 @@
                         FROM PRICE_HISTORY PH WHERE PH.INGREDIENT_ID = I.INGREDIENT_ID
                     ) WHERE RN = 2) AS PREVIOUS_COLLECTED_DATE
 
-                FROM INGREDIENT_MASTER I
+                /* [핵심] 중복 제거 서브쿼리 */
+                FROM (
+                    SELECT I.*, ROW_NUMBER() OVER(PARTITION BY NAME ORDER BY KAMIS_KIND_CODE ASC) as NAME_RN
+                    FROM INGREDIENT_MASTER I
+                ) I
                 
+                WHERE I.NAME_RN = 1
                 <include refid="searchFrag"/>
                 
                 <choose>
                     <when test="sortColumn != null and sortColumn != ''">
-                         <!-- [수정] 프론트엔드 정렬 컬럼명 매핑 -->
                          <choose>
                             <when test="sortColumn == 'ingredientId'">ORDER BY I.INGREDIENT_ID</when>
                             <when test="sortColumn == 'category'">ORDER BY I.CATEGORY</when>
