@@ -102,7 +102,13 @@
 	<select id="selectImportantNotices" resultType="com.fom.boot.domain.notice.model.vo.Notice">
         SELECT 
             NOTICE_NO, NOTICE_SUBJECT, NOTICE_CONTENT, NOTICE_CREATEAT, 
-            NOTICE_ISNEW, NOTICE_IMPORTANT, VIEW_COUNT, MEMBER_ID
+            CASE 
+	            WHEN NOTICE_CREATEAT >= SYSDATE - 3 THEN 'Y' 
+	            ELSE 'N' 
+        	END AS NOTICE_ISNEW, 
+            NOTICE_IMPORTANT, 
+            VIEW_COUNT, 
+            MEMBER_ID
         FROM NOTICE
         WHERE NOTICE_IMPORTANT = 'Y' 
           AND IS_DELETED = 'N'
@@ -121,7 +127,10 @@
                     NOTICE_SUBJECT,
                     NOTICE_CONTENT,
                     NOTICE_CREATEAT,
-                    NOTICE_ISNEW,
+                    (CASE 
+	                    WHEN NOTICE_CREATEAT >= SYSDATE - 3 THEN 'Y' 
+	                    ELSE 'N' 
+                	END) AS NOTICE_ISNEW,
                     NOTICE_IMPORTANT,
                     VIEW_COUNT
                 FROM NOTICE
@@ -177,7 +186,10 @@
 	        NOTICE_SUBJECT,
 	        NOTICE_CONTENT,
 	        NOTICE_CREATEAT,
-	        NOTICE_ISNEW,
+	        CASE 
+	            WHEN NOTICE_CREATEAT >= SYSDATE - 3 THEN 'Y' 
+	            ELSE 'N' 
+	        END AS NOTICE_ISNEW,
 	        NOTICE_IMPORTANT,
 	        VIEW_COUNT
 	    FROM NOTICE
@@ -224,7 +236,10 @@
 	        NOTICE_SUBJECT,
 	        NOTICE_CONTENT,
 	        NOTICE_CREATEAT,
-	        NOTICE_ISNEW,
+	        CASE 
+	            WHEN NOTICE_CREATEAT >= SYSDATE - 3 THEN 'Y' 
+	            ELSE 'N' 
+	        END AS NOTICE_ISNEW,
 	        NOTICE_IMPORTANT,
 	        VIEW_COUNT
 	    FROM NOTICE
@@ -235,7 +250,7 @@
 	
 	  <!-- 이전 글 -->
 	  <select id="selectPrevNotice" parameterType="int" resultType="map">
-		    SELECT NOTICE_NO AS noticeNo, NOTICE_SUBJECT AS noticeTitle
+		    SELECT NOTICE_NO AS "noticeNo", NOTICE_SUBJECT AS "noticeTitle"
 		    FROM NOTICE
 		    WHERE NOTICE_NO &lt; #{noticeNo}
 		      AND IS_DELETED = 'N'
@@ -246,7 +261,7 @@
 		
 		<!-- 다음 글 -->
 		<select id="selectNextNotice" parameterType="int" resultType="map">
-		    SELECT NOTICE_NO AS noticeNo, NOTICE_SUBJECT AS noticeTitle
+		    SELECT NOTICE_NO AS "noticeNo", NOTICE_SUBJECT AS "noticeTitle"
 		    FROM NOTICE
 		    WHERE NOTICE_NO &gt; #{noticeNo}
 		      AND IS_DELETED = 'N'
