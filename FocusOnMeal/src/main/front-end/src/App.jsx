@@ -53,6 +53,7 @@ import IngredientInfo from './pages/admin/IngredientInfo';
 import AdminSafetyList from './pages/admin/SafetyInfo';
 import AdminSafetyForm from './pages/admin/SafetyForm';
 import NoticeInsert from './pages/admin/NoticeInsert';
+import ApiManagement from './pages/admin/ApiManagement';
 
 function App() {
   
@@ -143,6 +144,9 @@ function App() {
         } />
         <Route path="/admin/ingredientInfo" element={
           <AdminRoute><IngredientInfo /></AdminRoute>
+        } />
+        <Route path="/admin/apiManagement" element={
+          <AdminRoute><ApiManagement /></AdminRoute>
         } />
 
         {/* 공지사항 게시판 관련 */}

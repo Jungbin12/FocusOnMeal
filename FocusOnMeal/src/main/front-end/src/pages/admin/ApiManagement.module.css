@@ -1,0 +1,162 @@
+.container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+.main {
+    flex: 1;
+    padding: 40px;
+    margin-left: 50px;
+}
+
+.main h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.cardContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+    align-items: start;
+}
+
+.card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.cardIcon {
+    font-size: 32px;
+}
+
+.cardHeader h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.cardDescription {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.syncBtn {
+    width: 100%;
+    background-color: #67932A;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.syncBtn:hover:not(:disabled) {
+    background-color: #587b24;
+}
+
+.syncBtn:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.resultBox {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.resultBox.success {
+    background-color: #f0f9eb;
+    border: 1px solid #b7eb8f;
+}
+
+.resultBox.error {
+    background-color: #fff2f0;
+    border: 1px solid #ffccc7;
+}
+
+.resultTitle {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.success .resultTitle {
+    color: #52c41a;
+}
+
+.error .resultTitle {
+    color: #ff4d4f;
+}
+
+.resultContent {
+    color: #333;
+    line-height: 1.6;
+}
+
+.resultDetail {
+    margin-top: 8px;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
+    font-size: 13px;
+    color: #666;
+    word-break: break-all;
+}
+
+.resultDuration {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #999;
+}

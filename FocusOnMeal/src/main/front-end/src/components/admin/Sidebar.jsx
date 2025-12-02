@@ -82,10 +82,10 @@ const Sidebar = () => {
                     </NavLink>
                 </li>
 
-                {/* 배치 */}
+                {/* API 관리 */}
                 <li>
                     <NavLink
-                        to="/admin/batch"
+                        to="/admin/apiManagement"
                         className={({ isActive }) =>
                             isActive ? styles.activeTitle : styles.menuTitle
                         }

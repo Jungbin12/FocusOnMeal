@@ -35,6 +35,9 @@ import com.fom.boot.domain.member.model.vo.Member;
 import com.fom.boot.domain.notice.model.service.NoticeService;
 import com.fom.boot.domain.notice.model.vo.Notice;
 import com.fom.boot.domain.safety.model.service.SafetyService;
+import com.fom.boot.domain.ingredient.model.service.KamisDataSyncService;
+import com.fom.boot.domain.alert.model.service.FoodSafetyDataSyncService;
+import com.fom.boot.domain.alert.model.service.AlertService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +54,9 @@ public class AdminController {
 	private final NoticeService nService;
 	private final IngredientService iService;
 	private final SafetyService safetyService;
+	private final KamisDataSyncService kamisDataSyncService;
+	private final FoodSafetyDataSyncService foodSafetyDataSyncService;
+	private final AlertService alertService;
 	
 	// application.properties에 설정된 파일 저장 경로 주입
 	@Value("${file.upload-dir}")
@@ -678,6 +684,114 @@ public class AdminController {
             log.error("[관리자] 안전 정보 삭제 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "삭제 중 오류가 발생했습니다."));
+        }
+    }
+
+    // =========================================================================
+    // API 동기화 관리
+    // =========================================================================
+
+    /**
+     * KAMIS 가격 데이터 동기화 (수동 실행)
+     */
+    @PostMapping("/sync/kamis")
+    public ResponseEntity<?> syncKamisData(Authentication authentication) {
+        log.info("[관리자] KAMIS 가격 데이터 동기화 수동 실행");
+
+        // 관리자 권한 체크
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "로그인이 필요합니다."));
+        }
+
+        String memberId = authentication.getName();
+        Member member = mService.findByMemberId(memberId);
+        if (member == null || !"Y".equals(member.getAdminYn())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "관리자만 접근 가능합니다."));
+        }
+
+        try {
+            long startTime = System.currentTimeMillis();
+            String result = kamisDataSyncService.syncAllCategoriesAndGetResult();
+            long endTime = System.currentTimeMillis();
+
+            return ResponseEntity.ok(Map.of(
+                "message", "KAMIS 가격 데이터 동기화 완료",
+                "result", result,
+                "duration", (endTime - startTime) + "ms"
+            ));
+        } catch (Exception e) {
+            log.error("[관리자] KAMIS 동기화 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "동기화 중 오류가 발생했습니다: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 식품안전 데이터 동기화 (수동 실행)
+     */
+    @PostMapping("/sync/safety")
+    public ResponseEntity<?> syncFoodSafetyData(Authentication authentication) {
+        log.info("[관리자] 식품안전 데이터 동기화 수동 실행");
+
+        // 관리자 권한 체크
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "로그인이 필요합니다."));
+        }
+
+        String memberId = authentication.getName();
+        Member member = mService.findByMemberId(memberId);
+        if (member == null || !"Y".equals(member.getAdminYn())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "관리자만 접근 가능합니다."));
+        }
+
+        try {
+            long startTime = System.currentTimeMillis();
+            int savedCount = foodSafetyDataSyncService.syncRecentAlerts();
+            long endTime = System.currentTimeMillis();
+
+            return ResponseEntity.ok(Map.of(
+                "message", "식품안전 데이터 동기화 완료",
+                "savedCount", savedCount,
+                "duration", (endTime - startTime) + "ms"
+            ));
+        } catch (Exception e) {
+            log.error("[관리자] 식품안전 동기화 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "동기화 중 오류가 발생했습니다: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 가격 변동 알림 생성 (수동 실행)
+     */
+    @PostMapping("/sync/priceAlert")
+    public ResponseEntity<?> createPriceAlerts(Authentication authentication) {
+        log.info("[관리자] 가격 변동 알림 생성 수동 실행");
+
+        // 관리자 권한 체크
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "로그인이 필요합니다."));
+        }
+
+        String memberId = authentication.getName();
+        Member member = mService.findByMemberId(memberId);
+        if (member == null || !"Y".equals(member.getAdminYn())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "관리자만 접근 가능합니다."));
+        }
+
+        try {
+            long startTime = System.currentTimeMillis();
+            alertService.createPriceChangeNotifications();
+            long endTime = System.currentTimeMillis();
+
+            return ResponseEntity.ok(Map.of(
+                "message", "가격 변동 알림 생성 완료",
+                "duration", (endTime - startTime) + "ms"
+            ));
+        } catch (Exception e) {
+            log.error("[관리자] 가격 변동 알림 생성 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "알림 생성 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
 }
