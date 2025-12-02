@@ -125,8 +125,22 @@ public class ChatController {
                     Integer ingredientPrice = null;
 
                     if (pricePerKg != null) {
-                        // 가격 계산 (단위에 따라)
+                        // DB 가격으로 계산 (단위에 따라)
                         ingredientPrice = calculateIngredientPrice(pricePerKg, amount, unit);
+                    } else {
+                        // DB에 가격이 없으면 AI 예상 가격 사용
+                        JsonNode aiEstimatedPrice = ingredientNode.get("estimatedPrice");
+                        if (aiEstimatedPrice != null && !aiEstimatedPrice.isNull()) {
+                            try {
+                                ingredientPrice = aiEstimatedPrice.asInt();
+                                log.info("DB 가격 없음 - AI 예상 가격 사용: {} = {}원", name, ingredientPrice);
+                            } catch (Exception e) {
+                                log.warn("AI 예상 가격 파싱 실패: {}", name);
+                            }
+                        }
+                    }
+
+                    if (ingredientPrice != null) {
                         totalPrice += ingredientPrice;
                     }
 

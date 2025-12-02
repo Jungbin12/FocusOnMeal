@@ -132,7 +132,8 @@ public class GeminiApiServiceImpl implements GeminiApiService {
                 {
                   "name": "재료명",
                   "amount": "수량",
-                  "unit": "단위"
+                  "unit": "단위",
+                  "estimatedPrice": "해당 재료의 예상 가격(숫자만, 원 단위)"
                 }
               ],
               "recipe": [
@@ -155,11 +156,11 @@ public class GeminiApiServiceImpl implements GeminiApiService {
               "mealType": "점심",
               "description": "간단하면서도 영양가 있는 한끼 식사",
               "ingredients": [
-                {"name": "밥", "amount": "200", "unit": "g"},
-                {"name": "김치", "amount": "100", "unit": "g"},
-                {"name": "계란", "amount": "1", "unit": "개"},
-                {"name": "참기름", "amount": "15", "unit": "ml"},
-                {"name": "대파", "amount": "30", "unit": "g"}
+                {"name": "밥", "amount": "200", "unit": "g", "estimatedPrice": 500},
+                {"name": "김치", "amount": "100", "unit": "g", "estimatedPrice": 800},
+                {"name": "계란", "amount": "1", "unit": "개", "estimatedPrice": 300},
+                {"name": "참기름", "amount": "15", "unit": "ml", "estimatedPrice": 400},
+                {"name": "대파", "amount": "30", "unit": "g", "estimatedPrice": 200}
               ],
               "recipe": [
                 "팬에 참기름을 두르고 김치를 볶습니다",
