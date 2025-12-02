@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.fom.boot.domain.admin.model.mapper.AdminMapper">
+  	<!-- 전체 회원 수 조회 (활성 회원만) -->
+    <select id="getTotalMembers" resultType="int">
+        SELECT COUNT(*) 
+        FROM MEMBER 
+        WHERE STATUS_YN = 'Y'
+    </select>
+
+    <!-- 전체 식자재 수 조회 -->
+    <select id="getTotalIngredients" resultType="int">
+        SELECT COUNT(*) 
+        FROM INGREDIENT_MASTER
+    </select>
+
+    <!-- 전체 식단 수 조회 (삭제되지 않은 식단만) -->
+    <select id="getTotalMealPlans" resultType="int">
+        SELECT COUNT(*) 
+        FROM MEAL_PLAN 
+        WHERE IS_DELETED = 'N'
+    </select>
+
+    <!-- 월별 회원 가입 추이 조회 (올해 기준, 누적 회원 수) -->
+    <select id="getMonthlyActivity" resultType="com.fom.boot.app.admin.dto.MonthlyActivityDto">
+        <![CDATA[
+        WITH MONTHS AS (
+            SELECT 1 AS MONTH_NUM, 'Jan' AS MONTH FROM DUAL UNION ALL
+            SELECT 2, 'Feb' FROM DUAL UNION ALL
+            SELECT 3, 'Mar' FROM DUAL UNION ALL
+            SELECT 4, 'Apr' FROM DUAL UNION ALL
+            SELECT 5, 'May' FROM DUAL UNION ALL
+            SELECT 6, 'Jun' FROM DUAL UNION ALL
+            SELECT 7, 'Jul' FROM DUAL UNION ALL
+            SELECT 8, 'Aug' FROM DUAL UNION ALL
+            SELECT 9, 'Sep' FROM DUAL UNION ALL
+            SELECT 10, 'Oct' FROM DUAL UNION ALL
+            SELECT 11, 'Nov' FROM DUAL UNION ALL
+            SELECT 12, 'Dec' FROM DUAL
+        )
+        SELECT 
+            M.MONTH,
+            NVL((
+                SELECT COUNT(*) 
+                FROM MEMBER 
+                WHERE EXTRACT(YEAR FROM ENROLL_DATE) = EXTRACT(YEAR FROM SYSDATE)
+                  AND EXTRACT(MONTH FROM ENROLL_DATE) <= M.MONTH_NUM
+                  AND STATUS_YN = 'Y'
+            ), 0) AS MEMBERS
+        FROM MONTHS M
+        ORDER BY M.MONTH_NUM
+        ]]>
+    </select>
+
+    <!-- 월별 신규 회원 수 조회 (올해 기준, 증가한 회원 수) -->
+    <select id="getMonthlyNewMembers" resultType="com.fom.boot.app.admin.dto.MonthlyActivityDto">
+        <![CDATA[
+        WITH MONTHS AS (
+            SELECT 1 AS MONTH_NUM, 'Jan' AS MONTH FROM DUAL UNION ALL
+            SELECT 2, 'Feb' FROM DUAL UNION ALL
+            SELECT 3, 'Mar' FROM DUAL UNION ALL
+            SELECT 4, 'Apr' FROM DUAL UNION ALL
+            SELECT 5, 'May' FROM DUAL UNION ALL
+            SELECT 6, 'Jun' FROM DUAL UNION ALL
+            SELECT 7, 'Jul' FROM DUAL UNION ALL
+            SELECT 8, 'Aug' FROM DUAL UNION ALL
+            SELECT 9, 'Sep' FROM DUAL UNION ALL
+            SELECT 10, 'Oct' FROM DUAL UNION ALL
+            SELECT 11, 'Nov' FROM DUAL UNION ALL
+            SELECT 12, 'Dec' FROM DUAL
+        )
+        SELECT 
+            M.MONTH,
+            NVL((
+                SELECT COUNT(*) 
+                FROM MEMBER 
+                WHERE EXTRACT(YEAR FROM ENROLL_DATE) = EXTRACT(YEAR FROM SYSDATE)
+                  AND EXTRACT(MONTH FROM ENROLL_DATE) = M.MONTH_NUM
+                  AND STATUS_YN = 'Y'
+            ), 0) AS MEMBERS
+        FROM MONTHS M
+        ORDER BY M.MONTH_NUM
+        ]]>
+    </select>
+
+    <!-- 월별 식단 생성 수 조회 (올해 기준, 누적) -->
+    <select id="getMonthlyMealPlans" resultType="com.fom.boot.app.admin.dto.MonthlyActivityDto">
+        <![CDATA[
+        WITH MONTHS AS (
+            SELECT 1 AS MONTH_NUM, 'Jan' AS MONTH FROM DUAL UNION ALL
+            SELECT 2, 'Feb' FROM DUAL UNION ALL
+            SELECT 3, 'Mar' FROM DUAL UNION ALL
+            SELECT 4, 'Apr' FROM DUAL UNION ALL
+            SELECT 5, 'May' FROM DUAL UNION ALL
+            SELECT 6, 'Jun' FROM DUAL UNION ALL
+            SELECT 7, 'Jul' FROM DUAL UNION ALL
+            SELECT 8, 'Aug' FROM DUAL UNION ALL
+            SELECT 9, 'Sep' FROM DUAL UNION ALL
+            SELECT 10, 'Oct' FROM DUAL UNION ALL
+            SELECT 11, 'Nov' FROM DUAL UNION ALL
+            SELECT 12, 'Dec' FROM DUAL
+        )
+        SELECT 
+            M.MONTH,
+            NVL((
+                SELECT COUNT(*) 
+                FROM MEAL_PLAN 
+                WHERE EXTRACT(YEAR FROM CREATED_AT) = EXTRACT(YEAR FROM SYSDATE)
+                  AND EXTRACT(MONTH FROM CREATED_AT) <= M.MONTH_NUM
+                  AND IS_DELETED = 'N'
+            ), 0) AS MEMBERS
+        FROM MONTHS M
+        ORDER BY M.MONTH_NUM
+        ]]>
+    </select>
+  </mapper>

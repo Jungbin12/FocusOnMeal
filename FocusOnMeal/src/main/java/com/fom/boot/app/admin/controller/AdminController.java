@@ -25,8 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fom.boot.app.admin.dto.AdminIngredientDTO;
+import com.fom.boot.app.admin.dto.DashboardStatsDto;
+import com.fom.boot.app.admin.dto.MonthlyActivityDto;
 import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.common.pagination.Pagination;
+import com.fom.boot.domain.admin.model.service.AdminService;
 import com.fom.boot.domain.alert.model.vo.SafetyAlert;
 import com.fom.boot.domain.ingredient.model.service.IngredientService;
 import com.fom.boot.domain.ingredient.model.vo.NutritionMaster;
@@ -51,6 +54,110 @@ public class AdminController {
 	private final NoticeService nService;
 	private final IngredientService iService;
 	private final SafetyService safetyService;
+	private final AdminService adminService;
+	
+	/**
+     * 대시보드 전체 데이터 조회
+     */
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> getDashboardData(Authentication authentication) {
+        // 1. 토큰 인증 체크
+        if (authentication == null || !authentication.isAuthenticated()) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        System.out.println("Auth name = " + authentication.getName());
+        System.out.println("Auth authorities = " + authentication.getAuthorities());
+
+        // 2. 토큰에서 관리자 여부 확인
+        String memberId = authentication.getName();
+        Member member = mService.findByMemberId(memberId);
+
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자 아님");
+        }
+        if (!"Y".equals(member.getAdminYn())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자만 접근 가능합니다.");
+        }
+
+        // 3. 대시보드 데이터 조회
+        Map<String, Object> response = new HashMap<>();
+        
+        // 통계 데이터 조회
+        DashboardStatsDto stats = adminService.getDashboardStats();
+        
+        // 월별 누적 회원 수
+        List<MonthlyActivityDto> monthlyActivity = adminService.getMonthlyActivity();
+        
+        // 월별 신규 회원 수
+        List<MonthlyActivityDto> monthlyNewMembers = adminService.getMonthlyNewMembers();
+        
+        // 월별 누적 식단 수
+        List<MonthlyActivityDto> monthlyMealPlans = adminService.getMonthlyMealPlans();
+        
+        response.put("stats", stats);
+        response.put("monthlyActivity", monthlyActivity);
+        response.put("monthlyNewMembers", monthlyNewMembers);
+        response.put("monthlyMealPlans", monthlyMealPlans);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 통계 데이터만 조회
+     */
+    @GetMapping("/dashboard/stats")
+    public ResponseEntity<?> getStats(Authentication authentication) {
+        // 1. 토큰 인증 체크
+        if (authentication == null || !authentication.isAuthenticated()) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        // 2. 관리자 여부 확인
+        String memberId = authentication.getName();
+        Member member = mService.findByMemberId(memberId);
+
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자 아님");
+        }
+        if (!"Y".equals(member.getAdminYn())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자만 접근 가능합니다.");
+        }
+
+        DashboardStatsDto stats = adminService.getDashboardStats();
+        return ResponseEntity.ok(stats);
+    }
+
+    /**
+     * 월별 활동 추이 데이터만 조회
+     */
+    @GetMapping("/dashboard/monthly-activity")
+    public ResponseEntity<?> getMonthlyActivity(Authentication authentication) {
+        // 1. 토큰 인증 체크
+        if (authentication == null || !authentication.isAuthenticated()) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        // 2. 관리자 여부 확인
+        String memberId = authentication.getName();
+        Member member = mService.findByMemberId(memberId);
+
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자 아님");
+        }
+        if (!"Y".equals(member.getAdminYn())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자만 접근 가능합니다.");
+        }
+
+        List<MonthlyActivityDto> monthlyActivity = adminService.getMonthlyActivity();
+        return ResponseEntity.ok(monthlyActivity);
+    }
 	
 	// application.properties에 설정된 파일 저장 경로 주입
 	@Value("${file.upload-dir}")
