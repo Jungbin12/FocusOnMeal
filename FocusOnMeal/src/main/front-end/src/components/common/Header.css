@@ -443,3 +443,12 @@
 .mark-all-read-btn:hover {
     color: #45a049;
 }
+/* 관리자 닉네임 효과 */
+.admin-clickable {
+    cursor: pointer;
+    font-weight: 600;
+}
+.admin-clickable:hover {
+    text-decoration: underline;
+    color: #45a049;
+}
