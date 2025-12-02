@@ -15,10 +15,6 @@ const Header = () => {
     const [activeTab, setActiveTab] = useState("위험공표"); // 탭 상태 추가
     const [adminYn, setadminYn] = useState(false);
 
-    useEffect(() => {
-        const adminYn = sessionStorage.getItem("adminYn");
-        setadminYn(adminYn === "Y");
-    }, []);
 
     // 페이지 이동 시 알림탭 닫기
     useEffect(() => {
@@ -30,13 +26,17 @@ const Header = () => {
         const checkLogin = () => {
             const token = sessionStorage.getItem("token");
             const nickname = sessionStorage.getItem("memberNickname");
+            const adminCheck = sessionStorage.getItem("adminYn");
 
             if (token) {
                 setIsLoggedIn(true);
                 setMemberNickname(nickname || "");
+                setadminYn(adminCheck === "Y");
                 fetchNotifications();
             } else {
                 setIsLoggedIn(false);
+                setMemberNickname("");
+                setadminYn(false);
             }
         };
 
@@ -107,6 +107,7 @@ const Header = () => {
         sessionStorage.removeItem("adminYn");
 
         setIsLoggedIn(false);
+        setadminYn(false);
         navigate("/");
     };
 
