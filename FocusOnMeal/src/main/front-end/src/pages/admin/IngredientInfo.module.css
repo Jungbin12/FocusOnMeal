@@ -18,9 +18,6 @@
     flex: 1;
     padding: 30px 40px;
     background: #fafafa;
-    /* [수정] overflow-x: auto를 visible로 변경하거나, 
-       드롭다운이 잘리지 않도록 충분한 높이를 확보해야 합니다. 
-       일단 visible로 두어 팝업이 잘리지 않게 합니다. */
     overflow: visible; 
 }
 
@@ -80,16 +77,15 @@
     background-color: #557a22;
 }
 
-/* 테이블 스타일 */
+/* --- 테이블 스타일 (반응형 적용) --- */
 .memberTable {
     width: 100%;
-    min-width: 1400px;
+    min-width: 1000px; 
     border-collapse: collapse;
-    table-layout: fixed;
+    table-layout: fixed; 
     background: #fff;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     border-radius: 8px;
-    /* [수정] overflow: hidden 제거 -> 드롭다운이 테이블 밖으로 나올 수 있게 함 */
     overflow: visible; 
 }
 
@@ -107,7 +103,7 @@
     text-align: center;
     vertical-align: middle;
     font-family: 'Noto Sans KR', sans-serif;
-    position: relative; /* z-index 컨텍스트 */
+    position: relative;
     z-index: 10;
 }
 
@@ -131,45 +127,55 @@
     text-align: center;
     line-height: 1.6;
     font-family: 'Noto Sans KR', sans-serif;
+    word-break: keep-all;
 }
 
 /* 빈 결과 셀 */
 .emptyCell {
     text-align: center !important;
-    padding: 80px 40px !important; /* [수정] 높이를 좀 더 주어 드롭다운 공간 확보 */
+    padding: 80px 40px !important;
     color: #999 !important;
     font-size: 14px !important;
     font-family: 'Noto Sans KR', sans-serif !important;
 }
 
-/* --- 컬럼별 너비 설정 --- */
+/* --- 컬럼별 너비 설정 (합계 100% 비율) --- */
 
-/* 1. No */
+/* 1. No : 5% */
 .noCol {
-    width: 80px;
+    width: 5%;
 }
 
-/* 2. 이미지 */
+/* 2. 이미지 : 15% */
 .imageCol {
-    width: 200px;
+    width: 15%;
 }
 
 .imageWrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 10px 0;
+    width: 100%;
 }
 
+/* [중요] 이미지가 칸 크기에 맞춰 줄어들도록 설정 */
 .ingredientImage {
-    width: 200px;
-    height: 200px;
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+    aspect-ratio: 1/1; /* 정사각형 비율 강제 */
     object-fit: cover;
     border-radius: 8px;
     border: 1px solid #e5e5e5;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    cursor: zoom-in;
+    transition: transform 0.2s;
+}
+.ingredientImage:hover {
+    transform: scale(1.02);
 }
 
 .imageChangeLabel {
@@ -178,24 +184,26 @@
     cursor: pointer;
     font-weight: 600;
     transition: color 0.2s;
+    white-space: nowrap;
 }
 .imageChangeLabel:hover {
     color: #557a22;
 }
 
+/* [중요] 파일 선택 버튼 숨김 */
 .fileInput {
     display: none;
 }
 
-/* 3. 카테고리 */
+/* 3. 카테고리 : 10% */
 .categoryCol {
-    width: 140px;
-    z-index: 20 !important; /* 드롭다운이 있는 컬럼의 z-index 높임 */
+    width: 10%;
+    z-index: 20 !important;
 }
 
-/* 4. 재료명 */
+/* 4. 재료명 : 12% */
 .ingredientNameCol {
-    width: 180px;
+    width: 12%;
 }
 
 .nameCell {
@@ -204,40 +212,32 @@
     font-family: 'Noto Sans KR', sans-serif !important;
 }
 
-/* 5. 기준단위 */
+/* 5. 기준단위 : 8% */
 .unitCol {
-    width: 100px;
+    width: 8%;
 }
 
-/* 6. 현재가격 */
+/* 6. 현재가격 : 10% */
 .priceCol {
-    width: 120px;
+    width: 10%;
 }
 
-/* 7. 어제가격 */
-/* priceCol 재사용 */
-
-/* 8. 최근 수집일 */
+/* 8. 최근 수집일 : 12% */
 .dateCol {
-    width: 130px;
+    width: 12%;
 }
 
-/* 9. 영양성분 */
+/* 9. 영양성분 : 8% */
 .nutritionCol {
-    width: 100px;
-}
-
-/* 10. 활성 상태 */
-.statusCol {
-    width: 100px;
+    width: 8%;
 }
 
 /* --- 텍스트 오버플로우 처리 --- */
-
 .textWrapper {
     position: relative;
     width: 100%;
     display: inline-block;
+    max-width: 100%;
 }
 
 .truncatedText {
@@ -247,6 +247,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: center;
+    vertical-align: middle;
     font-family: 'Noto Sans KR', sans-serif;
     color: #333;
 }
@@ -254,7 +255,8 @@
 .tooltip {
     display: none;
     position: absolute;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     top: 100%;
     margin-top: 5px;
     background: rgba(0,0,0,0.85);
@@ -271,6 +273,17 @@
     display: block;
 }
 
+/* [추가] 클릭 가능한 이름 스타일 */
+.clickableName {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.clickableName:hover {
+    color: #67932A;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
 /* 정렬 화살표 */
 .sortArrow {
     display: inline-block;
@@ -285,48 +298,6 @@
     font-weight: bold;
 }
 
-/* 토글 스위치 */
-.toggleSwitch {
-    position: relative;
-    width: 44px;
-    height: 24px;
-    display: inline-block;
-}
-.toggleSwitch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; 
-    left: 0; 
-    right: 0; 
-    bottom: 0;
-    background-color: #ccc;
-    border-radius: 24px;
-    transition: 0.3s;
-}
-.slider::before {
-    content: "";
-    position: absolute;
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    border-radius: 50%;
-    transition: 0.3s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-.toggleSwitch input:checked + .slider {
-    background-color: #67932A;
-}
-.toggleSwitch input:checked + .slider::before {
-    transform: translateX(20px);
-}
-
 /* 영양성분 수정 버튼 */
 .editBtn {
     background: transparent;
@@ -339,6 +310,7 @@
     border-radius: 4px;
     transition: all 0.2s;
     font-family: 'Noto Sans KR', sans-serif;
+    white-space: nowrap;
 }
 
 .editBtn:hover {
@@ -366,7 +338,6 @@
     left: 50%;
     transform: translateX(-50%);
     margin-top: 10px;
-    
     background: white;
     border: 1px solid #ddd;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -409,18 +380,16 @@
     border-bottom: 1px solid #f5f5f5;
     transition: all 0.2s;
 }
-
 .filterItem:last-child {
     border-bottom: none;
 }
-
 .filterItem:hover {
     background-color: #f7f9fc;
     color: #67932A;
     font-weight: 500;
 }
 
-/* [추가] 이미지 삭제 버튼 */
+/* 이미지 삭제 버튼 */
 .deleteBtn {
     font-size: 12px;
     color: #e74c3c;
@@ -429,16 +398,17 @@
     background: none;
     border: none;
     padding: 0;
-    margin-left: 8px; /* 변경 버튼 옆 간격 */
+    margin-left: 8px; 
     transition: color 0.2s;
     font-family: 'Noto Sans KR', sans-serif;
+    white-space: nowrap;
 }
 .deleteBtn:hover {
     color: #c0392b;
     text-decoration: underline;
 }
 
-/* [추가] 이미지 미리보기 모달 오버레이 (검은 배경) */
+/* 이미지 미리보기 모달 오버레이 */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -449,11 +419,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000; /* 최상단 */
+    z-index: 2000; 
     animation: fadeIn 0.2s ease-in-out;
 }
 
-/* [추가] 모달 컨텐츠 (이미지 박스) */
+/* 모달 컨텐츠 */
 .modalContent {
     position: relative;
     max-width: 90%;
@@ -467,13 +437,13 @@
 }
 
 .modalImage {
-    max-width: 100%;
-    max-height: 80vh; /* 화면 높이의 80%까지만 */
+    max-width: 90vw; 
+    max-height: 80vh; 
     border-radius: 4px;
     object-fit: contain;
 }
 
-/* [추가] 닫기 버튼 (X) */
+/* 닫기 버튼 */
 .closeBtn {
     position: absolute;
     top: -40px;
@@ -494,18 +464,228 @@
     to { opacity: 1; }
 }
 
-/* 기존 .ingredientImage에 커서 포인터 추가 (클릭 가능함 표시) */
-.ingredientImage {
-    width: 200px;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid #e5e5e5;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    cursor: zoom-in; /* [추가] 돋보기 커서 */
-    transition: transform 0.2s;
+/* ========================================================== */
+/* [추가됨] 영양성분 모달 스타일 (2단 레이아웃 + 도넛 차트)  */
+/* ========================================================== */
+
+.nutritionModalInner {
+    display: flex;
+    /* [수정] 좌우 간격을 20px -> 15px로 줄임 */
+    gap: 15px; 
+    
+    /* 상하 패딩만 주고 좌우는 0 (부모 패딩 활용) */
+    padding: 10px 0; 
+    
+    width: 100%;
+    /* [중요] 테두리 포함 크기 계산 */
+    box-sizing: border-box; 
+    align-items: center; 
 }
-.ingredientImage:hover {
-    transform: scale(1.02);
+
+/* [왼쪽] 차트 섹션 */
+.chartSection {
+    /* [수정] 너비를 200px -> 180px로 줄여서 공간 확보 */
+    flex: 0 0 180px; 
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    /* 오른쪽 구분선과 여백 */
+    border-right: 1px solid #f0f0f0;
+    padding-right: 15px; 
+    justify-content: center;
+}
+
+.chartInfoSummary {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.chartInfoTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 5px;
+    letter-spacing: -0.5px;
+}
+
+.chartInfoCategory {
+    font-size: 12px;
+    color: #888;
+    background-color: #f3f3f3;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+/* 도넛 차트 */
+.donutChartWrapper {
+    position: relative;
+    /* 차트 크기 140px 유지 */
+    width: 140px;
+    height: 140px;
+    margin-bottom: 20px;
+}
+
+.donutChart {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.3s ease;
+}
+
+.donutHole {
+    width: 74%;
+    height: 74%;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.03);
+}
+
+.chartTotalLabel {
+    font-size: 15px;
+    font-weight: 800;
+    color: #444;
+}
+
+/* 범례 */
+.chartLegend {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.legendColor {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+}
+
+/* [오른쪽] 입력 폼 섹션 */
+.formSection {
+    /* [중요] 남은 공간을 모두 차지하되 넘치지 않게 함 */
+    flex: 1; 
+    min-width: 0; /* Flexbox 넘침 방지 트릭 */
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    /* 왼쪽 여백 살짝 줌 */
+    padding-left: 10px; 
+    /* 오른쪽 여백 제거 (잘림 방지) */
+    padding-right: 0; 
+}
+
+/* 세로 폼 컨테이너 */
+.verticalForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* 입력창 한 줄 스타일 */
+.formGroupRow {
+    display: grid;
+    /* 라벨 90px, 나머지 입력창 */
+    grid-template-columns: 90px 1fr; 
+    align-items: center;
+    gap: 10px; /* 라벨과 입력창 사이 간격 명시 */
+}
+
+.formGroupRow label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    text-align: left;
+    letter-spacing: -0.5px;
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+.formGroupRow input {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: right;
+    width: 100%;
+    /* [중요] 박스 크기 계산 포함 */
+    box-sizing: border-box; 
+    background-color: #fff;
+    transition: all 0.2s;
+    
+    /* [수정] 스피너 제거 (표준 속성 추가) */
+    appearance: none;        /* 표준 속성: 이것을 추가하세요 */
+    -moz-appearance: textfield; /* Firefox 전용: 숫자 입력창 화살표 제거용 */
+    -webkit-appearance: none;   /* Chrome/Safari 전용 */
+}
+
+.formGroupRow input::-webkit-outer-spin-button,
+.formGroupRow input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.formGroupRow input:focus {
+    border-color: #67932A;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(103, 147, 42, 0.1);
+}
+
+/* 하단 버튼 영역 */
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.cancelBtn, .saveBtn {
+    min-width: 70px; 
+    height: 36px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cancelBtn {
+    background-color: #fff;
+    color: #666;
+    border: 1px solid #ddd;
+}
+.cancelBtn:hover {
+    background-color: #f9f9f9;
+    border-color: #ccc;
+}
+
+.saveBtn {
+    background-color: #67932A;
+    color: white;
+}
+.saveBtn:hover {
+    background-color: #557a22;
 }

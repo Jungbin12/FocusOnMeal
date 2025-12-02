@@ -65,6 +65,7 @@ public interface IngredientMapper {
 			@Param("limit") int limit);
 			
 	int updateNutrition(NutritionMaster nutrition);
+	int updateNutrition(AdminIngredientDTO dto);
 
 	int insertNutrition(NutritionMaster nutrition);
 	NutritionMaster selectNutritionByIngredientId(int id);

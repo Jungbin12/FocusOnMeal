@@ -20,10 +20,10 @@ public class AdminIngredientDTO {
     // 3. 영양 정보 (NUTRITION_MASTER 테이블) - 수정 대상
     private int nutritionId;       // 영양정보 ID (없으면 0 or null)
     private BigDecimal calories;   // 칼로리 (100g 당)
-    private BigDecimal carbsG;     // 탄수화물 (g)
-    private BigDecimal proteinG;   // 단백질 (g)
-    private BigDecimal fatG;       // 지방 (g)
-    private BigDecimal sugarG;     // 당류 (g)
+    private BigDecimal carbs;     // 탄수화물 (g)
+    private BigDecimal protein;   // 단백질 (g)
+    private BigDecimal fat;       // 지방 (g)
+    private BigDecimal sugar;     // 당류 (g)
     
     // 4. 가격 정보 (PRICE_HISTORY 테이블)
     private Integer currentPrice;           // 최신 가격 (원)

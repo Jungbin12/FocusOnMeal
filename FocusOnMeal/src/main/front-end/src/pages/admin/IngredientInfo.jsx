@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 import styles from "./IngredientInfo.module.css";
 
+// [중요] 작성하신 Modal 컴포넌트 경로를 맞춰주세요
+import Modal from "../../components/Modal"; 
 import Sidebar from "../../components/admin/Sidebar";
 import Pagination from "../../components/common/Pagination";
 
@@ -11,17 +14,17 @@ const CATEGORIES = [
 ];
 
 const IngredientInfo = () => {
+    const navigate = useNavigate();
+
     const [ingredientList, setIngredientList] = useState([]);
     
-    // 백엔드 변수명(totalCount)에 맞춰 초기값 수정
+    // 페이지네이션 상태
     const [pageInfo, setPageInfo] = useState({ maxPage: 1, totalCount: 0 });
     const [currentPage, setCurrentPage] = useState(1);
 
-    // 검색 상태
+    // 검색 상태 (API 요청용 / UI 입력용 분리)
     const [fetchSearchType, setFetchSearchType] = useState('all'); 
     const [fetchSearchKeyword, setFetchSearchKeyword] = useState('');
-    
-    // UI 입력 상태
     const [searchType, setSearchType] = useState('all');
     const [searchKeyword, setSearchKeyword] = useState('');
     
@@ -33,10 +36,24 @@ const IngredientInfo = () => {
     const [showCategoryFilter, setShowCategoryFilter] = useState(false);
     const categoryFilterRef = useRef(null);
     
+    // 이미지 새로고침용 키
     const [imgRefreshKey, setImgRefreshKey] = useState(Date.now());
     
     // 이미지 미리보기 모달 상태
     const [previewImage, setPreviewImage] = useState(null);
+
+    // [영양성분 수정 모달 상태]
+    const [showNutritionModal, setShowNutritionModal] = useState(false);
+    const [nutritionForm, setNutritionForm] = useState({
+        ingredientId: '',
+        name: '',
+        category: '', // 화면 표시용
+        calories: 0,
+        carbs: 0,
+        protein: 0,
+        fat: 0,
+        sugar: 0
+    });
 
     // 외부 클릭 시 카테고리 필터 닫기
     useEffect(() => {
@@ -51,7 +68,7 @@ const IngredientInfo = () => {
         };
     }, [categoryFilterRef]);
 
-    // 일반 검색 실행
+    // 검색 실행
     const handleSearch = () => {
         setCurrentPage(1);
         setFetchSearchType(searchType);
@@ -64,7 +81,7 @@ const IngredientInfo = () => {
         if (e.key === 'Enter') handleSearch();
     };
 
-    // 카테고리 헤더에서 선택 시 실행되는 검색
+    // 카테고리 선택 필터링
     const handleCategoryFilter = (selectedCategory) => {
         setCurrentPage(1);
         setFetchSearchType('categoryName');
@@ -73,6 +90,7 @@ const IngredientInfo = () => {
         setShowCategoryFilter(false);
     };
 
+    // 정렬 핸들러
     const handleSort = (column) => {
         if (sortColumn !== column) {
             setSortColumn(column);
@@ -87,6 +105,7 @@ const IngredientInfo = () => {
         }
     };
     
+    // 이미지 업로드
     const handleImageUpload = async (ingredientId, file) => {
         if (!file) return;
         const formData = new FormData();
@@ -107,6 +126,7 @@ const IngredientInfo = () => {
         }
     };
 
+    // 이미지 삭제
     const handleImageDelete = async (ingredientId) => {
         if (!window.confirm("등록된 이미지를 삭제하시겠습니까? \n(기본 이미지로 변경됩니다)")) return;
 
@@ -134,10 +154,60 @@ const IngredientInfo = () => {
         e.target.style.cursor = 'default';
     };
 
-    const handleNutritionEdit = (ingredientId) => {
-        alert(`식재료 ID ${ingredientId}의 영양성분을 수정합니다.`);
+    // 상세 페이지 이동
+    const handleMoveToDetail = (ingredientId) => {
+        navigate(`/admin/ingredient/detail/${ingredientId}`);
     };
 
+    // [영양성분 수정 버튼 클릭]
+    const handleNutritionEdit = (item) => {
+        setNutritionForm({
+            ingredientId: item.ingredientId,
+            name: item.name,
+            category: item.category || '-',
+            calories: item.calories || 0,
+            carbs: item.carbs || 0,
+            protein: item.protein || 0,
+            fat: item.fat || 0,
+            sugar: item.sugar || 0
+        });
+        setShowNutritionModal(true);
+    };
+
+    // 영양성분 입력값 변경
+    const handleNutritionChange = (e) => {
+        const { name, value } = e.target;
+        // 숫자로 변환하여 저장 (차트 계산을 위해)
+        setNutritionForm(prev => ({
+            ...prev,
+            [name]: Number(value)
+        }));
+    };
+
+    // [추가] 마우스 휠로 숫자 변경 방지 핸들러
+    const handleWheel = (e) => {
+        e.target.blur();
+    };
+
+    // 영양성분 저장 요청
+    const handleNutritionUpdate = async () => {
+        if (!window.confirm(`${nutritionForm.name}의 영양성분을 수정하시겠습니까?`)) return;
+
+        try {
+            await axios.put("/api/admin/ingredient/nutrition", nutritionForm, {
+                headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` }
+            });
+            
+            alert("영양성분이 수정되었습니다.");
+            setShowNutritionModal(false);
+            fetchIngredientList(); 
+        } catch (err) {
+            console.error(err);
+            alert("수정 중 오류가 발생했습니다.");
+        }
+    };
+
+    // 목록 조회 API
     const fetchIngredientList = () => {
         const token = sessionStorage.getItem("token");
         if (!token) return;
@@ -175,6 +245,27 @@ const IngredientInfo = () => {
         );
     };
 
+    // --- [도넛 차트 계산 로직] ---
+    // 탄수화물(Yellow), 단백질(Green), 지방(Orange)
+    const totalNutrients = (nutritionForm.carbs || 0) + (nutritionForm.protein || 0) + (nutritionForm.fat || 0);
+    
+    // 각 성분의 퍼센트 계산
+    const pCarbs = totalNutrients === 0 ? 0 : ((nutritionForm.carbs / totalNutrients) * 100);
+    const pProtein = totalNutrients === 0 ? 0 : ((nutritionForm.protein / totalNutrients) * 100);
+    const pFat = totalNutrients === 0 ? 0 : ((nutritionForm.fat / totalNutrients) * 100);
+
+    // 차트 각도 계산 (순서: 단백질 -> 지방 -> 탄수화물)
+    const degProtein = pProtein; 
+    const degFat = degProtein + pFat; 
+    
+    const chartBackground = totalNutrients === 0 
+        ? '#eee' 
+        : `conic-gradient(
+            #00C896 0% ${degProtein}%, 
+            #FF7F50 ${degProtein}% ${degFat}%, 
+            #FFC107 ${degFat}% 100%
+          )`;
+
     return (
         <div className={styles.container}>
             <Sidebar />
@@ -197,7 +288,6 @@ const IngredientInfo = () => {
                     >
                         <option value="all">전체</option>
                         <option value="ingredientName">재료명</option>
-                        <option value="categoryName">카테고리(직접입력)</option> 
                     </select>
 
                     <input
@@ -284,8 +374,6 @@ const IngredientInfo = () => {
                             </th>
 
                             <th className={styles.nutritionCol}>영양성분</th>
-                            
-                            {/* [삭제] 활성상태 컬럼 제거됨 */}
                         </tr>
                     </thead>
 
@@ -334,7 +422,10 @@ const IngredientInfo = () => {
 
                                     <td className={styles.nameCell}>
                                         <div className={styles.textWrapper}>
-                                            <span className={styles.truncatedText}>
+                                            <span 
+                                                className={`${styles.truncatedText} ${styles.clickableName}`}
+                                                onClick={() => handleMoveToDetail(item.ingredientId)}
+                                            >
                                                 {item.name || '-'}
                                             </span>
                                             <div className={styles.tooltip}>
@@ -372,7 +463,7 @@ const IngredientInfo = () => {
                                                 hour: '2-digit', 
                                                 minute: '2-digit'
                                             }) : 
-                                         item.enrollDate ? 
+                                       item.enrollDate ? 
                                             new Date(item.enrollDate).toLocaleString("ko-KR", {
                                                 year: 'numeric', 
                                                 month: '2-digit', 
@@ -385,13 +476,11 @@ const IngredientInfo = () => {
                                     <td>
                                         <button 
                                             className={styles.editBtn}
-                                            onClick={() => handleNutritionEdit(item.ingredientId)}
+                                            onClick={() => handleNutritionEdit(item)}
                                         >
                                             [수정]
                                         </button>
                                     </td>
-                                    
-                                    {/* [삭제] 활성상태 토글 버튼 제거됨 */}
                                 </tr>
                             ))
                         )}
@@ -405,6 +494,7 @@ const IngredientInfo = () => {
                 />
             </main>
 
+            {/* 이미지 미리보기 모달 */}
             {previewImage && (
                 <div className={styles.modalOverlay} onClick={() => setPreviewImage(null)}>
                     <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
@@ -415,6 +505,128 @@ const IngredientInfo = () => {
                     </div>
                 </div>
             )}
+
+            {/* [수정] 영양성분 수정 모달 (2단 레이아웃 + 도넛 차트) */}
+            <Modal
+                isOpen={showNutritionModal}
+                onClose={() => setShowNutritionModal(false)}
+                // title에 문자열 대신 JSX를 전달
+                title={
+                    <span>
+                        영양성분 수정
+                        <span style={{ fontSize: '14px', color: '#999', marginLeft: '6px', fontWeight: 'normal' }}>
+                            (100g 기준)
+                        </span>
+                    </span>
+                }
+            >
+                <div className={styles.nutritionModalInner}>
+                    
+                    {/* [왼쪽] 차트 및 정보 영역 */}
+                    <div className={styles.chartSection}>
+                        <div className={styles.chartInfoSummary}>
+                            <div className={styles.chartInfoTitle}>{nutritionForm.name}</div>
+                            <div className={styles.chartInfoCategory}>{nutritionForm.category}</div>
+                        </div>
+
+                        {/* 도넛 차트 */}
+                        <div className={styles.donutChartWrapper}>
+                            <div 
+                                className={styles.donutChart} 
+                                style={{ background: chartBackground }}
+                            >
+                                <div className={styles.donutHole}>
+                                    <div className={styles.chartTotalLabel}>
+                                        {totalNutrients === 0 ? '0kcal' : `${nutritionForm.calories}kcal`}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 범례 */}
+                        <div className={styles.chartLegend}>
+                            <div className={styles.legendItem}>
+                                <span className={styles.legendColor} style={{background: '#00C896'}}></span>
+                                <span>단백질</span>
+                            </div>
+                            <div className={styles.legendItem}>
+                                <span className={styles.legendColor} style={{background: '#FF7F50'}}></span>
+                                <span>지방</span>
+                            </div>
+                            <div className={styles.legendItem}>
+                                <span className={styles.legendColor} style={{background: '#FFC107'}}></span>
+                                <span>탄수화물</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* [오른쪽] 입력 폼 영역 (onWheel 추가됨) */}
+                    <div className={styles.formSection}>
+                        <div className={styles.verticalForm}>
+                            <div className={styles.formGroupRow}>
+                                <label>열량 (kcal)</label>
+                                <input 
+                                    type="number" 
+                                    name="calories" 
+                                    value={nutritionForm.calories} 
+                                    onChange={handleNutritionChange} 
+                                    onWheel={handleWheel}
+                                    placeholder="0" 
+                                />
+                            </div>
+                            <div className={styles.formGroupRow}>
+                                <label>탄수화물 (g)</label>
+                                <input 
+                                    type="number" 
+                                    name="carbs" 
+                                    value={nutritionForm.carbs} 
+                                    onChange={handleNutritionChange}
+                                    onWheel={handleWheel} 
+                                    placeholder="0" 
+                                />
+                            </div>
+                            <div className={styles.formGroupRow}>
+                                <label>단백질 (g)</label>
+                                <input 
+                                    type="number" 
+                                    name="protein" 
+                                    value={nutritionForm.protein} 
+                                    onChange={handleNutritionChange} 
+                                    onWheel={handleWheel}
+                                    placeholder="0" 
+                                />
+                            </div>
+                            <div className={styles.formGroupRow}>
+                                <label>지방 (g)</label>
+                                <input 
+                                    type="number" 
+                                    name="fat" 
+                                    value={nutritionForm.fat} 
+                                    onChange={handleNutritionChange} 
+                                    onWheel={handleWheel}
+                                    placeholder="0" 
+                                />
+                            </div>
+                            <div className={styles.formGroupRow}>
+                                <label>당류 (g)</label>
+                                <input 
+                                    type="number" 
+                                    name="sugar" 
+                                    value={nutritionForm.sugar} 
+                                    onChange={handleNutritionChange} 
+                                    onWheel={handleWheel}
+                                    placeholder="0" 
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.modalFooter}>
+                            <button className={styles.cancelBtn} onClick={() => setShowNutritionModal(false)}>취소</button>
+                            <button className={styles.saveBtn} onClick={handleNutritionUpdate}>저장하기</button>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };
