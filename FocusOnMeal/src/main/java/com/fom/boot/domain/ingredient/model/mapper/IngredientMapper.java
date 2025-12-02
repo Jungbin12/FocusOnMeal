@@ -64,9 +64,8 @@ public interface IngredientMapper {
 			@Param("offset") int offset, 
 			@Param("limit") int limit);
 			
-	int updateNutrition(NutritionMaster nutrition);
-	
 	int insertNutrition(NutritionMaster nutrition);
 	NutritionMaster selectNutritionByIngredientId(int id);
+	int updateNutrition(AdminIngredientDTO dto);
 	
 }

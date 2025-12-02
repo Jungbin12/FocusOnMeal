@@ -232,10 +232,10 @@
         
         <result property="nutritionId" column="NUTRITION_ID"/>
         <result property="calories" column="CALORIES"/>
-        <result property="carbsG" column="CARBS_G"/>
-        <result property="proteinG" column="PROTEIN_G"/>
-        <result property="fatG" column="FAT_G"/>
-        <result property="sugarG" column="SUGAR_G"/>
+        <result property="carbs" column="CARBS_G"/>
+        <result property="protein" column="PROTEIN_G"/>
+        <result property="fat" column="FAT_G"/>
+        <result property="sugar" column="SUGAR_G"/>
     </resultMap>
 
     <!-- [수정] WHERE 태그 제거하고 조건문만 남김 (쿼리 내에서 유연하게 사용) -->
@@ -281,8 +281,13 @@
                     /* 상태 */
                     'Y' AS STATUS_YN,
                     
-                    /* 영양성분 */
-                    0 AS NUTRITION_ID, 0 AS CALORIES, 0 AS CARBS_G, 0 AS PROTEIN_G, 0 AS FAT_G, 0 AS SUGAR_G,
+                    /* [수정] 영양성분 실제 데이터 조회 (없으면 0) */
+                    NVL(N.NUTRITION_ID, 0) AS NUTRITION_ID,
+                    NVL(N.CALORIES, 0)     AS CALORIES,
+                    NVL(N.CARBS_G, 0)      AS CARBS_G,
+                    NVL(N.PROTEIN_G, 0)    AS PROTEIN_G,
+                    NVL(N.FAT_G, 0)        AS FAT_G,
+                    NVL(N.SUGAR_G, 0)      AS SUGAR_G,
                     
                     /* 가격 (최신) */
                     (SELECT PRICE_VALUE FROM (
@@ -313,6 +318,10 @@
                     SELECT I.*, ROW_NUMBER() OVER(PARTITION BY NAME ORDER BY KAMIS_KIND_CODE ASC) as NAME_RN
                     FROM INGREDIENT_MASTER I
                 ) I
+                
+                /* [추가] 영양성분 테이블 조인 */
+                LEFT JOIN NUTRITION_MASTER N 
+                       ON I.INGREDIENT_ID = N.INGREDIENT_ID
                 
                 WHERE I.NAME_RN = 1
                 <include refid="searchFrag"/>
@@ -352,41 +361,42 @@
         END;
     </update>
 
-    <update id="updateNutrition">
-        UPDATE NUTRITION_MASTER
-        SET 
-            CALORIES = #{calories},
-            CARBS_G = #{carbsG},
-            PROTEIN_G = #{proteinG},
-            FAT_G = #{fatG},
-            SUGAR_G = #{sugarG}
-        WHERE NUTRITION_ID = #{nutritionId}
+    <!-- [수정] 영양성분 통합 저장 (Merge Into) -->
+    <!-- DTO 변수명(carbs 등)과 매핑되도록 수정됨 -->
+    <update id="updateNutrition" parameterType="com.fom.boot.app.admin.dto.AdminIngredientDTO">
+        MERGE INTO NUTRITION_MASTER N
+        USING DUAL 
+           ON (N.INGREDIENT_ID = #{ingredientId})
+        
+        WHEN MATCHED THEN
+            UPDATE SET
+                CALORIES  = #{calories},
+                CARBS_G   = #{carbs},
+                PROTEIN_G = #{protein},
+                FAT_G     = #{fat},
+                SUGAR_G   = #{sugar}
+                
+        WHEN NOT MATCHED THEN
+            INSERT (
+                NUTRITION_ID, 
+                INGREDIENT_ID, 
+                MEASURE_UNIT,
+                CALORIES, 
+                CARBS_G, 
+                PROTEIN_G, 
+                FAT_G, 
+                SUGAR_G
+            )
+            VALUES (
+                SEQ_NUTRITION_MASTER.NEXTVAL,
+                #{ingredientId},
+                '100g',
+                #{calories},
+                #{carbs},
+                #{protein},
+                #{fat},
+                #{sugar}
+            )
     </update>
 
-    <insert id="insertNutrition">
-        <selectKey keyProperty="nutritionId" resultType="int" order="BEFORE">
-            SELECT SEQ_NUTRITION.NEXTVAL FROM DUAL
-        </selectKey>
-        INSERT INTO NUTRITION_MASTER (
-            NUTRITION_ID,
-            INGREDIENT_ID,
-            MEASURE_UNIT,
-            CALORIES,
-            CARBS_G,
-            PROTEIN_G,
-            FAT_G,
-            SUGAR_G
-        ) VALUES (
-            #{nutritionId},
-            #{ingredientId},
-            '100g',
-            #{calories},
-            #{carbsG},
-            #{proteinG},
-            #{fatG},
-            #{sugarG}
-        )
-    </insert>
-
-
-  </mapper>
+</mapper>

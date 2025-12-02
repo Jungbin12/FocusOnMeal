@@ -370,39 +370,39 @@ public class AdminController {
 	}
 
 	// 영양성분 수정
-	@PatchMapping("/ingredient/nutrition")
-	public ResponseEntity<?> updateNutrition(
-			@RequestBody NutritionMaster nutrition,
-			Authentication authentication) {
+	@PutMapping("/ingredient/nutrition") // Front가 PUT으로 보냄
+    public ResponseEntity<?> updateNutrition(
+            @RequestBody AdminIngredientDTO dto, // NutritionMaster -> AdminIngredientDTO로 변경
+            Authentication authentication) {
 
-		// 1. 토큰 인증 체크
-		if (authentication == null || !authentication.isAuthenticated()) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "로그인 필요"));
-		}
+        // 1. 토큰 인증 체크
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "로그인 필요"));
+        }
 
-		// 2. 관리자 여부 확인
-		String memberId = authentication.getName();
-		Member member = mService.findByMemberId(memberId);
-		if (member == null || !"Y".equals(member.getAdminYn())) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자 권한 필요");
-		}
+        // 2. 관리자 여부 확인
+        String memberId = authentication.getName();
+        Member member = mService.findByMemberId(memberId);
+        if (member == null || !"Y".equals(member.getAdminYn())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자 권한 필요");
+        }
 
-		log.info("수정할 영양성분 정보: {}", nutrition);
+        log.info("수정할 영양성분 정보: {}", dto);
 
-		try {
-			// Service에서 nutritionId 유무에 따라 update/insert 처리
-			int result = iService.updateNutrition(nutrition);
-			
-			if(result > 0) {
-				return ResponseEntity.ok("영양성분 수정 성공");
-			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("수정 실패");
-			}
-		} catch (Exception e) {
-			log.error("영양성분 수정 중 에러 발생", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 에러");
-		}
-	}
+        try {
+            // Service로 DTO 전달 (Service 메서드 파라미터도 DTO로 바꿔야 함)
+            int result = iService.updateNutrition(dto);
+            
+            if(result > 0) {
+                return ResponseEntity.ok("영양성분 수정 성공");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("수정 실패");
+            }
+        } catch (Exception e) {
+            log.error("영양성분 수정 중 에러 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 에러");
+        }
+    }
 
 	// 식재료 이미지 변경 (상대 경로 -> 절대 경로 변환 로직 추가)
 	@PostMapping("/ingredient/image")

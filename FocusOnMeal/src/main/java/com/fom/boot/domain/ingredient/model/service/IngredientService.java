@@ -27,7 +27,7 @@ public interface IngredientService {
 	List<FavoriteIngredientSummaryDTO> getFavoritesByMemberId(String memberId);
 	int getTotalIngredientsBySearch(String type, String keyword);
 	List<AdminIngredientDTO> selectAdminIngredients(PageInfo pageInfo, String type, String keyword, String sortColumn, String sortOrder);
-	int updateNutrition(NutritionMaster nutrition);
 	NutritionMaster getNutritionByIngredientId(int id);
+	int updateNutrition(AdminIngredientDTO dto);
 
 }

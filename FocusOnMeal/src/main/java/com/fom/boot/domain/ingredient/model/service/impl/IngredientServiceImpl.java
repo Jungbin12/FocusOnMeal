@@ -102,21 +102,14 @@ public class IngredientServiceImpl implements IngredientService {
 	}
 
 	@Override
-	@Transactional // 데이터 변경이 일어나므로 readOnly=false (기본값) 적용
-	public int updateNutrition(NutritionMaster nutrition) {
-		// 1. nutritionId가 존재하면(0보다 크면) -> 이미 있는 데이터 수정 (UPDATE)
-		if (nutrition.getNutritionId() > 0) {
-			return iMapper.updateNutrition(nutrition);
-		} 
-		// 2. nutritionId가 없으면 -> 새로운 데이터 등록 (INSERT)
-		else {
-			// (단, ingredientId는 필수)
-			return iMapper.insertNutrition(nutrition);
-		}
+	public NutritionMaster getNutritionByIngredientId(int id) {
+		return iMapper.selectNutritionByIngredientId(id);
 	}
 
 	@Override
-	public NutritionMaster getNutritionByIngredientId(int id) {
-		return iMapper.selectNutritionByIngredientId(id);
+	@Transactional 
+	public int updateNutrition(AdminIngredientDTO dto) {
+        // Mapper XML에서 MERGE INTO를 사용하므로, insert/update 분기 없이 바로 호출합니다.
+		return iMapper.updateNutrition(dto);
 	}
 }
