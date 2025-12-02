@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Footer from "../../components/common/Footer.jsx";
 
 import cloudImg from "../../assets/parallax/cloud.png";
@@ -13,8 +13,37 @@ const ParallaxPage = () => {
     const [currentSection, setCurrentSection] = useState(0);
     const [staticLeaves, setStaticLeaves] = useState([]);
     const [cursorParticles, setCursorParticles] = useState([]);
+    const [showOverlay, setShowOverlay] = useState(false);
+    
     const containerRef = useRef(null);
     const scrollTimeoutRef = useRef(null);
+    const rafIdRef = useRef(null);
+    const isSnapingRef = useRef(false);
+    const lastScrollTimeRef = useRef(Date.now());
+    const lastScrollTopRef = useRef(0);
+
+    const sections = [
+        {
+        id: 1,
+        title: "Focus on Meal",
+        subtitle: "메인에 들어가는 내용 왼쪽 상단에 들어갈 예정",
+        bgColor: "linear-gradient(180deg, #38A7DF 0%, #6AB9E2 100%)",
+        height: 1.8,
+        hasParallax: true,
+        },
+        { 
+        id: 2, 
+        bgColor: "linear-gradient(180deg, #67932A 0%, #99A237 100%)", 
+        height: 1,
+        hasParallax: false,
+        },
+        { 
+        id: 3, 
+        bgColor: "linear-gradient(180deg, #99A237 0%, #B6BE5C 100%)", 
+        height: 1.4,
+        hasParallax: false,
+        },
+    ];
 
     /* 💚 첫 장 정적 나뭇잎 */
     useEffect(() => {
@@ -42,15 +71,49 @@ const ParallaxPage = () => {
         }
     }, [currentSection]);
 
-    /* 📌 스크롤 핸들러 */
-    useEffect(() => {
-        const handleScroll = () => {
+    /* 🎯 자동 스냅 함수 */
+    const snapToSection = useCallback((targetSection) => {
+        if (isSnapingRef.current) return;
+        
         const container = containerRef.current;
         if (!container) return;
 
-        const scrollTop = container.scrollTop;
+        isSnapingRef.current = true;
         
-        // 전체 높이 계산 (각 섹션의 height 반영)
+        // 페이지 전환 시 오버레이 표시
+        if (targetSection > 0 && currentSection === 0) {
+        setShowOverlay(true);
+        setTimeout(() => setShowOverlay(false), 600);
+        }
+        
+        let targetScroll = 0;
+        for (let i = 0; i < targetSection; i++) {
+        targetScroll += window.innerHeight * sections[i].height;
+        }
+        
+        container.scrollTo({
+        top: targetScroll,
+        behavior: "smooth",
+        });
+
+        setTimeout(() => {
+        isSnapingRef.current = false;
+        }, 800);
+    }, [sections, currentSection]);
+
+    /* 📌 스크롤 핸들러 (최적화) */
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        let ticking = false;
+
+        const updateScroll = () => {
+        const scrollTop = container.scrollTop;
+        const scrollDelta = scrollTop - lastScrollTopRef.current;
+        lastScrollTopRef.current = scrollTop;
+        
+        // 전체 높이 계산
         let totalHeight = 0;
         sections.forEach(section => {
             totalHeight += container.clientHeight * section.height;
@@ -58,8 +121,8 @@ const ParallaxPage = () => {
         const scrollHeight = totalHeight - container.clientHeight;
 
         setScrollProgress((scrollTop / scrollHeight) * 100);
-        
-        // 현재 섹션 계산 (height 반영)
+
+        // 현재 섹션 계산
         let accumulatedHeight = 0;
         let currentSec = 0;
         for (let i = 0; i < sections.length; i++) {
@@ -72,31 +135,76 @@ const ParallaxPage = () => {
         }
         setCurrentSection(currentSec);
 
-        // 🌿 수풀 확대 체크 - 일정 스케일 이상이면 자동으로 2페이지로 이동
+        // 🌿 수풀 확대 체크 - 자동 이동
         if (currentSec === 0) {
             const sectionHeight = container.clientHeight * sections[0].height;
             const localScroll = scrollTop;
             const scale = 1 + (localScroll / sectionHeight) * 1.0;
             
-            // 수풀 스케일이 1.85 이상이면 자동으로 2페이지로 이동
-            if (scale >= 1.85) {
-            const targetScroll = container.clientHeight * sections[0].height;
-            container.scrollTo({
-                top: targetScroll,
-                behavior: "smooth",
-            });
+            if (scale >= 1.85 && !isSnapingRef.current) {
+            snapToSection(1);
             }
         }
 
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = setTimeout(() => {}, 150);
+        // 🔙 2페이지에서 위로 스크롤 시 1페이지 맨 위로
+        if (currentSec === 1 && scrollDelta < 0 && !isSnapingRef.current) {
+            const section1Start = container.clientHeight * sections[0].height;
+            const distanceFromSection1 = Math.abs(scrollTop - section1Start);
+            
+            if (distanceFromSection1 < 50) {
+            snapToSection(0);
+            }
+        }
+
+        // 자동 스냅 로직 (민감도 개선)
+        const now = Date.now();
+        if (now - lastScrollTimeRef.current > 100 && !isSnapingRef.current) {
+            let accHeight = 0;
+            for (let i = 0; i < sections.length; i++) {
+            const sectionHeight = container.clientHeight * sections[i].height;
+            const sectionMiddle = accHeight + sectionHeight / 2;
+            
+            // 섹션 경계 근처에서 스냅 (민감도 향상)
+            if (Math.abs(scrollTop - accHeight) < sectionHeight * 0.15) {
+                if (currentSec === i && scrollDelta > 0) {
+                snapToSection(i);
+                }
+                break;
+            }
+            
+            // 섹션 끝 근처에서 다음 섹션으로 스냅
+            if (Math.abs(scrollTop - (accHeight + sectionHeight)) < sectionHeight * 0.15) {
+                if (currentSec === i && scrollDelta > 0) {
+                snapToSection(i + 1);
+                }
+                break;
+            }
+            
+            accHeight += sectionHeight;
+            }
+        }
+
+        ticking = false;
         };
 
-        const c = containerRef.current;
-        if (c) c.addEventListener("scroll", handleScroll, { passive: true });
+        const handleScroll = () => {
+        lastScrollTimeRef.current = Date.now();
+        
+        if (!ticking) {
+            rafIdRef.current = requestAnimationFrame(updateScroll);
+            ticking = true;
+        }
+        };
 
-        return () => c?.removeEventListener("scroll", handleScroll);
-    }, []);
+        container.addEventListener("scroll", handleScroll, { passive: true });
+
+        return () => {
+        container.removeEventListener("scroll", handleScroll);
+        if (rafIdRef.current) {
+            cancelAnimationFrame(rafIdRef.current);
+        }
+        };
+    }, [sections, snapToSection]);
 
     /* 🥕 커스텀 당근 커서 */
     useEffect(() => {
@@ -111,7 +219,7 @@ const ParallaxPage = () => {
         top: "0px",
         fontSize: "34px",
         pointerEvents: "none",
-        zIndex: 999999,
+        zIndex: "999999",
         userSelect: "none",
         transform: "translate(-70%, -40%) rotate(95deg)",
         });
@@ -159,32 +267,8 @@ const ParallaxPage = () => {
         return () => window.removeEventListener("pointermove", handleMove);
     }, []);
 
-    /* 🌈 섹션 데이터 */
-    const sections = [
-        {
-        id: 1,
-        title: "Focus on Meal",
-        subtitle: "메인에 들어가는 내용 왼쪽 상단에 들어갈 예정 제목이랑 내용 크기 줄일 것.",
-        bgColor: "linear-gradient(180deg, #38A7DF 0%, #6AB9E2 100%)",
-        height: 1.8,
-        hasParallax: true,
-        },
-        { 
-        id: 2, 
-        bgColor: "linear-gradient(180deg, #67932A 0%, #99A237 100%)", 
-        height: 1,
-        hasParallax: false,
-        },
-        { 
-        id: 3, 
-        bgColor: "linear-gradient(180deg, #99A237 0%, #B6BE5C 100%)", 
-        height: 1.4,
-        hasParallax: false,
-        },
-    ];
-
-    /* 🖼️ 1번째 섹션 패럴랙스 계산 - 아래에서 위로 올라오기 */
-    const getParallaxTransform = (speed, initialOffset = 0, shouldScale = false) => {
+    /* 🖼️ 1번째 섹션 패럴랙스 계산 - GPU 가속 */
+    const getParallaxTransform = useCallback((speed, initialOffset = 0, shouldScale = false) => {
         const container = containerRef.current;
         if (!container) return {};
 
@@ -195,16 +279,18 @@ const ParallaxPage = () => {
         if (localScroll < 0) {
         return { 
             transform: shouldScale 
-            ? `translateY(${initialOffset}px) scale(1)` 
-            : `translateY(${initialOffset}px)` 
+            ? `translate3d(0, ${initialOffset}px, 0) scale(1)` 
+            : `translate3d(0, ${initialOffset}px, 0)`,
+            willChange: "transform",
         };
         }
 
         if (localScroll > sectionHeight) {
         return { 
             transform: shouldScale
-            ? `translateY(${-sectionHeight * speed + initialOffset}px) scale(2)`
-            : `translateY(${-sectionHeight * speed + initialOffset}px)` 
+            ? `translate3d(0, ${-sectionHeight * speed + initialOffset}px, 0) scale(2)`
+            : `translate3d(0, ${-sectionHeight * speed + initialOffset}px, 0)`,
+            willChange: "transform",
         };
         }
 
@@ -212,11 +298,17 @@ const ParallaxPage = () => {
         
         if (shouldScale) {
         const scale = 1 + (localScroll / sectionHeight) * 1.0;
-        return { transform: `translateY(${translateY}px) scale(${scale})` };
+        return { 
+            transform: `translate3d(0, ${translateY}px, 0) scale(${scale})`,
+            willChange: "transform",
+        };
         }
         
-        return { transform: `translateY(${translateY}px)` };
-    };
+        return { 
+        transform: `translate3d(0, ${translateY}px, 0)`,
+        willChange: "transform",
+        };
+    }, [sections]);
 
     return (
         <>
@@ -224,6 +316,13 @@ const ParallaxPage = () => {
             {`
             body, html {
                 cursor: none !important;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            * {
+                box-sizing: border-box;
             }
 
             @keyframes cursorFade {
@@ -298,7 +397,7 @@ const ParallaxPage = () => {
                 height: "100vh",
                 overflowY: "scroll",
                 scrollSnapType: "y proximity",
-                scrollBehavior: "smooth",
+                scrollBehavior: "auto",
             }}
             >
             {sections.map((section, index) => (
@@ -313,7 +412,7 @@ const ParallaxPage = () => {
                     overflow: "hidden",
                 }}
                 >
-                {/* 🌿 첫 화면 나뭇잎 (1페이지에서만 보임) */}
+                {/* 🌿 첫 화면 나뭇잎 */}
                 {index === 0 && staticLeaves.map((leaf) => (
                     <div
                     key={leaf.id}
@@ -331,6 +430,7 @@ const ParallaxPage = () => {
                         animationDelay: `${leaf.delay}s`,
                         pointerEvents: "none",
                         zIndex: 500,
+                        willChange: "transform, opacity",
                     }}
                     />
                 ))}
@@ -352,10 +452,10 @@ const ParallaxPage = () => {
                     </div>
                 )}
 
-                {/* ⭐ 1번째 페이지 패럴랙스 이미지 - 아래에서 위로 올라오기 */}
+                {/* ⭐ 1번째 페이지 패럴랙스 이미지 */}
                 {index === 0 && section.hasParallax && (
                     <>
-                    {/* 🎨 배경 하단 진한 초록색 레이어 (맨 뒤) */}
+                    {/* 🎨 배경 하단 진한 초록색 레이어 */}
                     <div
                         style={{
                         position: "absolute",
@@ -368,7 +468,7 @@ const ParallaxPage = () => {
                         }}
                     />
 
-                    {/* ☁ 구름 - 가장 느리게 + 높이 배치 (뒤쪽) */}
+                    {/* ☁ 구름 */}
                     <img
                         src={cloudImg}
                         alt="cloud"
@@ -381,12 +481,11 @@ const ParallaxPage = () => {
                         minHeight: "120vh",
                         objectFit: "cover",
                         ...getParallaxTransform(0.2, 100, false),
-                        transition: "transform 0.1s linear",
                         zIndex: 1,
                         }}
                     />
 
-                    {/* 🏔 산 - 구름과 같은 위치 */}
+                    {/* 🏔 산 */}
                     <img
                         src={mountainImg}
                         alt="mountain"
@@ -399,12 +498,11 @@ const ParallaxPage = () => {
                         minHeight: "120vh",
                         objectFit: "cover",
                         ...getParallaxTransform(0.45, 250, false),
-                        transition: "transform 0.1s linear",
                         zIndex: 2,
                         }}
                     />
 
-                    {/* 🌾 밀밭 - 구름과 같은 위치 */}
+                    {/* 🌾 밀밭 */}
                     <img
                         src={cornImg}
                         alt="cornfield"
@@ -417,12 +515,11 @@ const ParallaxPage = () => {
                         minHeight: "120vh",
                         objectFit: "cover",
                         ...getParallaxTransform(0.65, 350, false),
-                        transition: "transform 0.1s linear",
                         zIndex: 3,
                         }}
                     />
 
-                    {/* 🌱 잔디 - 구름과 같은 위치 */}
+                    {/* 🌱 잔디 */}
                     <img
                         src={grassImg}
                         alt="grass"
@@ -435,12 +532,11 @@ const ParallaxPage = () => {
                         minHeight: "120vh",
                         objectFit: "cover",
                         ...getParallaxTransform(0.85, 450, false),
-                        transition: "transform 0.1s linear",
                         zIndex: 4,
                         }}
                     />
 
-                    {/* 🌿 수풀 - 맨 아래 배치 + 확대 효과 (맨 앞) */}
+                    {/* 🌿 수풀 - 확대 효과 */}
                     <img
                         src={bushImg}
                         alt="bush"
@@ -454,7 +550,6 @@ const ParallaxPage = () => {
                         objectFit: "cover",
                         transformOrigin: "center bottom",
                         ...getParallaxTransform(1.0, 550, true),
-                        transition: "transform 0.1s linear",
                         zIndex: 5,
                         }}
                     />
@@ -512,7 +607,6 @@ const ParallaxPage = () => {
                         transition: "box-shadow 0.3s ease",
                         }}
                     >
-                        {/* 사이렌 아이콘 */}
                         <div
                         style={{
                             position: "absolute",
@@ -583,7 +677,6 @@ const ParallaxPage = () => {
                         transition: "all 0.3s ease",
                         }}
                     >
-                        {/* 채팅 아이콘 */}
                         <div
                         style={{
                             position: "absolute",
@@ -621,7 +714,6 @@ const ParallaxPage = () => {
                         확인해보세요
                         </p>
 
-                        {/* 호버 시 나타나는 채팅 메시지들 */}
                         {hoveredBox === 'notice' && (
                         <div style={{ marginTop: "30px", position: "relative" }}>
                             <div
@@ -678,8 +770,7 @@ const ParallaxPage = () => {
                 </div>
             ))}
             
-            {/* 🔽 Footer - 3페이지 바로 다음에 자연스럽게 배치 */}
-            <Footer/>
+            <Footer />
             </div>
 
             {/* 🔘 스크롤 인디케이터 */}
@@ -704,20 +795,10 @@ const ParallaxPage = () => {
                     currentSection === index
                         ? "white"
                         : "rgba(255,255,255,0.3)",
-                    cursor: "pointer",
-                    transition: "0.3s",
+                cursor: "pointer",
+                transition: "0.3s",
                 }}
-                onClick={() => {
-                    let targetScroll = 0;
-                    for (let i = 0; i < index; i++) {
-                    targetScroll += window.innerHeight * sections[i].height;
-                    }
-                    
-                    containerRef.current.scrollTo({
-                    top: targetScroll,
-                    behavior: "smooth",
-                    });
-                }}
+                onClick={() => snapToSection(index)}
                 />
             ))}
             </div>
