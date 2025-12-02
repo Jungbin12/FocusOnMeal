@@ -9,11 +9,33 @@
         FROM MEMBER 
         WHERE STATUS_YN = 'Y'
     </select>
+    
+    <!-- [수정] WHERE 태그 제거하고 조건문만 남김 (쿼리 내에서 유연하게 사용) -->
+    <sql id="searchFrag">
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="type == 'ingredientName'">
+                    AND I.NAME LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="type == 'categoryName'">
+                    AND I.CATEGORY LIKE '%' || #{keyword} || '%'
+                </when>
+                <otherwise>
+                    AND (I.NAME LIKE '%' || #{keyword} || '%' OR I.CATEGORY LIKE '%' || #{keyword} || '%')
+                </otherwise>
+            </choose>
+        </if>
+    </sql>
 
-    <!-- 전체 식자재 수 조회 -->
+    <!-- (중복 제거) 전체 식자재 수 조회 -->
     <select id="getTotalIngredients" resultType="int">
-        SELECT COUNT(*) 
-        FROM INGREDIENT_MASTER
+        SELECT COUNT(*)
+        FROM (
+            SELECT I.*, ROW_NUMBER() OVER(PARTITION BY NAME ORDER BY KAMIS_KIND_CODE ASC) as NAME_RN
+            FROM INGREDIENT_MASTER I
+        ) I
+        WHERE I.NAME_RN = 1
+        <include refid="searchFrag"/>
     </select>
 
     <!-- 전체 식단 수 조회 (삭제되지 않은 식단만) -->
