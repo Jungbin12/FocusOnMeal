@@ -762,6 +762,7 @@ function IngredientDetail() {
                                                     value: '가격 (원)',
                                                     angle: -90,
                                                     position: 'insideLeft',
+                                                    offset: -5,
                                                     style: { textAnchor: 'middle' }
                                                 }}
                                                 stroke="#666"
