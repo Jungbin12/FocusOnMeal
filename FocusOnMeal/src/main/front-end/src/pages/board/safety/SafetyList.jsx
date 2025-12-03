@@ -191,7 +191,7 @@ const SafetyAlertList = () => {
                         onChange={handleKeywordChange}
                         className={styles.input}
                     />
-                    <button type="submit" className={styles.searchBtn}>🔍</button>
+                    <button type="submit" className={styles.searchBtn}>검색</button>
                 </form>
 
                 <table className={styles.alertTable}>
