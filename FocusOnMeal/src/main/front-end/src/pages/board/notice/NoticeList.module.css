@@ -3,7 +3,7 @@
 /* ============================= */
 .container {
     width: 100%;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 60px auto;
     font-family: "Noto Sans KR", sans-serif;
 }
@@ -36,6 +36,21 @@
     border-radius: 4px;
 }
 
+.searchBtn {
+    border: 1px solid #67932A;
+    background-color: #67932A;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.searchBtn:hover {
+    background-color: #7AA83A;
+    border-color: #7AA83A;
+}
+
 /* ============================= */
 /* 테이블 기본 */
 /* ============================= */
@@ -43,6 +58,13 @@
     width: 100%;
     border-collapse: collapse;
     border-top: 2px solid #444;
+}
+
+.noticeTable th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    height: 35px; 
+    vertical-align: middle;
 }
 
 .noticeTable th, 
@@ -92,24 +114,26 @@
 /* ============================= */
 .badgeImportant {
     display: inline-block;
-    padding: 3px 6px;
+    padding: 4px 10px;
     margin-right: 6px;
     background-color: #ff4d4f;
     color: #fff;
     font-size: 12px;
     font-weight: 700;
     border-radius: 4px;
+    vertical-align: middle;
 }
 
 .badgeNew {
     display: inline-block;
-    padding: 3px 6px;
+    padding: 4px 10px;
     margin-right: 6px;
     background-color: #0796E5;
     color: #fff;
     font-size: 12px;
     font-weight: 700;
     border-radius: 4px;
+    vertical-align: middle;
 }
 
 /* ============================= */
