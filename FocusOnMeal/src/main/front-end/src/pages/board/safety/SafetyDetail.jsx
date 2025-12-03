@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DOMPurify from 'dompurify';
 import styles from "./SafetyDetail.module.css";
+import Footer from "../../../components/common/Footer";
 
 const SafetyDetail = () => {
     const { alertId } = useParams();
@@ -94,6 +95,7 @@ const SafetyDetail = () => {
     });
 
     return (
+        <>
         <div className={styles.container}>
             <div className={styles.detailWrapper}>
                 <h1 className={styles.pageTitle}>안전 정보 뉴스</h1>
@@ -167,6 +169,8 @@ const SafetyDetail = () => {
                 </div>
             </div>
         </div>
+        <Footer />
+        </>
     );
 };
 

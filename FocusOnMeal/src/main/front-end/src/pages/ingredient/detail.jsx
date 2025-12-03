@@ -16,6 +16,7 @@ import {
     Pie,      // [추가]
     Cell      // [추가]
 } from 'recharts';
+import Footer from '../../components/common/Footer';
 
 /**
  * 토큰을 안전하게 가져오는 함수 (변동 없음)
@@ -415,6 +416,7 @@ function IngredientDetail() {
     const hasNutritionData = nutritionChartData.some(d => d.value > 0);
     
     return (
+        <>
         <div className={styles.container}>
             <h2 className={styles.pageTitle}>식품성분표 상세 페이지</h2>
             
@@ -928,6 +930,8 @@ function IngredientDetail() {
                 onAlertChange={(isEnabled) => setIsPriceAlertEnabled(isEnabled)}
             />
         </div>
+        <Footer />
+        </>
     );
 }
 

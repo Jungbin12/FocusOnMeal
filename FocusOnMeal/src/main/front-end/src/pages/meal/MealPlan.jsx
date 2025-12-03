@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import "./MealPlan.css";
+import Footer from "../../components/common/Footer" 
 
 const MealPlan = () => {
     // 상태 관리
@@ -541,6 +542,7 @@ const MealPlan = () => {
                     </div>
                 </div>
             )}
+            <Footer/>
         </div>
     );
 };

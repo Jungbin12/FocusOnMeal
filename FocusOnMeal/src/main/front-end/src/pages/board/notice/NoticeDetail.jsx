@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./NoticeDetail.module.css";
+import Footer from "../../../components/common/Footer";
 
 const NoticeDetail = () => {
     const { noticeNo } = useParams();
@@ -74,6 +75,7 @@ const NoticeDetail = () => {
     }
 
     return (
+        <>
         <div className={styles.container}>
             <div className={styles.detailWrapper}>
                 <h1 className={styles.pageTitle}>공지사항</h1>
@@ -154,6 +156,8 @@ const NoticeDetail = () => {
                 </div>
             </div>
         </div>
+        <Footer/>
+        </>
     );
 };
 

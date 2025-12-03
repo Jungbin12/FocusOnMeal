@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import Pagination from '../../../components/common/Pagination';
 import styles from './noticeList.module.css';
+import Footer from '../../../components/common/Footer';
 
 const NoticeList = () => {
     const [importantList, setImportantList] = useState([]); // 필독 공지
@@ -207,6 +208,7 @@ const NoticeList = () => {
                 />
             </div>
         </div>
+        <Footer />
         </>
     );
 };

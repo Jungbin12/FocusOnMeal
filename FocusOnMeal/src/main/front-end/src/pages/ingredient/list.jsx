@@ -3,6 +3,7 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom'; // [수�
 import axios from 'axios';
 import styles from './list.module.css';
 import Pagination from '../../components/common/Pagination'; 
+import Footer from '../../components/common/Footer';
 
 // 카테고리 정의
 const CATEGORIES = [
@@ -188,6 +189,7 @@ function IngredientSearch() {
   if (loading) return <div className={styles.container}>데이터를 불러오는 중...</div>;
 
   return (
+    <>
     <div className={styles.container}>
       <h2>식품성분표 목록</h2> 
       
@@ -440,8 +442,9 @@ function IngredientSearch() {
           changePage={changePage}
         />
       </div>
-
     </div>
+    <Footer/>
+    </>
   );
 }
 

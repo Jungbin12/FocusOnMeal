@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import Pagination from '../../../components/common/Pagination';
 import styles from './SafetyList.module.css';
+import Footer from '../../../components/common/Footer';
 
 const SafetyAlertList = () => {
     const [alertList, setAlertList] = useState([]);
@@ -312,6 +313,7 @@ const SafetyAlertList = () => {
                 />
             </div>
         </div>
+        <Footer />
         </>
     );
 };
