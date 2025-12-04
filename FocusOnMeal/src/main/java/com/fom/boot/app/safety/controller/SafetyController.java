@@ -76,7 +76,7 @@ public class SafetyController {
 			int totalCount = safetyService.selectAlertListCount(searchMap);
 
 			// 페이징 정보 생성
-			PageInfo pi = Pagination.getPageInfo(page, totalCount);
+			PageInfo pi = Pagination.getPageInfo(page, totalCount, 10);
 
 			// 목록 조회 (searchMap이 Map<String, Object>을 전달하도록 변경됨)
 			List<SafetyAlert> list = safetyService.selectAlertList(pi, searchMap);
