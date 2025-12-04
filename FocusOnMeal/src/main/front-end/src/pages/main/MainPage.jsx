@@ -284,7 +284,7 @@ const ParallaxPage = () => {
                 pointerEvents: 'none',
             };
         }
-        
+
         const container = containerRef.current;
         if (!container) return {};
 
