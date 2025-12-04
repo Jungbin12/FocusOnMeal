@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Sidebar from "../../components/mypage/Sidebar"
+import Sidebar from "../../components/mypage/Sidebar";
+import styles from './EditProfile.module.css';
 
 const EditProfile = () => {
     const [loading, setLoading] = useState(true);
@@ -10,7 +11,7 @@ const EditProfile = () => {
         phone: ''
     });
     
-    const [originalPhone, setOriginalPhone] = useState(''); // ✅ 추가: 원본 전화번호 저장
+    const [originalPhone, setOriginalPhone] = useState('');
     
     const [formData, setFormData] = useState({
         nickname: '',
@@ -48,7 +49,7 @@ const EditProfile = () => {
             });
 
             setUserData(res.data);
-            setOriginalPhone(res.data.phone || ''); // ✅ 추가: 원본 전화번호 저장
+            setOriginalPhone(res.data.phone || '');
             setFormData({
                 nickname: res.data.nickname || '',
                 currentPassword: '',
@@ -213,7 +214,6 @@ const EditProfile = () => {
     };
 
     const handleSubmit = async () => {
-        // 비밀번호 변경 시 유효성 검사
         const isPasswordChange = formData.currentPassword || formData.newPassword || formData.confirmPassword;
         
         if (isPasswordChange) {
@@ -235,7 +235,6 @@ const EditProfile = () => {
             }
         }
 
-        // ✅ 수정: 전화번호가 변경되었을 때만 유효성 검사
         const phoneChanged = formData.phone !== originalPhone;
         if (phoneChanged && formData.phone && !validations.phone.valid) {
             alert('올바른 휴대폰 번호를 입력해주세요.');
@@ -258,17 +257,13 @@ const EditProfile = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            // ✅ sessionStorage에 닉네임 업데이트
-            // 백엔드 응답에 닉네임이 있으면 그것을 사용, 없으면 formData의 닉네임 사용
             const updatedNickname = response.data.nickname || formData.nickname;
             sessionStorage.setItem('memberNickname', updatedNickname);
             
-            // ✅ 헤더 업데이트를 위한 이벤트 발생
             window.dispatchEvent(new Event("loginStateChange"));
 
             alert('회원정보가 수정되었습니다!');
             
-            // 비밀번호 필드 초기화
             setFormData(prev => ({
                 ...prev,
                 currentPassword: '',
@@ -277,7 +272,6 @@ const EditProfile = () => {
             }));
             setPasswordStrength({ score: 0, text: '', color: '' });
             
-            // 최신 정보 다시 로드
             loadUserData();
         } catch (error) {
             console.error('회원정보 수정 오류:', error);
@@ -285,243 +279,111 @@ const EditProfile = () => {
         }
     };
 
+    const getInputClassName = (field) => {
+        if (!formData[field]) return styles.input;
+        return validations[field]?.valid ? `${styles.input} ${styles.inputValid}` : `${styles.input} ${styles.inputInvalid}`;
+    };
+
     if (loading) {
         return (
-            <div style={{
-                minHeight: '100vh',
-                backgroundColor: '#f9fafb',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
-                <p style={{ fontSize: '18px', color: '#6b7280' }}>로딩 중...</p>
+            <div className={styles.loadingContainer}>
+                <p className={styles.loadingText}>로딩 중...</p>
             </div>
         );
     }
 
     return (
-        <div style={{
-            display: "flex",
-            minHeight: "100vh",
-            backgroundColor: "#f9fafb"
-        }}>
-        <Sidebar />
-            <div style={{
-                flex: 1,
-                padding: "40px 20px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-            }}>
-                <div style={{
-                    maxWidth: '600px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    borderRadius: '12px',
-                    border: '3px solid #7AA83A',
-                    padding: '40px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                }}>
-                    <h2 style={{
-                        fontSize: '28px',
-                        fontWeight: 'bold',
-                        color: '#1f2937',
-                        marginBottom: '30px',
-                        textAlign: 'center'
-                    }}>
-                        회원정보 수정
-                    </h2>
+        <div className={styles.container}>
+            <Sidebar />
+            <div className={styles.content}>
+                <div className={styles.card}>
+                    <h2 className={styles.title}>회원정보 수정</h2>
 
                     {/* 아이디 (고정) */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{
-                            display: 'block',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: '#374151',
-                            marginBottom: '8px'
-                        }}>
-                            아이디
-                        </label>
+                    <div className={styles.fieldGroup}>
+                        <label className={styles.label}>아이디</label>
                         <input
                             type="text"
                             value={userData.memberId}
                             disabled
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                border: '2px solid #e5e7eb',
-                                borderRadius: '8px',
-                                fontSize: '15px',
-                                backgroundColor: '#f3f4f6',
-                                color: '#6b7280',
-                                cursor: 'not-allowed'
-                            }}
+                            className={styles.inputDisabled}
                         />
-                        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                            아이디는 변경할 수 없습니다.
-                        </p>
+                        <p className={styles.helperText}>아이디는 변경할 수 없습니다.</p>
                     </div>
 
                     {/* 닉네임 (랜덤 버튼만) */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{
-                            display: 'block',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: '#374151',
-                            marginBottom: '8px'
-                        }}>
-                            닉네임
-                        </label>
-                        <div style={{ display: 'flex', gap: '10px' }}>
+                    <div className={styles.fieldGroup}>
+                        <label className={styles.label}>닉네임</label>
+                        <div className={styles.nicknameWrapper}>
                             <input
                                 type="text"
                                 value={formData.nickname}
                                 disabled
-                                style={{
-                                    flex: 1,
-                                    padding: '12px',
-                                    border: '2px solid #e5e7eb',
-                                    borderRadius: '8px',
-                                    fontSize: '15px',
-                                    backgroundColor: '#f3f4f6',
-                                    color: '#374151',
-                                    cursor: 'not-allowed'
-                                }}
+                                className={styles.inputNickname}
                                 placeholder="랜덤 버튼을 눌러 닉네임을 생성하세요"
                             />
                             <button
                                 onClick={generateRandomNickname}
                                 disabled={nicknameSpinning}
-                                style={{
-                                    padding: '12px 20px',
-                                    backgroundColor: nicknameSpinning ? '#9ca3af' : '#8b5cf6',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontSize: '15px',
-                                    fontWeight: '600',
-                                    cursor: nicknameSpinning ? 'not-allowed' : 'pointer',
-                                    transition: 'background-color 0.2s',
-                                    whiteSpace: 'nowrap'
-                                }}
+                                className={styles.randomButton}
                             >
                                 {nicknameSpinning ? '🎲 굴리는 중...' : '🎲 랜덤'}
                             </button>
                         </div>
-                        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                            닉네임은 랜덤 버튼으로만 변경할 수 있습니다.
-                        </p>
+                        <p className={styles.helperText}>닉네임은 랜덤 버튼으로만 변경할 수 있습니다.</p>
                     </div>
 
-                    <div style={{
-                        height: '1px',
-                        backgroundColor: '#e5e7eb',
-                        margin: '30px 0'
-                    }} />
+                    <div className={styles.divider} />
 
                     {/* 기존 비밀번호 */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{
-                            display: 'block',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: '#374151',
-                            marginBottom: '8px'
-                        }}>
-                            기존 비밀번호
-                        </label>
+                    <div className={styles.fieldGroup}>
+                        <label className={styles.label}>기존 비밀번호</label>
                         <input
                             type="password"
                             value={formData.currentPassword}
                             onChange={(e) => handleChange('currentPassword', e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                border: '2px solid #d1d5db',
-                                borderRadius: '8px',
-                                fontSize: '15px',
-                                outline: 'none'
-                            }}
+                            className={styles.input}
                             placeholder="비밀번호를 변경하려면 입력하세요"
                         />
-                        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                            비밀번호를 변경하지 않으려면 비워두세요.
-                        </p>
+                        <p className={styles.helperText}>비밀번호를 변경하지 않으려면 비워두세요.</p>
                     </div>
 
                     {/* 새 비밀번호 */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{
-                            display: 'block',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: '#374151',
-                            marginBottom: '8px'
-                        }}>
-                            새 비밀번호
-                        </label>
+                    <div className={styles.fieldGroup}>
+                        <label className={styles.label}>새 비밀번호</label>
                         <input
                             type="password"
                             value={formData.newPassword}
                             onChange={(e) => handleChange('newPassword', e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                border: `2px solid ${
-                                    !formData.newPassword ? '#d1d5db' :
-                                    validations.newPassword.valid ? '#10b981' : '#ef4444'
-                                }`,
-                                borderRadius: '8px',
-                                fontSize: '15px',
-                                outline: 'none'
-                            }}
+                            className={getInputClassName('newPassword')}
                             placeholder="새 비밀번호 (영문, 숫자, 특수문자 포함 8자 이상)"
                         />
                         {formData.newPassword && (
                             <>
-                                <div style={{
-                                    marginTop: '10px',
-                                    padding: '8px',
-                                    backgroundColor: '#f3f4f6',
-                                    borderRadius: '6px'
-                                }}>
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        marginBottom: '8px'
-                                    }}>
-                                        <span style={{ fontSize: '13px', color: '#6b7280' }}>비밀번호 강도:</span>
-                                        <span style={{
-                                            fontSize: '13px',
-                                            fontWeight: '600',
-                                            color: passwordStrength.color
-                                        }}>
+                                <div className={styles.strengthBox}>
+                                    <div className={styles.strengthHeader}>
+                                        <span className={styles.strengthLabel}>비밀번호 강도:</span>
+                                        <span 
+                                            className={styles.strengthText}
+                                            style={{ color: passwordStrength.color }}
+                                        >
                                             {passwordStrength.text}
                                         </span>
                                     </div>
-                                    <div style={{
-                                        height: '6px',
-                                        backgroundColor: '#e5e7eb',
-                                        borderRadius: '3px',
-                                        overflow: 'hidden'
-                                    }}>
-                                        <div style={{
-                                            width: `${(passwordStrength.score / 6) * 100}%`,
-                                            height: '100%',
-                                            backgroundColor: passwordStrength.color,
-                                            transition: 'width 0.3s, background-color 0.3s'
-                                        }} />
+                                    <div className={styles.strengthBarContainer}>
+                                        <div 
+                                            className={styles.strengthBar}
+                                            style={{
+                                                width: `${(passwordStrength.score / 6) * 100}%`,
+                                                backgroundColor: passwordStrength.color
+                                            }}
+                                        />
                                     </div>
                                 </div>
                                 {validations.newPassword.message && (
-                                    <p style={{
-                                        fontSize: '13px',
-                                        color: validations.newPassword.valid ? '#10b981' : '#ef4444',
-                                        marginTop: '8px'
-                                    }}>
+                                    <p className={`${styles.validationMessage} ${
+                                        validations.newPassword.valid ? styles.validationSuccess : styles.validationError
+                                    }`}>
                                         {validations.newPassword.message}
                                     </p>
                                 )}
@@ -530,131 +392,58 @@ const EditProfile = () => {
                     </div>
 
                     {/* 새 비밀번호 확인 */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{
-                            display: 'block',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: '#374151',
-                            marginBottom: '8px'
-                        }}>
-                            새 비밀번호 확인
-                        </label>
+                    <div className={styles.fieldGroup}>
+                        <label className={styles.label}>새 비밀번호 확인</label>
                         <input
                             type="password"
                             value={formData.confirmPassword}
                             onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                border: `2px solid ${
-                                    !formData.confirmPassword ? '#d1d5db' :
-                                    validations.confirmPassword.valid ? '#10b981' : '#ef4444'
-                                }`,
-                                borderRadius: '8px',
-                                fontSize: '15px',
-                                outline: 'none'
-                            }}
+                            className={getInputClassName('confirmPassword')}
                             placeholder="새 비밀번호를 다시 입력하세요"
                         />
                         {validations.confirmPassword.message && (
-                            <p style={{
-                                fontSize: '13px',
-                                color: validations.confirmPassword.valid ? '#10b981' : '#ef4444',
-                                marginTop: '8px'
-                            }}>
+                            <p className={`${styles.validationMessage} ${
+                                validations.confirmPassword.valid ? styles.validationSuccess : styles.validationError
+                            }`}>
                                 {validations.confirmPassword.message}
                             </p>
                         )}
                     </div>
 
-                    <div style={{
-                        height: '1px',
-                        backgroundColor: '#e5e7eb',
-                        margin: '30px 0'
-                    }} />
+                    <div className={styles.divider} />
 
                     {/* 휴대폰 번호 */}
-                    <div style={{ marginBottom: '30px' }}>
-                        <label style={{
-                            display: 'block',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: '#374151',
-                            marginBottom: '8px'
-                        }}>
-                            휴대폰 번호
-                        </label>
+                    <div className={styles.fieldGroupLarge}>
+                        <label className={styles.label}>휴대폰 번호</label>
                         <input
                             type="tel"
                             value={formData.phone}
                             onChange={handlePhoneInput}
                             maxLength={13}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                border: `2px solid ${
-                                    !formData.phone ? '#d1d5db' :
-                                    validations.phone.valid ? '#10b981' : '#ef4444'
-                                }`,
-                                borderRadius: '8px',
-                                fontSize: '15px',
-                                outline: 'none'
-                            }}
+                            className={getInputClassName('phone')}
                             placeholder="010-0000-0000"
                         />
-                        {/* ✅ 수정: 전화번호가 변경되었을 때만 에러 메시지 표시 */}
                         {formData.phone !== originalPhone && validations.phone.message && (
-                            <p style={{
-                                fontSize: '13px',
-                                color: validations.phone.valid ? '#10b981' : '#ef4444',
-                                marginTop: '8px'
-                            }}>
+                            <p className={`${styles.validationMessage} ${
+                                validations.phone.valid ? styles.validationSuccess : styles.validationError
+                            }`}>
                                 {validations.phone.message}
                             </p>
                         )}
-                        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                            변경하지 않으려면 그대로 두세요.
-                        </p>
+                        <p className={styles.helperText}>변경하지 않으려면 그대로 두세요.</p>
                     </div>
 
                     {/* 수정/탈퇴 버튼 */}
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div className={styles.buttonGroup}>
                         <button
                             onClick={() => window.location.href = '/member/delete'}
-                            style={{
-                                flex: 1,
-                                padding: '14px',
-                                backgroundColor: '#ef4444',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '16px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'background-color 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
+                            className={styles.deleteButton}
                         >
                             회원 탈퇴
                         </button>
                         <button
                             onClick={handleSubmit}
-                            style={{
-                                flex: 2,
-                                padding: '14px',
-                                backgroundColor: '#3b82f6',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '16px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'background-color 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                            className={styles.submitButton}
                         >
                             수정하기
                         </button>
@@ -662,7 +451,7 @@ const EditProfile = () => {
                 </div>
             </div>
         </div>
-            );
+    );
 };
 
 export default EditProfile;
