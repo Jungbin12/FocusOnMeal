@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
+import styles from './Join.module.css';
 
 // 이메일 도메인 목록
 const emailDomains = [
@@ -503,94 +504,53 @@ function Join() {
     };
     
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Malgun Gothic, sans-serif' }}>
-            <div style={{ maxWidth: '600px', width: '100%', backgroundColor: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', padding: '50px 40px', animation: 'slideUp 0.5s ease' }}>
-
+        <div className={styles.container}>
+            <div className={styles.card}>
                 {/* 제목 */}
-                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-                    <h2 style={{ fontSize: '32px', fontWeight: 'bold', margin: '0', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>회원가입</h2>
+                <div className={styles.header}>
+                    <h2 className={styles.title}>회원가입</h2>
                 </div>
                 
                 {/* 폼 */}
                 <form onSubmit={handleSubmit}>
-                    
                     {/* Hidden 닉네임 */}
                     <input type="hidden" value={generatedNickname} />
                     
                     {/* 1. 아이디 */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
-                            아이디 <span style={{ color: '#c33' }}>*</span>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>
+                            아이디 <span className={styles.required}>*</span>
                         </label>
-                        <div style={{ display: 'flex', gap: '10px' }}>
+                        <div className={styles.flexRow}>
                             <input
                                 type="text"
                                 name="memberId"
                                 value={formData.memberId}
                                 onChange={handleChange}
                                 placeholder="아이디를 입력해주세요 (4자 이상)"
-                                style={{
-                                    flex: 1,
-                                    padding: '15px 20px',
-                                    border: errors.memberId ? '2px solid #c33' : '2px solid #e0e0e0',
-                                    borderRadius: '10px',
-                                    fontSize: '16px',
-                                    backgroundColor: '#fafafa',
-                                    color: '#333',
-                                    transition: 'all 0.3s ease',
-                                    boxSizing: 'border-box'
-                                }}
-                                onFocus={(e) => {
-                                    if (!errors.memberId) {
-                                        e.target.style.borderColor = '#667eea';
-                                        e.target.style.backgroundColor = 'white';
-                                        e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-                                    }
-                                }}
-                                onBlur={(e) => {
-                                    if (!errors.memberId) {
-                                        e.target.style.borderColor = '#e0e0e0';
-                                        e.target.style.backgroundColor = '#fafafa';
-                                        e.target.style.boxShadow = 'none';
-                                    }
-                                }}
+                                className={`${styles.input} ${styles.flexGrow} ${errors.memberId ? styles.error : ''}`}
                             />
                             <button
                                 type="button"
                                 onClick={handleCheckId}
                                 disabled={!formData.memberId || idChecked}
-                                style={{
-                                    padding: '15px 20px',
-                                    backgroundColor: idChecked && idAvailable ? '#10b981' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    background: idChecked && idAvailable ? '#10b981' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '10px',
-                                    cursor: (!formData.memberId || idChecked) ? 'not-allowed' : 'pointer',
-                                    whiteSpace: 'nowrap',
-                                    fontWeight: 'bold',
-                                    transition: 'all 0.3s ease'
-                                }}
+                                className={`${styles.checkButton} ${idChecked && idAvailable ? styles.checked : styles.unchecked}`}
                             >
                                 {idChecked && idAvailable ? '✓ 확인완료' : '중복확인'}
                             </button>
                         </div>
                         {errors.memberId && (
-                            <p style={{ color: '#c33', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
-                                {errors.memberId}
-                            </p>
+                            <p className={styles.errorMessage}>{errors.memberId}</p>
                         )}
                         {idChecked && idAvailable && (
-                            <p style={{ color: '#10b981', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
-                                사용 가능한 아이디입니다.
-                            </p>
+                            <p className={styles.successMessage}>사용 가능한 아이디입니다.</p>
                         )}
                     </div>
                     
                     {/* 2. 비밀번호 */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
-                            비밀번호 <span style={{ color: '#c33' }}>*</span>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>
+                            비밀번호 <span className={styles.required}>*</span>
                         </label>
                         <input
                             type="password"
@@ -598,63 +558,36 @@ function Join() {
                             value={formData.memberPw}
                             onChange={handleChange}
                             placeholder="8자 이상, 영문+숫자+특수문자"
-                            style={{
-                                width: '100%',
-                                padding: '15px 20px',
-                                border: errors.memberPw ? '2px solid #c33' : '2px solid #e0e0e0',
-                                borderRadius: '10px',
-                                fontSize: '16px',
-                                backgroundColor: '#fafafa',
-                                color: '#333',
-                                transition: 'all 0.3s ease',
-                                boxSizing: 'border-box'
-                            }}
-                            onFocus={(e) => {
-                                if (!errors.memberPw) {
-                                    e.target.style.borderColor = '#667eea';
-                                    e.target.style.backgroundColor = 'white';
-                                    e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-                                }
-                            }}
-                            onBlur={(e) => {
-                                if (!errors.memberPw) {
-                                    e.target.style.borderColor = '#e0e0e0';
-                                    e.target.style.backgroundColor = '#fafafa';
-                                    e.target.style.boxShadow = 'none';
-                                }
-                            }}
+                            className={`${styles.input} ${errors.memberPw ? styles.error : ''}`}
                         />
                         {formData.memberPw && (
-                            <div style={{ marginTop: '10px' }}>
-                                <div style={{ height: '6px', backgroundColor: '#e5e7eb', borderRadius: '3px', overflow: 'hidden' }}>
-                                    <div
-                                        style={{
-                                            width: `${(passwordStrength / 5) * 100}%`,
-                                            height: '100%',
-                                            backgroundColor: getStrengthColor(),
-                                            transition: 'all 0.3s'
-                                        }}
-                                    />
-                                </div>
-                                <p style={{ fontSize: '12px', marginTop: '5px', color: getStrengthColor() }}>
-                                    강도: {getStrengthText()}
-                                </p>
+                            <div className={styles.strengthBar}>
+                                <div
+                                    className={styles.strengthProgress}
+                                    style={{
+                                        width: `${(passwordStrength / 5) * 100}%`,
+                                        backgroundColor: getStrengthColor()
+                                    }}
+                                />
                             </div>
                         )}
-                        {errors.memberPw && (
-                            <p style={{ color: '#dc2626', fontSize: '14px', marginTop: '5px' }}>
-                                {errors.memberPw}
+                        {formData.memberPw && (
+                            <p className={styles.strengthText} style={{ color: getStrengthColor() }}>
+                                강도: {getStrengthText()}
                             </p>
                         )}
-                        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
+                        {errors.memberPw && (
+                            <p className={styles.errorMessage}>{errors.memberPw}</p>
+                        )}
+                        <p className={styles.hintText}>
                             숫자와 특수문자를 포함해야 합니다. (영문 선택)
                         </p>
                     </div>
                     
                     {/* 3. 비밀번호 확인 */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
-                            비밀번호 확인 <span style={{ color: '#c33' }}>*</span>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>
+                            비밀번호 확인 <span className={styles.required}>*</span>
                         </label>
                         <input
                             type="password"
@@ -662,48 +595,20 @@ function Join() {
                             value={formData.confirmPw}
                             onChange={handleChange}
                             placeholder="비밀번호를 다시 입력해주세요"
-                            style={{
-                                width: '100%',
-                                padding: '15px 20px',
-                                border: errors.confirmPw ? '2px solid #c33' : '2px solid #e0e0e0',
-                                borderRadius: '10px',
-                                fontSize: '16px',
-                                backgroundColor: '#fafafa',
-                                color: '#333',
-                                transition: 'all 0.3s ease',
-                                boxSizing: 'border-box'
-                            }}
-                            onFocus={(e) => {
-                                if (!errors.confirmPw) {
-                                    e.target.style.borderColor = '#667eea';
-                                    e.target.style.backgroundColor = 'white';
-                                    e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-                                }
-                            }}
-                            onBlur={(e) => {
-                                if (!errors.confirmPw) {
-                                    e.target.style.borderColor = '#e0e0e0';
-                                    e.target.style.backgroundColor = '#fafafa';
-                                    e.target.style.boxShadow = 'none';
-                                }
-                            }}
+                            className={`${styles.input} ${errors.confirmPw ? styles.error : ''}`}
                         />
                         {formData.confirmPw && formData.memberPw === formData.confirmPw && (
-                            <p style={{ color: '#10b981', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
-                                ✓ 비밀번호가 일치합니다.
-                            </p>
+                            <p className={styles.successMessage}>✓ 비밀번호가 일치합니다.</p>
                         )}
                         {errors.confirmPw && (
-                            <p style={{ color: '#c33', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
-                                {errors.confirmPw}
-                            </p>
+                            <p className={styles.errorMessage}>{errors.confirmPw}</p>
                         )}
                     </div>
 
                     {/* 4. 이름 */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
-                            이름 <span style={{ color: '#c33' }}>*</span>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>
+                            이름 <span className={styles.required}>*</span>
                         </label>
                         <input
                             type="text"
@@ -711,43 +616,17 @@ function Join() {
                             value={formData.memberName}
                             onChange={handleChange}
                             placeholder="이름을 입력해주세요"
-                            style={{
-                                width: '100%',
-                                padding: '15px 20px',
-                                border: errors.memberName ? '2px solid #c33' : '2px solid #e0e0e0',
-                                borderRadius: '10px',
-                                fontSize: '16px',
-                                backgroundColor: '#fafafa',
-                                color: '#333',
-                                transition: 'all 0.3s ease',
-                                boxSizing: 'border-box'
-                            }}
-                            onFocus={(e) => {
-                                if (!errors.memberName) {
-                                    e.target.style.borderColor = '#667eea';
-                                    e.target.style.backgroundColor = 'white';
-                                    e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-                                }
-                            }}
-                            onBlur={(e) => {
-                                if (!errors.memberName) {
-                                    e.target.style.borderColor = '#e0e0e0';
-                                    e.target.style.backgroundColor = '#fafafa';
-                                    e.target.style.boxShadow = 'none';
-                                }
-                            }}
+                            className={`${styles.input} ${errors.memberName ? styles.error : ''}`}
                         />
                         {errors.memberName && (
-                            <p style={{ color: '#c33', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
-                                {errors.memberName}
-                            </p>
+                            <p className={styles.errorMessage}>{errors.memberName}</p>
                         )}
                     </div>
 
                     {/* 5. 전화번호 */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
-                            전화번호 <span style={{ color: '#c33' }}>*</span>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>
+                            전화번호 <span className={styles.required}>*</span>
                         </label>
                         <input
                             type="text"
@@ -755,45 +634,19 @@ function Join() {
                             value={formData.phone}
                             onChange={handleChange}
                             placeholder="010-1234-5678"
-                            style={{
-                                width: '100%',
-                                padding: '15px 20px',
-                                border: errors.phone ? '2px solid #c33' : '2px solid #e0e0e0',
-                                borderRadius: '10px',
-                                fontSize: '16px',
-                                backgroundColor: '#fafafa',
-                                color: '#333',
-                                transition: 'all 0.3s ease',
-                                boxSizing: 'border-box'
-                            }}
-                            onFocus={(e) => {
-                                if (!errors.phone) {
-                                    e.target.style.borderColor = '#667eea';
-                                    e.target.style.backgroundColor = 'white';
-                                    e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-                                }
-                            }}
-                            onBlur={(e) => {
-                                if (!errors.phone) {
-                                    e.target.style.borderColor = '#e0e0e0';
-                                    e.target.style.backgroundColor = '#fafafa';
-                                    e.target.style.boxShadow = 'none';
-                                }
-                            }}
+                            className={`${styles.input} ${errors.phone ? styles.error : ''}`}
                         />
                         {errors.phone && (
-                            <p style={{ color: '#c33', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
-                                {errors.phone}
-                            </p>
+                            <p className={styles.errorMessage}>{errors.phone}</p>
                         )}
                     </div>
                     
                     {/* 6. 이메일 + 인증 */}
-                    <div style={{ marginBottom: '25px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
-                            이메일 <span style={{ color: '#c33' }}>*</span>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>
+                            이메일 <span className={styles.required}>*</span>
                         </label>
-                        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                        <div className={styles.flexRowWithSeparator}>
                             <input
                                 type="text"
                                 name="emailId"
@@ -801,33 +654,14 @@ function Join() {
                                 onChange={handleChange}
                                 placeholder="이메일"
                                 disabled={emailVerified}
-                                style={{
-                                    flex: 1,
-                                    padding: '15px 20px',
-                                    border: '2px solid #e0e0e0',
-                                    borderRadius: '10px',
-                                    fontSize: '16px',
-                                    backgroundColor: '#fafafa',
-                                    color: '#333',
-                                    transition: 'all 0.3s ease',
-                                    boxSizing: 'border-box'
-                                }}
+                                className={`${styles.input} ${styles.flexGrow}`}
                             />
-                            <span style={{ alignSelf: 'center', color: '#555', fontWeight: 'bold' }}>@</span>
+                            <span className={styles.separator}>@</span>
                             <select
                                 value={selectedDomain}
                                 onChange={(e) => setSelectedDomain(e.target.value)}
                                 disabled={emailVerified}
-                                style={{
-                                    padding: '15px 20px',
-                                    border: '2px solid #e0e0e0',
-                                    borderRadius: '10px',
-                                    fontSize: '16px',
-                                    backgroundColor: '#fafafa',
-                                    color: '#333',
-                                    transition: 'all 0.3s ease',
-                                    cursor: 'pointer'
-                                }}
+                                className={styles.select}
                             >
                                 {emailDomains.map((domain, index) => (
                                     <option key={index} value={domain}>{domain}</option>
@@ -841,17 +675,7 @@ function Join() {
                                     onChange={handleChange}
                                     placeholder="직접입력"
                                     disabled={emailVerified}
-                                    style={{
-                                        flex: 1,
-                                        padding: '15px 20px',
-                                        border: '2px solid #e0e0e0',
-                                        borderRadius: '10px',
-                                        fontSize: '16px',
-                                        backgroundColor: '#fafafa',
-                                        color: '#333',
-                                        transition: 'all 0.3s ease',
-                                        boxSizing: 'border-box'
-                                    }}
+                                    className={`${styles.input} ${styles.flexGrow}`}
                                 />
                             )}
                         </div>
@@ -862,71 +686,26 @@ function Join() {
                                     type="button"
                                     onClick={handleSendVerificationCode}
                                     disabled={loading || verificationSent}
-                                    style={{
-                                        width: '100%',
-                                        padding: '15px',
-                                        background: (loading || verificationSent) ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '10px',
-                                        fontSize: '16px',
-                                        fontWeight: 'bold',
-                                        marginBottom: '10px',
-                                        cursor: (loading || verificationSent) ? 'not-allowed' : 'pointer',
-                                        transition: 'all 0.3s ease',
-                                        boxShadow: (loading || verificationSent) ? 'none' : '0 4px 15px rgba(102, 126, 234, 0.4)'
-                                    }}
-                                    onMouseOver={(e) => {
-                                        if (!loading && !verificationSent) {
-                                            e.target.style.transform = 'translateY(-2px)';
-                                            e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
-                                        }
-                                    }}
-                                    onMouseOut={(e) => {
-                                        if (!loading && !verificationSent) {
-                                            e.target.style.transform = 'translateY(0)';
-                                            e.target.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-                                        }
-                                    }}
+                                    className={`${styles.button} ${styles.buttonFull}`}
                                 >
                                     {verificationSent ? `재전송 (${formatTime(verificationTimer)})` : '인증 코드 발송'}
                                 </button>
 
                                 {verificationSent && (
-                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                    <div className={styles.flexRow}>
                                         <input
                                             type="text"
                                             value={emailVerificationCode}
                                             onChange={(e) => setEmailVerificationCode(e.target.value)}
                                             placeholder="인증 코드 6자리"
                                             maxLength={6}
-                                            style={{
-                                                flex: 1,
-                                                padding: '15px 20px',
-                                                border: '2px solid #e0e0e0',
-                                                borderRadius: '10px',
-                                                fontSize: '16px',
-                                                backgroundColor: '#fafafa',
-                                                color: '#333',
-                                                transition: 'all 0.3s ease',
-                                                boxSizing: 'border-box'
-                                            }}
+                                            className={`${styles.input} ${styles.flexGrow}`}
                                         />
                                         <button
                                             type="button"
                                             onClick={handleVerifyCode}
                                             disabled={loading}
-                                            style={{
-                                                padding: '15px 20px',
-                                                backgroundColor: '#10b981',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '10px',
-                                                fontWeight: 'bold',
-                                                cursor: loading ? 'not-allowed' : 'pointer',
-                                                whiteSpace: 'nowrap',
-                                                transition: 'all 0.3s ease'
-                                            }}
+                                            className={`${styles.button} ${styles.buttonSuccess}`}
                                         >
                                             확인
                                         </button>
@@ -936,45 +715,39 @@ function Join() {
                         )}
 
                         {emailVerified && (
-                            <div style={{ backgroundColor: '#d1fae5', padding: '15px', borderRadius: '10px', textAlign: 'center' }}>
-                                <p style={{ color: '#065f46', fontWeight: '600', margin: '0', fontSize: '14px' }}>
+                            <div className={styles.verifiedBox}>
+                                <p className={styles.verifiedText}>
                                     ✓ 이메일 인증이 완료되었습니다.
                                 </p>
                             </div>
                         )}
 
                         {errors.email && (
-                            <p style={{ color: '#c33', fontSize: '14px', marginTop: '5px', margin: '5px 0 0 0' }}>
-                                {errors.email}
-                            </p>
+                            <p className={styles.errorMessage}>{errors.email}</p>
                         )}
                     </div>
 
                     {/* 7. 성별 */}
-                    <div style={{ marginBottom: '30px' }}>
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#555', fontSize: '14px' }}>
-                            성별
-                        </label>
+                    <div className={styles.genderWrapper}>
+                        <label className={styles.label}>성별</label>
                         <div style={{ display: 'flex', gap: '20px' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                            <label className={styles.genderLabel}>
                                 <input
                                     type="radio"
                                     name="gender"
                                     value="M"
                                     checked={formData.gender === 'M'}
                                     onChange={handleChange}
-                                    style={{ marginRight: '8px' }}
                                 />
                                 <span>남</span>
                             </label>
-                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                            <label className={styles.genderLabel}>
                                 <input
                                     type="radio"
                                     name="gender"
                                     value="F"
                                     checked={formData.gender === 'F'}
                                     onChange={handleChange}
-                                    style={{ marginRight: '8px' }}
                                 />
                                 <span>여</span>
                             </label>
@@ -985,32 +758,7 @@ function Join() {
                     <button
                         type="submit"
                         disabled={loading}
-                        style={{
-                            width: '100%',
-                            padding: '16px',
-                            background: loading ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '10px',
-                            fontSize: '18px',
-                            fontWeight: 'bold',
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            transition: 'all 0.3s ease',
-                            boxShadow: loading ? 'none' : '0 4px 15px rgba(102, 126, 234, 0.4)',
-                            marginTop: '10px'
-                        }}
-                        onMouseOver={(e) => {
-                            if (!loading) {
-                                e.target.style.transform = 'translateY(-2px)';
-                                e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
-                            }
-                        }}
-                        onMouseOut={(e) => {
-                            if (!loading) {
-                                e.target.style.transform = 'translateY(0)';
-                                e.target.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-                            }
-                        }}
+                        className={`${styles.button} ${styles.buttonFull}`}
                     >
                         {loading ? '처리 중...' : '가입하기'}
                     </button>
