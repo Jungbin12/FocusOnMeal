@@ -20,4 +20,22 @@ public class Pagination {
 		
 		return new PageInfo(currentPage, totalCount, naviLimit, maxPage, startNavi, endNavi, boardLimit, startRow, endRow);
 	}
+	
+	public static PageInfo getPageInfo(int currentPage, int totalCount, int boardLimit) {
+	    int naviLimit = 10;
+	    // boardLimit는 파라미터로 받음
+	    
+	    int maxPage = (int)Math.ceil((double)totalCount/boardLimit);
+	    int startNavi = (currentPage - 1)/naviLimit*naviLimit + 1;
+	    int endNavi = startNavi + naviLimit - 1;
+
+	    if(endNavi > maxPage) {
+	        endNavi = maxPage;
+	    }
+
+	    int startRow = (currentPage - 1) * boardLimit + 1;
+	    int endRow = startRow + boardLimit - 1;
+
+	    return new PageInfo(currentPage, totalCount, naviLimit, maxPage, startNavi, endNavi, boardLimit, startRow, endRow);
+	}
 }
