@@ -164,7 +164,7 @@ const Allergies = () => {
                         onClick={loadData}
                         style={{
                             padding: '10px 20px',
-                            backgroundColor: '#3b82f6',
+                            backgroundColor: '#7AA83A;',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
@@ -197,7 +197,7 @@ const Allergies = () => {
                     width: '100%',
                     backgroundColor: 'white',
                     borderRadius: '12px',
-                    border: '3px solid #3b82f6',
+                    border: '3px solid #7AA83A;',
                     padding: '40px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                 }}>
@@ -258,7 +258,7 @@ const Allergies = () => {
                                             height: '18px',
                                             marginRight: '8px',
                                             cursor: 'pointer',
-                                            accentColor: '#3b82f6',
+                                            accentColor: '#0b7a2a',
                                             flexShrink: 0
                                         }}
                                     />
@@ -301,7 +301,7 @@ const Allergies = () => {
                             onClick={handleSave}
                             style={{
                                 padding: '12px 40px',
-                                backgroundColor: '#84cc16',
+                                backgroundColor: '#7AA83A',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '6px',
@@ -310,8 +310,8 @@ const Allergies = () => {
                                 cursor: 'pointer',
                                 transition: 'background-color 0.2s'
                             }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#65a30d'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = '#84cc16'}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#0b7a2a'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = '#7AA83A'}
                         >
                             확인
                         </button>

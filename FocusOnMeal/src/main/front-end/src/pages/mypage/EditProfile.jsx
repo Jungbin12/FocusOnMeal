@@ -318,7 +318,7 @@ const EditProfile = () => {
                     width: '100%',
                     backgroundColor: 'white',
                     borderRadius: '12px',
-                    border: '3px solid #3b82f6',
+                    border: '3px solid #7AA83A',
                     padding: '40px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                 }}>
