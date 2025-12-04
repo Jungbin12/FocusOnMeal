@@ -308,26 +308,81 @@ const MealPlan = () => {
                 {/* 신체 정보 입력 */}
                 <div className="input-section">
                     <div className="info-group">
-                        <label>신체 정보 입력</label>
-                        <div className="input-row">
-                            <span>키 :</span>
-                            <input
-                                type="number"
-                                value={height}
-                                onChange={(e) => setHeight(e.target.value)}
-                                placeholder="170"
-                                min="100"
-                                max="250"
-                            />
-                            <span>몸무게</span>
-                            <input
-                                type="number"
-                                value={weight}
-                                onChange={(e) => setWeight(e.target.value)}
-                                placeholder="70"
-                                min="30"
-                                max="200"
-                            />
+                        <label> 신체 정보 설정</label>
+                        <div className="input-row-styled">
+                            
+                            {/* 키 입력 카드 */}
+                            <div className="input-card">
+                                <div className="icon-wrapper">
+                                    {/* 자(Ruler) 아이콘 */}
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M2 12h20M2 12l2-2m-2 2l2 2M22 12l-2-2m2 2l-2 2M6 10v4M10 10v4M14 10v4M18 10v4" />
+                                    </svg>
+                                </div>
+                                
+                                <div className="input-content">
+                                    {/* 윗줄: 라벨과 숫자 입력 */}
+                                    <div className="input-top-row">
+                                        <span className="input-label">키 (Height)</span>
+                                        <div className="input-value-box">
+                                            <input
+                                                type="number"
+                                                value={height}
+                                                onChange={(e) => setHeight(e.target.value)}
+                                            />
+                                            <span className="unit">cm</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* 아랫줄: 슬라이더 */}
+                                    <input 
+                                        type="range" 
+                                        min="100" 
+                                        max="250" 
+                                        value={height} 
+                                        onChange={(e) => setHeight(e.target.value)} 
+                                        className="range-slider"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* 몸무게 입력 카드 */}
+                            <div className="input-card">
+                                <div className="icon-wrapper weight-icon">
+                                    {/* 체중계 아이콘 */}
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M12 3a9 9 0 1 0 9 9 9 9 0 0 0-9-9z" />
+                                        <path d="M12 7v5" />
+                                        <path d="M12 16h.01" />
+                                    </svg>
+                                </div>
+
+                                <div className="input-content">
+                                    {/* 윗줄: 라벨과 숫자 입력 */}
+                                    <div className="input-top-row">
+                                        <span className="input-label">몸무게 (Weight)</span>
+                                        <div className="input-value-box">
+                                            <input
+                                                type="number"
+                                                value={weight}
+                                                onChange={(e) => setWeight(e.target.value)}
+                                            />
+                                            <span className="unit">kg</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* 아랫줄: 슬라이더 */}
+                                    <input 
+                                        type="range" 
+                                        min="30" 
+                                        max="200" 
+                                        value={weight} 
+                                        onChange={(e) => setWeight(e.target.value)} 
+                                        className="range-slider"
+                                    />
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
