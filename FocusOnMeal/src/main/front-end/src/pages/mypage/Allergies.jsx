@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Sidebar from "../../components/mypage/Sidebar"
+import Sidebar from "../../components/mypage/Sidebar";
+import styles from './Allergies.module.css';
 
 const Allergies = () => {
     const [allergies, setAllergies] = useState([]);
@@ -53,8 +54,8 @@ const Allergies = () => {
             }
             
             const res = await axios.get(`${API_BASE_URL}/api/mypage/allergies`, {
-            headers: { Authorization: `Bearer ${token}` },
-            withCredentials: true
+                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true
             });
             
             console.log("📥 사용자 알레르기 응답:", res.data);
@@ -115,12 +116,12 @@ const Allergies = () => {
             console.log("📤 저장 요청:", checked);
             
             await axios.post(
-            "http://localhost:8080/api/mypage/allergies",
-            { allergyIds: checked },
-            {
-                headers: { Authorization: `Bearer ${token}` },
-                withCredentials: true
-            }
+                "http://localhost:8080/api/mypage/allergies",
+                { allergyIds: checked },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                    withCredentials: true
+                }
             );
             
             alert("알레르기 정보가 저장되었습니다!");
@@ -132,45 +133,23 @@ const Allergies = () => {
 
     if (loading) {
         return (
-            <div style={{
-                minHeight: '100vh',
-                backgroundColor: '#f9fafb',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
-                <p style={{ fontSize: '18px', color: '#6b7280' }}>로딩 중...</p>
+            <div className={styles.loadingContainer}>
+                <p className={styles.loadingText}>로딩 중...</p>
             </div>
         );
     }
 
     if (allergies.length === 0) {
         return (
-            <div style={{
-                minHeight: '100vh',
-                backgroundColor: '#f9fafb',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
-                <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: '18px', color: '#dc2626', marginBottom: '10px' }}>
+            <div className={styles.errorContainer}>
+                <div className={styles.errorContent}>
+                    <p className={styles.errorTitle}>
                         알레르기 데이터가 없습니다.
                     </p>
-                    <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>
+                    <p className={styles.errorMessage}>
                         브라우저 콘솔(F12)에서 오류를 확인해주세요.
                     </p>
-                    <button
-                        onClick={loadData}
-                        style={{
-                            padding: '10px 20px',
-                            backgroundColor: '#7AA83A;',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '6px',
-                            cursor: 'pointer'
-                        }}
-                    >
+                    <button onClick={loadData} className={styles.refreshButton}>
                         새로고침
                     </button>
                 </div>
@@ -179,115 +158,46 @@ const Allergies = () => {
     }
 
     return (
-        <div style={{
-            display: "flex",
-            minHeight: "100vh",
-            backgroundColor: "#f9fafb"
-        }}>
-        <Sidebar/>
-            <div style={{
-                flex: 1,
-                padding: "40px 20px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-            }}>
-                <div style={{
-                    maxWidth: '800px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    borderRadius: '12px',
-                    border: '3px solid #7AA83A;',
-                    padding: '40px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                }}>
-                    
-                    <h2 style={{
-                        fontSize: '28px',
-                        fontWeight: 'bold',
-                        color: '#1f2937',
-                        marginBottom: '30px'
-                    }}>
-                        알레르기 정보
-                    </h2>
+        <div className={styles.container}>
+            <Sidebar />
+            <div className={styles.content}>
+                <div className={styles.card}>
+                    <h2 className={styles.title}>알레르기 정보</h2>
 
-                    <div style={{
-                        backgroundColor: '#f3f4f6',
-                        padding: '10px',
-                        borderRadius: '6px',
-                        marginBottom: '20px',
-                        fontSize: '12px',
-                        color: '#6b7280'
-                    }}>
+                    <div className={styles.infoBox}>
                         <p>📊 총 알레르기: {allergies.length}개</p>
                         <p>✅ 선택됨: {checked.length}개</p>
                     </div>
 
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(5, 1fr)',
-                        gap: '15px 20px',
-                        marginBottom: '40px'
-                    }}>
+                    <div className={styles.grid}>
                         {allergies.map((allergy) => {
                             const allergyId = allergy.allergyId;
                             const allergyName = allergy.allergyName;
+                            const isChecked = checked.includes(allergyId);
                             
                             return (
                                 <label
                                     key={allergyId}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        cursor: 'pointer',
-                                        fontSize: '15px',
-                                        color: '#374151',
-                                        userSelect: 'none',
-                                        padding: '8px',
-                                        borderRadius: '6px',
-                                        backgroundColor: checked.includes(allergyId) ? '#dbeafe' : 'transparent',
-                                        transition: 'background-color 0.2s'
-                                    }}
+                                    className={`${styles.checkboxLabel} ${isChecked ? styles.checked : ''}`}
                                 >
                                     <input
                                         type="checkbox"
-                                        checked={checked.includes(allergyId)}
+                                        checked={isChecked}
                                         onChange={() => toggleCheck(allergyId)}
-                                        style={{
-                                            width: '18px',
-                                            height: '18px',
-                                            marginRight: '8px',
-                                            cursor: 'pointer',
-                                            accentColor: '#0b7a2a',
-                                            flexShrink: 0
-                                        }}
+                                        className={styles.checkbox}
                                     />
-                                    <span style={{ lineHeight: '1.3' }}>{allergyName}</span>
+                                    <span className={styles.checkboxText}>{allergyName}</span>
                                 </label>
                             );
                         })}
                     </div>
 
                     {checked.length > 0 && (
-                        <div style={{
-                            backgroundColor: '#f3f4f6',
-                            padding: '15px',
-                            borderRadius: '8px',
-                            marginBottom: '30px'
-                        }}>
-                            <p style={{ 
-                                fontSize: '14px', 
-                                color: '#6b7280', 
-                                marginBottom: '8px',
-                                fontWeight: '600'
-                            }}>
+                        <div className={styles.selectedBox}>
+                            <p className={styles.selectedTitle}>
                                 선택된 알레르기 ({checked.length}개):
                             </p>
-                            <p style={{ 
-                                fontSize: '14px', 
-                                color: '#374151',
-                                lineHeight: '1.6'
-                            }}>
+                            <p className={styles.selectedList}>
                                 {allergies
                                     .filter(a => checked.includes(a.allergyId))
                                     .map(a => a.allergyName)
@@ -296,23 +206,8 @@ const Allergies = () => {
                         </div>
                     )}
 
-                    <div style={{ textAlign: 'right' }}>
-                        <button
-                            onClick={handleSave}
-                            style={{
-                                padding: '12px 40px',
-                                backgroundColor: '#7AA83A',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '16px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'background-color 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#0b7a2a'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = '#7AA83A'}
-                        >
+                    <div className={styles.buttonContainer}>
+                        <button onClick={handleSave} className={styles.saveButton}>
                             확인
                         </button>
                     </div>
