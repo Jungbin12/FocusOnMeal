@@ -200,6 +200,7 @@ const ParallaxPage = () => {
                     {sections.map((section, index) => (
                         <div
                             key={section.id}
+                            data-section-index={index}
                             style={{
                                 width: "100%",
                                 height: section.height === "auto" ? "auto" : `${section.height * 100}vh`,
@@ -207,7 +208,7 @@ const ParallaxPage = () => {
                                 scrollSnapAlign: index < 3 ? "start" : "none",
                                 background: section.bgColor,
                                 position: "relative",
-                                overflow: index === 0 ? "hidden" : "visible",
+                                overflow: "hidden",
                                 display: "flex",
                                 flexDirection: "column",
                                 justifyContent: section.isFooter ? "flex-start" : "flex-start",
@@ -267,24 +268,20 @@ const ParallaxPage = () => {
 
                             {/* 2, 3페이지 콘텐츠 */}
                             {(index === 1 || index === 2) && (
-                                <>
-                                    <ContentSections
-                                        index={index}
-                                        hoveredBox={hoveredBox}
-                                        setHoveredBox={setHoveredBox}
-                                        ingredientList={ingredientList}
-                                        navigate={navigate}
-                                    />
-                                    {/* 3페이지에만 푸터 추가 */}
-                                    {index === 2 && (
-                                        <div style={{ 
-                                            marginTop: "auto",
-                                            width: "100%",
-                                        }}>
-                                            <Footer />
-                                        </div>
-                                    )}
-                                </>
+                                <ContentSections
+                                    index={index}
+                                    hoveredBox={hoveredBox}
+                                    setHoveredBox={setHoveredBox}
+                                    ingredientList={ingredientList}
+                                    navigate={navigate}
+                                />
+                            )}
+
+                            {/* 4페이지 푸터 */}
+                            {section.isFooter && (
+                                <div style={{ width: "100%" }}>
+                                    <Footer />
+                                </div>
                             )}
                         </div>
                     ))}
