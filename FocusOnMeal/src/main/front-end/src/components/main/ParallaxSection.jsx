@@ -6,6 +6,9 @@ import grassImg from "../../assets/parallax/grasszip.png";
 import bushImg from "../../assets/parallax/bushzip.png";
 
 const ParallaxEffects = ({ getParallaxTransform, currentSection }) => {
+
+    const parallaxActive = currentSection === 0;
+
     return (
         <>
             {/* 🎨 배경 하단 진한 초록색 레이어 */}

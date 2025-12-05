@@ -20,8 +20,18 @@ const useParallaxScroll = ({ containerRef, sections }) => {
         setIsTransitioning(true);
 
         let targetScroll = 0;
+        const sectionElements = container.querySelectorAll('[data-section-index]');
+        
         for (let i = 0; i < targetSection; i++) {
-            targetScroll += window.innerHeight * sections[i].height;
+            // 실제 DOM 높이 사용
+            const sectionElement = sectionElements[i];
+            if (sectionElement) {
+                targetScroll += sectionElement.offsetHeight;
+            } else if (sections[i].height === "auto") {
+                targetScroll += 0;
+            } else {
+                targetScroll += window.innerHeight * sections[i].height;
+            }
         }
 
         container.scrollTo({
@@ -46,19 +56,42 @@ const useParallaxScroll = ({ containerRef, sections }) => {
             const scrollTop = container.scrollTop;
             lastScrollTopRef.current = scrollTop;
             
-            // 현재 섹션 계산
+            // 현재 섹션 계산 - 가장 많이 보이는 섹션 찾기
             let accumulatedHeight = 0;
             let currentSec = 0;
+            
+            const sectionElements = container.querySelectorAll('[data-section-index]');
+            
             for (let i = 0; i < sections.length; i++) {
-                const sectionHeight = container.clientHeight * sections[i].height;
-                if (scrollTop < accumulatedHeight + sectionHeight) {
+                let sectionHeight;
+                
+                // 실제 DOM 높이 가져오기
+                const sectionElement = sectionElements[i];
+                if (sectionElement) {
+                    sectionHeight = sectionElement.offsetHeight;
+                } else if (sections[i].height === "auto") {
+                    sectionHeight = 0;
+                } else {
+                    sectionHeight = container.clientHeight * sections[i].height;
+                }
+                
+                // 섹션의 중간 지점을 기준으로 현재 섹션 판단
+                const sectionMiddle = accumulatedHeight + sectionHeight / 2;
+                
+                if (scrollTop < sectionMiddle) {
                     currentSec = i;
                     break;
                 }
+                
                 accumulatedHeight += sectionHeight;
+                
+                // 마지막 섹션 처리
+                if (i === sections.length - 1) {
+                    currentSec = i;
+                }
             }
+            
             setCurrentSection(currentSec);
-
             ticking = false;
         };
 
@@ -83,7 +116,8 @@ const useParallaxScroll = ({ containerRef, sections }) => {
             }
 
             // 2, 3페이지에서만 페이지 스냅 적용
-            if (currentSection > 0) {
+            // 4페이지(푸터)에서는 자유 스크롤
+            if (currentSection > 0 && currentSection < 3) {
                 e.preventDefault();
                 
                 if (isSnapingRef.current || isTransitioning) return;
