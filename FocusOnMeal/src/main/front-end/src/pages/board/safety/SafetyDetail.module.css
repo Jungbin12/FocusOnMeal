@@ -182,13 +182,13 @@
 }
 
 .title {
-    color: #2b6cb0;
+    color: #67932A;
     cursor: pointer;
 }
 
 .title:hover {
     text-decoration: underline;
-    color: #224e85;
+    color: #67932A;
 }
 
 /* SafetyDetail.css */

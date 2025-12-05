@@ -45,7 +45,7 @@
     font-weight: bold;
     color: #333;
     margin: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #67932A;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -117,12 +117,12 @@
     font-size: 18px;
     font-weight: bold;
     color: white;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #67932A;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 20px rgba(153, 162, 55, 0.5);
     margin-top: 10px;
 }
 
@@ -154,7 +154,7 @@
 }
 
 .loginLinks a:hover {
-    color: #667eea;
+    color: #67932A;
 }
 
 .loginLinks a::after {
@@ -164,7 +164,7 @@
     left: 0;
     width: 0;
     height: 2px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #67932A;
     transition: width 0.3s ease;
 }
 

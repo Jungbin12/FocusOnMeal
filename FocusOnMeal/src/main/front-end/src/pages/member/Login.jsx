@@ -17,7 +17,7 @@ const Login = () => {
         setError('');
 
         try {
-            const response = await fetch('/api/member/login', {  // ✅ /api 추가
+            const response = await fetch('/api/member/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,8 +51,15 @@ const Login = () => {
                     console.log("리다이렉트:", from);
                 }
             } else {
-                const errorText = await response.text();
-                setError(errorText || '로그인에 실패했습니다.');
+                // ✅ JSON 파싱해서 message 필드만 추출
+                try {
+                    const errorData = await response.json();
+                    setError(errorData.message || '로그인에 실패했습니다.');
+                } catch (parseError) {
+                    // JSON 파싱 실패 시 텍스트로 처리
+                    const errorText = await response.text();
+                    setError(errorText || '로그인에 실패했습니다.');
+                }
             }
         } catch (err) {
             console.error('로그인 오류:', err);

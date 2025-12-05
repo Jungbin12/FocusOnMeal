@@ -52,7 +52,7 @@
 .cardValue {
     font-size: 36px;
     font-weight: 700;
-    color: #2470dc;
+    color: #67932A;
     margin: 0;
 }
 
@@ -105,13 +105,13 @@
 
 .chartBtn:hover {
     background-color: #f8f9fa;
-    border-color: #2470dc;
+    border-color: #67932A;
 }
 
 .chartBtn.active {
-    background-color: #2470dc;
+    background-color: #67932A;
     color: #fff;
-    border-color: #2470dc;
+    border-color: #67932A;
     font-weight: 600;
 }
 
