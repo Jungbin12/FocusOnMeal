@@ -121,7 +121,7 @@
 }
 
 .alertTable th {
-    background-color: #f8f9fa;
+    background-color: #f3f6ef;
     font-weight: 600;
     user-select: none;
 }
@@ -342,7 +342,7 @@
 }
 
 .editBtn {
-    background-color: #0796E5;
+    background-color: #67932A;
     color: white;
     padding: 6px 14px;
     border: none;
@@ -353,5 +353,5 @@
 }
 
 .editBtn:hover {
-    background-color: #0576b8;
+    background-color: #0b7a2a;
 }
