@@ -1,53 +1,73 @@
-/* 1. 기본 헤더 (서브 페이지용) */
+/* ========================================= */
+/* 1. 기본 헤더 (서브 페이지용) - 글래스모피즘 적용 */
+/* ========================================= */
 .header {
     width: 100%;
-    background-color: #fff;
-    border-bottom: 1px solid #0b7a2a;
+    /* 배경을 약간 투명하게 하여 뒤가 비치도록 함 */
+    background-color: rgba(255, 255, 255, 0.85); 
+    /* 글래스모피즘 핵심: 블러 효과 */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(11, 122, 42, 0.2); /* 경계선도 연하게 */
     z-index: 10000;
-    position: relative; 
+    position: sticky; /* 상단 고정 (스크롤 시 따라옴) */
+    top: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* 부드러운 그림자 */
 }
 
+/* ========================================= */
 /* 2. 메인 페이지용 투명 헤더 (오버라이딩) */
+/* ========================================= */
 .header.transparent {
     background: transparent;
+    backdrop-filter: none; /* 메인 배경이 보여야 하므로 블러 제거 */
     border-bottom: none;
+    box-shadow: none;
     position: absolute; 
     top: 0;
     left: 0;
 }
 
+/* 메인 페이지 메뉴 호버 시 텍스트 흰색 유지 */
 .header.transparent .nav-menu a:hover {
-    color:white !important;
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.2); /* 반투명 흰색 배경 */
 }
 
-/* 내부 정렬 (1920px 박스) */
+/* ========================================= */
+/* 3. 레이아웃 및 로고 */
+/* ========================================= */
+/* 내부 정렬 (1920px 박스 유지) */
 .header-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     max-width: 1920px;
-    margin: 0 30px;       /* 가운데 정렬 */
-    padding: 5px 10px;   /* 내부 여백 */
+    margin: 0 30px;
+    padding: 5px 10px; /* 높이감 약간 조정 */
 }
 
-/* 로고 */
+/* 로고 애니메이션 */
 .logo-area {
     display: flex;
     align-items: center;
-    margin:0;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* 텐션 있는 움직임 */
-}
-
-.logo-img:hover {
-    transform: scale(1.05) rotate(-2deg); /* 살짝 커지면서 기울기 */
+    margin: 0;
 }
 
 .logo-img {
     width: 140px;
     height: 90px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* nav 영역 오른쪽 정렬 */
+.logo-img:hover {
+    transform: scale(1.05) rotate(-2deg);
+}
+
+/* ========================================= */
+/* 4. 네비게이션 메뉴 (알약 호버 효과) */
+/* ========================================= */
 .nav {
     flex: 1;
     display: flex;
@@ -55,165 +75,218 @@
     margin-right: 50px;
 }
 
-/* 메뉴 기본 */
 .nav-menu {
-    list-style: none; /* 기본 점 제거 */
+    list-style: none;
     padding: 0;
     margin: 0;
-    display: flex; /* 가로 정렬 */
-    gap: 40px;
+    display: flex;
+    gap: 15px; /* 간격 조금 줄임 (배경색 때문) */
 }
 
-/* 메뉴 아이템 */
-.nav-menu li {
-    position: relative;
-}
-
-/* 메뉴 링크 */
 .nav-menu a {
     text-decoration: none;
-    color: #000;
+    color: #333; /* 완전 검정보다 부드러운 색 */
     font-size: 17px;
-    font-weight: 500;
+    font-weight: 600;
+    padding: 8px 18px; /* 배경색 영역 확보 */
+    border-radius: 25px; /* 둥근 알약 모양 */
+    transition: all 0.2s ease;
 }
 
-/* 호버 */
+/* 메뉴 호버 시: 연두색 배경 + 진한 녹색 글자 */
 .nav-menu a:hover {
+    background-color: #e3f2c1; 
     color: #0b7a2a;
+    transform: translateY(-2px); /* 살짝 떠오름 */
 }
 
-/* 1. 사용자 영역 전체 배치 */
+/* ========================================= */
+/* 5. 사용자 영역 (User Area) */
+/* ========================================= */
 .user-area {
     display: flex;
     align-items: center;
-    gap: 15px;
-    font-size: 14px; /* 메인 메뉴(17px)보다 작게 설정 */
+    gap: 8px; /* 요소 간 간격 */
+    font-size: 14px;
+    color: #333;
+    padding-left: 20px;
+    border-left: 2px solid #f0f0f0; /* 메뉴와 구분선 추가 */
+    height:20px;
+}
+
+/* 메인 페이지에서는 구분선 색상 변경 */
+.header.transparent .user-area {
+    color: #fff;
+    border-left-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 닉네임 */
+.welcome {
+    font-weight: 600;
+    color: #333;
+    background-color: #f5f5f5; /* 닉네임 배경 */
+    padding: 6px 8px;
+    border-radius: 12px;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+/* 메인 페이지 닉네임 */
+.header.transparent .welcome {
+    background-color: rgba(255, 255, 255, 0.2);
     color: #fff;
 }
 
-/* 2. 닉네임 강조 */
-.welcome {
-    color: #333;
-    font-weight: 600;
-    margin-right: 5px;
+/* 관리자 클릭 가능 효과 */
+.admin-clickable {
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+.admin-clickable:hover {
+    background-color: #e3f2c1; 
+    color: #0b7a2a;
 }
 
-/* 3. 메뉴 아이템 (마이페이지, 로그아웃, 로그인 등) 공통 스타일 */
+/* 메인 페이지 관리자 클릭 */
+.header.transparent .admin-clickable:hover {
+    background-color: #e3f2c1; 
+    color: #0b7a2a;
+}
+
+/* 로그인/회원가입 등 기본 텍스트 버튼 */
 .user-menu-item {
-    color: #666;
+    color: #555;
     text-decoration: none;
-    font-weight: 400;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
     background: none;
     border: none;
     cursor: pointer;
     padding: 0;
-    font-size: 13px;
-    transition: color 0.2s;
-    position: relative;
 }
 
 .user-menu-item:hover {
-    --color: #0b7a2a;
-    text-decoration: underline;
+    color: #0b7a2a;
 }
 
-/* 4. 항목 사이에 얇은 구분선 넣기 (슬래시 대체) */
-.user-menu-item:not(:last-child)::after {
-    content: "";
-    
-    display: block;
-    width: 1%;
-    height: 8px;
-    background-color: #ddd;
-    position: absolute;
-    right: -8px; /* 간격 조절 */
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-/* 메인 페이지용 구분선 (흰색 또는 반투명 흰색) */
-.header.transparent .user-menu-item:not(:last-child)::after {
-    background-color: rgba(255, 255, 255, 0.5); /* 반투명 흰색 */
-}
-
-/* ========================================= */
-/* 2. 메인 페이지 전용 (투명 배경 - 하늘색 배경 위) */
-/* ========================================= */
-/* .header에 transparent 클래스가 있을 때만 적용됨 */
-
+/* 메인 페이지에서는 흰색 */
 .header.transparent .user-menu-item {
-    color: #f9fdfe; /* 흰색 텍스트 */
+    color: #f9fdfe;
 }
-
 .header.transparent .user-menu-item:hover {
-    color: #fff; /* 호버 시 더 밝은 흰색 */
+    color: #fff;
     text-decoration: underline;
 }
 
+/* 로그아웃 버튼 (특별 스타일) */
+button.user-menu-item.logout-btn {
+    font-size: 12px;
+    padding: 5px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    color: #666;
+}
 
-/* 알림 벨 래퍼 */
+button.user-menu-item.logout-btn:hover {
+    --border-color: #0b7a2a;
+    --color: #0b7a2a;
+    --background-color: white;
+    background-color: #e3f2c1; 
+    color: #0b7a2a;
+    
+}
+
+/* 메인 페이지 로그아웃 버튼 */
+.header.transparent button.user-menu-item.logout-btn {
+    border-color: rgba(255,255,255,0.6);
+    color: #fff;
+}
+.header.transparent button.user-menu-item.logout-btn:hover {
+    background-color: white;
+    color: #0b7a2a;
+}
+
+
+/* ========================================= */
+/* 6. 알림 (Notification) 스타일 */
+/* ========================================= */
 .notification-bell-wrapper {
     position: relative;
+    display: flex;
+    align-items: center;
     margin-right: 15px;
 }
 
-/* 알림 벨 버튼 */
 .notification-bell-button {
     background: none;
     border: none;
     cursor: pointer;
-    position: relative;
     padding: 5px;
-    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
 }
 
-/* 읽지 않은 알림 빨간 점 */
+.notification-bell-button:hover {
+    transform: rotate(15deg);
+}
+
+/* 메인 페이지 벨 아이콘 색상 보정 */
+.header.transparent .notification-bell-button svg {
+    stroke: white; /* Lucide 아이콘 색상 변경 */
+}
+
+/* 읽지 않은 알림 점 */
 .notification-unread-dot {
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 8px;
-    height: 8px;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
     background-color: #ff4444;
     border-radius: 50%;
+    border: 1px solid white;
 }
 
-/* 알림 드롭다운 */
+/* 드롭다운 박스 */
 .notification-dropdown {
     position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 10px;
-    width: 350px;
-    max-height: 450px;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
+    top: 140%;
+    right: -50px; /* 위치 미세 조정 */
+    width: 360px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.05);
+    z-index: 10001;
+    overflow: hidden;
+    animation: slideUp 0.2s ease-out;
 }
 
-/* 알림 탭 헤더 */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 탭 스타일 */
 .notification-tabs {
     display: flex;
-    border-bottom: 1px solid #e0e0e0;
-    background-color: #f9f9f9;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
     border-radius: 8px 8px 0 0;
 }
 
-/* 알림 탭 버튼 */
 .notification-tab {
     flex: 1;
-    padding: 12px;
-    background: none;
+    padding: 14px;
     border: none;
-    cursor: pointer;
+    background: none;
     font-size: 14px;
+    color: #888;
+    cursor: pointer;
     font-weight: 500;
-    color: #666;
-    transition: all 0.2s;
 }
 
 .notification-tab:first-child {
@@ -230,259 +303,129 @@
 
 .notification-tab.active {
     color: #0b7a2a;
-    font-weight: 600;
-    background-color: white;
+    font-weight: 700;
+    background: white;
     border-bottom: 2px solid #0b7a2a;
 }
 
-/* 알림 콘텐츠 영역 */
+/* 알림 리스트 */
 .notification-content {
     max-height: 400px;
     overflow-y: auto;
 }
 
-/* 로그인 필요 메시지 */
-.notification-login-required {
-    padding: 20px;
-    text-align: center;
-}
-
-.login-link {
-    color: #4CAF50;
-    text-decoration: underline;
-}
-
-/* 알림 없음 */
 .notification-empty {
     padding: 20px;
     text-align: center;
     color: #999;
+    font-size: 14px;
 }
 
 /* 알림 아이템 */
 .notification-item {
     padding: 15px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f5f5f5;
+    background: white;
+    transition: background 0.2s;
     cursor: pointer;
-    background-color: white;
-    transition: background-color 0.2s;
 }
 
-/* Hover 효과 */
-.notification-item.hover {
-    background-color: #f0f0f0;
+.notification-item:hover {
+    background-color: #f9fbf7; /* 아주 연한 초록빛 */
 }
 
-/* 읽지 않은 알림 강조 */
+/* 읽지않은 알림 강조 */
 .notification-item.unread {
-    background-color: #f8f9fa;
+    background-color: #f0f7e6; /* 읽지 않은 알림 강조색 */
 }
 
-/* 상단 행 (타입, 시간) */
+/* 상단 행 ( 타입, 시간) */
 .notification-item-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
-}
-
-/* 알림 타입 배지 */
-.notification-type {
-    display: inline-block;
-    padding: 2px 8px;
+    margin-bottom: 6px;
     font-size: 12px;
+}
+
+/* 알림타입 뱃지 */
+.notification-type {
+    padding: 3px 8px;
     border-radius: 4px;
-    color: white;
+    font-weight: 600;
+    font-size: 11px;
 }
-
-.notification-type.danger {
-    background-color: #ff4444;
-}
-
-.notification-type.normal {
-    background-color: #4CAF50;
-}
+.notification-type.danger { background: #ffebee; color: #d32f2f; }
+.notification-type.normal { background: #e8f5e9; color: #2e7d32; }
 
 /* 시간 */
 .notification-time {
-    font-size: 12px;
-    color: #999;
+    color: #aaa;
 }
 
-/* 알림 제목 */
 .notification-title {
     font-size: 14px;
-    margin-bottom: 5px;
-    color: #222;
+    margin-bottom: 4px;
+    color: #333;
+    line-height: 1.4;
 }
 
 .notification-title.bold {
-    font-weight: bold;
+    font-weight: 700;
 }
 
 /* 알림 메시지 */
 .notification-message {
     font-size: 13px;
     color: #666;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.notification-dropdown {
-    overflow: hidden; /* 전체 드롭다운 overflow 숨김 */
-}
-
-.notification-content {
-    overflow-x: hidden; /* 가로 스크롤 제거 */
-    overflow-y: auto; /* 세로 스크롤만 허용 */
-}
-
-.notification-item {
-    overflow: hidden; /* 개별 아이템 넘침 방지 */
-}
-
-.notification-title {
+    line-height: 1.5;
+    
+    /* 2줄 말줄임 */
     display: -webkit-box;
-    line-clamp: 2;             /* ← 표준 속성 추가 */
-    -webkit-line-clamp: 2;     /* ← 기존 WebKit 속성 */
-    -webkit-line-clamp: 2; /* 2줄까지만 표시 */
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: break-word; /* 긴 단어 줄바꿈 */
 }
 
-/* Header.css */
-
-/* 알림 아이템 */
-.notification-item {
-    padding: 14px 16px;
-    border-bottom: 1px solid #f0f0f0;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    overflow: hidden;
-    position: relative; /* ✅ 액션 버튼 위치 기준 */
-}
-
-.notification-item:hover .notification-actions {
-    opacity: 1; /* ✅ 호버 시 버튼 표시 */
-}
-
-/* ✅ 개별 액션 버튼 영역 */
+/* 개별 액션 버튼 (삭제/읽음) */
 .notification-actions {
     display: flex;
+    justify-content: flex-end;
     gap: 8px;
-    margin-top: 8px;
-    opacity: 0; /* 기본적으로 숨김 */
-    transition: opacity 0.2s;
+    margin-top: 10px;
 }
 
-/* 읽지 않은 알림일 때는 항상 표시 */
-.notification-item.unread .notification-actions {
-    opacity: 1;
-}
-
-/* ✅ 개별 액션 버튼 */
 .notification-action-btn {
     padding: 4px 10px;
-    font-size: 12px;
-    border: none;
+    font-size: 11px;
     border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 500;
-}
-
-.notification-action-btn.mark-read {
-    background: #e8f5e9;
-    color: #4CAF50;
-}
-
-.notification-action-btn.mark-read:hover {
-    background: #4CAF50;
-    color: white;
-}
-
-.notification-action-btn.delete {
-    background: #ffebee;
-    color: #f44336;
-}
-
-.notification-action-btn.delete:hover {
-    background: #f44336;
-    color: white;
-}
-
-/* 읽음 처리 버튼 영역 */
-.notification-action-bar {
-    padding: 10px 16px;
-    border-bottom: 1px solid #e0e0e0;
-    background: #fafafa;
-    text-align: right;
-}
-
-.mark-all-read-btn {
-    padding: 6px 12px;
-    background: none;
     border: none;
-    color: #4CAF50;
-    font-size: 13px;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.2s;
-}
-
-.mark-all-read-btn:hover {
-    color: #45a049;
-}
-
-/* Header.css */
-
-/* 읽음 처리 버튼 영역 */
-.notification-action-bar {
-    padding: 10px 16px;
-    border-bottom: 1px solid #e0e0e0;
-    background: #fafafa;
-    text-align: right;
-}
-
-.mark-all-read-btn {
-    padding: 6px 12px;
-    background: none;
-    border: none;
-    color: #4CAF50;
-    font-size: 13px;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.2s;
-}
-
-.mark-all-read-btn:hover {
-    color: #45a049;
-}
-/* 관리자 닉네임 효과 */
-.admin-clickable {
     cursor: pointer;
     font-weight: 600;
 }
-.admin-clickable:hover {
+/* 읽음 처리 버튼 영역 */
+.notification-action-bar {
+    padding: 10px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fafafa;
+    text-align: right;
+}
+
+.mark-all-read-btn {
+    padding: 6px 12px;
+    background: none;
+    border: none;
+    color: #4CAF50;
+    font-size: 13px;
+    cursor: pointer;
     text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.mark-all-read-btn:hover {
     color: #45a049;
 }
+.notification-action-btn.mark-read { background: #fff; border: 1px solid #ddd; color: #666; }
+.notification-action-btn.mark-read:hover { border-color: #0b7a2a; color: #0b7a2a; }
 
-/* 로그아웃 버튼 */
-.logout {
-    padding: 5px 12px;
-    font-size: 12px;
-    background: #e8f5e9;
-    color: #0b7a2a;
-    border: 1px solid #b2dfdb;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.logout:hover {
-    background: #b2dfdb;
-    color: #fff;
-    border-color: #b2dfdb;
-}
+.notification-action-btn.delete { background: #fff; border: 1px solid #ddd; color: #ff5252; }
+.notification-action-btn.delete:hover { border-color: #ff5252; background: #ffebee; }
