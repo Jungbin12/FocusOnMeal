@@ -348,7 +348,7 @@ const MealPlan = () => {
                                         max="250" 
                                         value={height} 
                                         onChange={(e) => setHeight(e.target.value)} 
-                                        className="range-slider"
+                                        className="range-slider slider-leaf"
                                     />
                                 </div>
                             </div>
@@ -385,7 +385,7 @@ const MealPlan = () => {
                                         max="200" 
                                         value={weight} 
                                         onChange={(e) => setWeight(e.target.value)} 
-                                        className="range-slider"
+                                        className="range-slider slider-apple"
                                     />
                                 </div>
                             </div>

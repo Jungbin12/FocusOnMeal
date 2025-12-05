@@ -1,5 +1,5 @@
 /* =========================================
-   1. 기본 설정 및 레이아웃 (Fonts & Layout)
+    1. 기본 설정 및 레이아웃 (Fonts & Layout)
    ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
 
@@ -86,7 +86,7 @@
 }
 
 /* =========================================
-   2. 신체 정보 입력 섹션 (Input Section)
+    2. 신체 정보 입력 섹션 (Input Section)
    ========================================= */
 .input-section {
     margin-bottom: 40px;
@@ -156,37 +156,46 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    justify-content: center; 
+    gap: 0px; 
 }
 
 /* 라벨과 숫자 입력창 (윗줄) */
 .input-top-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: row;      
+    justify-content: space-between; 
+    align-items: flex-end;    
+    margin-bottom: 5px;       
+    width: 100%;
 }
 
 .input-label {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     color: #888;
+    margin-bottom: 6px;
 }
 
+/* 숫자 , 단위 박스 */
 .input-value-box {
     display: flex;
-    align-items: baseline;
+    align-items: baseline; 
     gap: 4px;
 }
 
 .input-value-box input {
-    width: 60px;
+    width: auto;           
+    min-width: 60px;       
     border: none;
     background: transparent;
-    font-size: 22px;
+    font-size: 36px;       
     font-weight: 800;
     color: #333;
-    text-align: right;
+    text-align: right;     
     padding: 0;
+    height: 40px;          
+    line-height: 40px;     
 }
 
 .input-value-box input:focus {
@@ -194,7 +203,7 @@
 }
 
 .input-value-box .unit {
-    font-size: 14px;
+    font-size: 16px;        
     font-weight: 600;
     color: #999;
 }
@@ -208,35 +217,75 @@
 
 /* 슬라이더 (아랫줄) */
 .range-slider {
-    -webkit-appearance: none;
+   -webkit-appearance: none; /* 기본 스타일 제거 */
     appearance: none;
     width: 100%;
-    height: 6px;
-    background: #e0e0e0;
-    border-radius: 5px;
+    height: 40px; 
+    background: transparent; 
+    margin: 0;
     outline: none;
-    cursor: pointer;
-    margin-top: 5px;
 }
-
-.range-slider::-webkit-slider-thumb {
+/* 2. 슬라이더 트랙(실제 움직이는 회색 선) 스타일 */
+.range-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 10px; /* 트랙의 높이 */
+    background: #e0e0e0; /* 트랙 색상 (회색) */
+    border-radius: 5px;
+    border: none;
+}
+/* 1. 나뭇잎 모양 핸들 (키 설정) */
+.slider-leaf::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #67932A;
+    appearance: none;
+    width: 32px;  
+    height: 32px;
     cursor: pointer;
-    box-shadow: 0 0 0 4px white, 0 2px 6px rgba(0,0,0,0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: transparent;
+    border: none;
+    
+    /* 나뭇잎 SVG 아이콘 (Data URI) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2367932A'%3E%3Cpath d='M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.76C7,13,11,9,17,8Z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.2s ease;
+    margin-top: -12px; /* 트랙 중앙 정렬을 위한 위치 조정 */
 }
 
-.range-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 4px #eef5e6, 0 2px 6px rgba(0,0,0,0.2);
+.slider-leaf::-webkit-slider-thumb:hover {
+    transform: scale(1.2) rotate(-10deg); /* 호버 시 살짝 커지고 회전 */
+}
+
+/* 오른쪽(몸무게) 슬라이더 */
+.slider-apple::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    
+    /* 중앙 정렬을 위한 마진 (트랙 높이 10px 기준) */
+    margin-top: -11px; 
+
+    /* SVG */
+    --background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F44336'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='50%25' y='50%25' font-size='24' text-anchor='middle' dy='.35em'%3E🥕%3C/text%3E%3C/svg%3E");
+    --background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF7043'%3E%3Cpath d='M19 6.5c-1.1 0-2 .9-2 2 .5.5 1 1.2 1 2 .8 0 1.5-.7 1.5-1.5 0-1.4-1.1-2.5-2.5-2.5zM16 6c-1.04 0-1.93.57-2.43 1.43-.86-.28-1.74.03-2.3.69-.37-.11-.76-.08-1.11.08L6.4 11.96c-1.37 2.05-.28 4.84 2.13 5.37 1.43.32 2.82-.44 3.4-1.72L16 6z' fill='%23FF7043'/%3E%3Cpath d='M16 6l-4.07 9.61c-.58 1.28-1.97 2.04-3.4 1.72-1.39-.31-2.31-1.59-2.11-3 .02-.13.06-.25.11-.37l3.76-5.63c.27-.4.77-.56 1.21-.38.56-.66 1.44-.97 2.3-.69C14.07 6.57 14.96 6 16 6z' fill='%23FFAB91'/%3E%3Cpath d='M16.5 2c-.5 0-1 .2-1.4.6-.4-.4-.9-.6-1.4-.6-.8 0-1.5.5-1.8 1.2-.3-.1-.6-.2-.9-.2-1.1 0-2 .9-2 2 0 .4.1.7.3 1L16 12l3.4-6.4c.4-.6.6-1.3.6-2.1 0-1.4-1.1-2.5-2.5-2.5-.4 0-.7.1-1 .3z' fill='%2366BB6A'/%3E%3C/svg%3E");
+    --background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Ccircle cx='12' cy='13' r='8' fill='%23fff' stroke='%23ddd' stroke-width='1'/%3E%3Cpath d='M8 3c-1.1 0-2 .9-2 2v4c0 .55.45 1 1 1s1-.45 1-1V5h.5c.28 0 .5-.22.5-.5S8.78 3 8.5 3H8zm7 0h-.5c-.28 0-.5.22-.5.5s.22.5.5.5h.5v4c0 .55.45 1 1 1s1-.45 1-1V5c0-1.1-.9-2-2-2z' fill='%23FFAB91'/%3E%3Cpath d='M12 15c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm-3-2c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm6 0c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1z' fill='%235D4037'/%3E%3C/svg%3E");
+    background-size: 32px;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.2s ease;
+}
+
+.slider-apple::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
 }
 
 /* =========================================
-   3. 알러지 정보 섹션 (Allergy Section)
+    3. 알러지 정보 섹션 (Allergy Section)
    ========================================= */
 .allergy-section {
     background: #ffffff;
@@ -320,7 +369,7 @@
 }
 
 /* =========================================
-   4. 메인 컨텐츠 영역 (Chat + Result)
+    4. 메인 컨텐츠 영역 (Chat + Result)
    ========================================= */
 .main-content {
     display: flex;
@@ -341,34 +390,11 @@
     margin-bottom: 15px;
     color: #333;
 }
-/* 
+
 .chat-box {
     flex: 1;
-    background-color: #67932A;
-    background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 2px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
-        linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
-    background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
-    
-    border-radius: 10px;
-    padding: 20px;
-    min-height: 550px;
-    max-height: 550px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    box-shadow: 0 4px 15px rgba(103, 147, 42, 0.4);
-    overflow: hidden;
-    justify-content: space-between;
-} */
-.chat-box {
-    flex: 1;
-    /* 기존 격자 배경 제거 및 부드러운 색상 적용 */
     background: #f9fbf7; /* 아주 연한 아이보리/연두 빛 */
-    border: 2px solid #e3f2c1; /* 테두리도 부드럽게 */
+    border: 2px solid #e3f2c1;
     border-radius: 20px;
     padding: 20px;
     min-height: 550px;
@@ -379,8 +405,43 @@
     box-shadow: inset 0 0 20px rgba(103, 147, 42, 0.05); /* 안쪽으로 살짝 깊이감 */
     overflow: hidden;
     justify-content: space-between;
+    box-sizing: border-box;
 }
 
+#chatPlaceholder {
+    /* 중앙 정렬을 위한 설정 */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    /* 폰트 및 색상 */
+    font-size: 18px;
+    font-weight: bold;
+    color: #67932A;
+    
+    /* 배경 꾸미기 */
+    background-color: #f4f9e6; /* 아주 연한 초록 배경 */
+    border-radius: 20px;
+    margin: 40px;
+    border: 2px dashed #cfe6b3;
+    
+    /* 애니메이션 (살짝 떠있는 느낌) */
+    animation: float 3s ease-in-out infinite;
+}
+
+/* 텍스트 위에 아이콘(이모지)을 CSS로 추가 */
+#chatPlaceholder::before {
+    content: "🥗"; 
+    font-size: 40px;
+    margin-bottom: 15px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
 
 .chat-messages {
     width: 100%;
@@ -408,20 +469,6 @@
     line-height: 1.5;
 }
 
-/* .message.user {
-    background: #F1F7AD;
-    color: #333;
-    margin-left: auto;
-    text-align: right;
-    box-shadow: 0 2px 8px rgba(241, 247, 173, 0.6);
-}
-
-.message.ai {
-    background: white;
-    color: #333;
-    border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-} */
  /* AI 메시지 (왼쪽) */
 .message.ai {
     background: white;
@@ -434,7 +481,7 @@
 
 /* 사용자 메시지 (오른쪽) */
 .message.user {
-    background: #F1F7AD; /* 브랜드 메인 컬러 */
+    background: #F1F7AD;
     color: 555;
     border-radius: 20px 20px 5px 20px; /* 말풍선 꼬리 반대쪽 */
     box-shadow: 0 4px 10px rgba(103, 147, 42, 0.2);
@@ -518,13 +565,22 @@
 .result-box {
     background: #f9f9f9;
     border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 25px;
+    border-radius: 20px;
+    padding: 20px;
     min-height: 550px;
     max-height: 550px;
     overflow-y: auto;
-}
+    box-sizing: border-box;
 
+    box-shadow: inset 0 0 20px rgba(103, 147, 42, 0.05); 
+    
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    --padding-bottom: 40px;
+}
+    
 /* 식단 카드 스타일 */
 .meal-plan {
     display: none;
@@ -535,7 +591,7 @@
 
 .meal-card {
     background: white;
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 24px;
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -561,13 +617,12 @@
     font-size: 24px;
     color: #333;
     margin: 0;
-    flex: 1; /* 남은 공간을 제목이 다 차지함 */
-    word-break: keep-all; /* 단어 단위로 줄바꿈 (한글에 적합) */
+    flex: 1;
 }
 
 .meal-type-badge {
-    background: linear-gradient(180deg, #67932A 0%, #99A237 100%);
-    color: white;
+    background: #F1F7AD;
+    color: #666;
     padding: 6px 16px;
     border-radius: 20px;
     font-size: 14px;
@@ -664,23 +719,29 @@
     gap: 6px;
 }
 
+/* 1. 레시피 보기 */
 .recipe-btn {
-    background: linear-gradient(180deg, #67932A 0%, #99A237 100%);
-    color: white;
+    background: #F1F7AD; 
+    color: #67932A;
+    --border: 1px solid #67932A;
 }
 
+/* 2. 저장하기 */
 .save-btn-card {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: #FF8A65;
     color: white;
+    border: 1px solid #FF8A65;
 }
 
+/* 호버 효과 (공통) */
 .recipe-btn:hover, .save-btn-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    opacity: 0.9;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 /* =========================================
-   5. 로딩 애니메이션 (Loading)
+    5. 로딩 애니메이션 (Loading)
    ========================================= */
 .loading {
     display: none;
@@ -742,18 +803,19 @@
 .error-message.active { display: block; }
 
 /* =========================================
-   6. 모달 (Modal)
+    6. 모달 (Modal)
    ========================================= */
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 9999;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     animation: fadeIn 0.3s ease;
+    overflow: hidden;
 }
 .modal.active {
     display: flex;
@@ -797,6 +859,7 @@
     padding: 30px;
     max-height: 500px;
     overflow-y: auto;
+    scrollbar-gutter: stable;
 }
 
 /* 모달 내부 요소들 */
@@ -860,6 +923,7 @@
 .recipe-steps li::marker { font-weight: 600; color: #67932A; }
 
 .modal-footer {
+    flex-shrink: 0; /* 줄어들지 않음 */
     display: flex;
     gap: 10px;
     padding: 20px 30px;
@@ -884,7 +948,7 @@
 }
 
 /* =========================================
-   7. 스크롤바 & 미디어 쿼리 (Global Utils)
+    7. 스크롤바 & 미디어 쿼리 (Global Utils)
    ========================================= */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
@@ -899,6 +963,10 @@
 .chat-messages::-webkit-scrollbar-thumb,
 .modal-body::-webkit-scrollbar-thumb,
 .result-box::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); }
+
+.chat-messages::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track,
+.result-box::-webkit-scrollbar-track { width: 6px; }
 
 @media (max-width: 768px) {
     .main-content { flex-direction: column; }
