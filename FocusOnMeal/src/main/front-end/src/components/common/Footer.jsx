@@ -82,7 +82,6 @@ const Footer = () => {
                             alt="Focus OnMeal" 
                             className={styles.logoImage} 
                         />
-                        <div className={styles.logoPlaceholder}></div>
                     </div>
 
                     {/* 오른쪽 영역: 링크 메뉴 + 하단 정보 */}
