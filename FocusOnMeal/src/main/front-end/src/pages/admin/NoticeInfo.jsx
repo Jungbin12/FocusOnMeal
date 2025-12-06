@@ -203,6 +203,37 @@ const NoticeInfo = () => {
                     </span>
                 </div>
                 <div className={styles.controlsContainer}>
+                    {/* 검색 UI */}
+                    <div className={styles.searchBox}>
+                        <select
+                            value={searchType}
+                            onChange={(e) => setSearchType(e.target.value)}
+                            className={styles.selectBox}
+                        >
+                            <option value="all">전체</option>
+                            <option value="title">제목</option>
+                            <option value="content">내용</option>
+                        </select>
+
+                        <input
+                            type="text"
+                            placeholder="검색어를 입력하세요"
+                            value={searchKeyword}
+                            onChange={(e) => setSearchKeyword(e.target.value)}
+                            onKeyDown={handleSearchOnEnter}
+                            className={styles.searchInput}
+                        />
+
+                        <button
+                            onClick={handleSearch}
+                            className={styles.searchBtn}
+                        >
+                            검색
+                        </button>
+                    </div>
+                </div>
+
+                <div className={styles.actionBar}>
                     {/* NEW / 필독 버튼 필터 */}
                     <div className={styles.filterButtons}>
                         <button
@@ -230,36 +261,6 @@ const NoticeInfo = () => {
                             onClick={() => handleFilterChange("IMPORTANT")}
                         >
                             필독!
-                        </button>
-                    </div>
-
-                    
-                    {/* 🔎 검색 UI */}
-                    <div className={styles.searchBox}>
-                        <select 
-                            value={searchType}
-                            onChange={(e) => setSearchType(e.target.value)}
-                            className={styles.selectBox}
-                        >
-                            <option value="all">전체</option>
-                            <option value="title">제목</option>
-                            <option value="content">내용</option>
-                        </select>
-
-                        <input
-                            type="text"
-                            placeholder="검색어를 입력하세요"
-                            value={searchKeyword}
-                            onChange={(e) => setSearchKeyword(e.target.value)}
-                            onKeyDown={handleSearchOnEnter}
-                            className={styles.searchInput}
-                            />
-
-                        <button 
-                            onClick={handleSearch}
-                            className={styles.searchBtn}
-                        >
-                            검색
                         </button>
                     </div>
                 </div>

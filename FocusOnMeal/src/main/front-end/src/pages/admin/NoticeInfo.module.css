@@ -38,12 +38,19 @@
     color: #67932A;
 }
 
-/* 필터와 검색 영역을 감싸는 컨테이너 */
+/* 검색 영역을 감싸는 컨테이너 */
 .controlsContainer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+}
+
+/* 액션 바 (필터 버튼 영역) */
+.actionBar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
 }
 
 /* 검색 영역 */
