@@ -166,7 +166,14 @@ const MemberInfo = () => {
         <div className={styles.container}>
             <Sidebar />
             <main className={styles.main}>
-                <h2 className={styles.title}>회원 관리</h2>
+                <div className={styles.titleRow}>
+                    <h2 className={styles.title}>회원 관리</h2>
+                    <span className={styles.totalCount}>
+                        (총 <span className={styles.countNumber}>
+                            {(pageInfo?.totalCount || 0).toLocaleString()}
+                        </span>건)
+                    </span>
+                </div>
                 <div className={styles.searchBox}>
                     <select
                         value={searchType}

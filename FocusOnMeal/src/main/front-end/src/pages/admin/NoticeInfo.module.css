@@ -1,73 +1,85 @@
 /* 전체 레이아웃 */
 .container {
     display: flex;
-    width: 100%;
-    min-height: calc(100vh - 70px);
-    background: #f7f7f7;
+    min-height: 100vh;
+    background-color: #f7f7f7;
 }
 
 /* 공통 메인 영역 */
 .main {
     flex: 1;
-    --padding: 10px 30px 40px 30px;
-    padding: 30px;
-    background: #fafafa;
+    padding: 40px;
+    margin-left: 50px;
 }
 
-/* 페이지 제목 */
-.title {
-    font-size: 26px;
-    font-weight: 700;
+/* 제목 영역 */
+.titleRow {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
     margin-bottom: 30px;
-    color: #222;
-    margin-top: 0;
 }
 
-/* 필터와 검색 영역을 감싸는 컨테이너 (수평 정렬) */
-.controlsContainer {
-    display: flex;
-    justify-content: space-between; /* 양 끝 정렬 */
-    align-items: flex-end; /* 수직 하단 정렬 (버튼 기준선 맞추기) */
-    margin-bottom: 15px; /* 테이블 위 마진 */
-    margin-top: 40px; /* 제목과의 간격 */
-}
-
-/* 검색 영역 (select + input + button) */
-.searchBox {
-    display: flex;
-    gap: 8px;
-    border-radius: 12px;
-}
-.selectBox{
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    text-align: center;
-    font-size: 14px;
-    padding: 6px 3px;
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
     margin: 0;
 }
 
-.searchInput {
-    width: 220px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+.totalCount {
     font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.countNumber {
+    font-weight: 600;
+    color: #67932A;
+}
+
+/* 필터와 검색 영역을 감싸는 컨테이너 */
+.controlsContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* 검색 영역 */
+.searchBox {
+    display: flex;
+    gap: 8px;
+}
+
+.selectBox, .searchInput {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.selectBox {
+    min-width: 100px;
+}
+
+.searchInput {
+    min-width: 250px;
 }
 
 .searchBtn {
-    background: #67932A;
-    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-    color: #fff;
-    padding: 6px 15px;
-    border-radius: 6px;
+    background-color: #67932A;
+    color: white;
+    padding: 8px 16px;
     border: none;
-    font-size: 14px;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
 }
 
 .searchBtn:hover {
-    background: #587b24;
+    background-color: #587b24;
 }
 
 /* 필터 버튼 영역 */
@@ -96,39 +108,29 @@
 .noticeTable {
     width: 100%;
     border-collapse: collapse;
-    font-size: 15px;
-    table-layout: fixed; 
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    table-layout: fixed;
 }
 
 .noticeTable th:nth-child(2) {
     width: 35%;
 }
 
-/* 테이블 헤더 */
-.noticeTable thead th {
-    background: #f3f6ef;
-    padding: 14px 12px;
-    border-bottom: 2px solid #dcdcdc;
-    font-weight: 600;
-    text-align: center;
-    color: #333;
-}
-
-/* 테이블 행 */
-.noticeTable tbody tr {
-    transition: 0.2s;
-}
-
-.noticeTable td:first-child,
-.noticeTable th:first-child {
-    text-align: center;
-}
-
-/* 테이블 셀 */
+.noticeTable th,
 .noticeTable td {
-    padding: 14px 12px;
-    border-bottom: 1px solid #eaeaea;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
     text-align: center;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+/* 테이블 헤더 */
+.noticeTable th {
+    background-color: #f3f6ef;
+    font-weight: 600;
+    user-select: none;
 }
 
 /* 제목(th, td)만 왼쪽 정렬 */
@@ -137,9 +139,8 @@
     text-align: left;
 }
 
-/* hover 효과 */
 .noticeTable tbody tr:hover {
-    background: #f0f4e8;
+    background-color: #fafafa;
 }
 
 .sortIcon {

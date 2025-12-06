@@ -270,14 +270,13 @@ const IngredientInfo = () => {
         <div className={styles.container}>
             <Sidebar />
             <main className={styles.main}>
-                <h2 className={styles.title} style={{ marginBottom: '8px' }}>
-                    식재료 관리
-                </h2>
-                
-                <div style={{ marginBottom: '20px', fontSize: '14px', color: '#666' }}>
-                    총 <span style={{ fontWeight: '600', color: '#67932A' }}>
-                        {(pageInfo?.totalCount || 0).toLocaleString()}
-                    </span>건
+                <div className={styles.titleRow}>
+                    <h2 className={styles.title}>식재료 관리</h2>
+                    <span className={styles.totalCount}>
+                        (총 <span className={styles.countNumber}>
+                            {(pageInfo?.totalCount || 0).toLocaleString()}
+                        </span>건)
+                    </span>
                 </div>
                 
                 <div className={styles.searchBox}>

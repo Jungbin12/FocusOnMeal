@@ -194,7 +194,14 @@ const NoticeInfo = () => {
         <div className={styles.container}>
             <Sidebar/>
             <div className={styles.main}>
-                <h1>공지사항</h1>
+                <div className={styles.titleRow}>
+                    <h1 className={styles.title}>공지사항</h1>
+                    <span className={styles.totalCount}>
+                        (총 <span className={styles.countNumber}>
+                            {(pageInfo?.totalCount || 0).toLocaleString()}
+                        </span>건)
+                    </span>
+                </div>
                 <div className={styles.controlsContainer}>
                     {/* NEW / 필독 버튼 필터 */}
                     <div className={styles.filterButtons}>

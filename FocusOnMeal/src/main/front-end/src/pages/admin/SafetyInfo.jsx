@@ -188,8 +188,15 @@ const AdminSafetyList = () => {
         <div className={styles.container}>
             <Sidebar />
             <div className={styles.main}>
-                <h1>안전정보 뉴스 관리</h1>
-                
+                <div className={styles.titleRow}>
+                    <h1 className={styles.title}>안전정보 뉴스 관리</h1>
+                    <span className={styles.totalCount}>
+                        (총 <span className={styles.countNumber}>
+                            {(pageInfo?.totalCount || 0).toLocaleString()}
+                        </span>건)
+                    </span>
+                </div>
+
                 <div className={styles.controlsContainer}>
                     {/* 검색 UI */}
                     <div className={styles.searchBox}>

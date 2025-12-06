@@ -1,7 +1,7 @@
 .container {
     display: flex;
     min-height: 100vh;
-    background-color: #f5f5f5;
+    background-color: #f7f7f7;
 }
 
 .main {
@@ -10,11 +10,30 @@
     margin-left: 50px;
 }
 
-.main h1 {
+/* 제목 영역 */
+.titleRow {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.title {
     font-size: 28px;
     font-weight: 700;
-    margin-bottom: 30px;
     color: #333;
+    margin: 0;
+}
+
+.totalCount {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.countNumber {
+    font-weight: 600;
+    color: #67932A;
 }
 
 /* 검색 및 필터 영역 */

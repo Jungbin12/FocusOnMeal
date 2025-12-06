@@ -1,90 +1,110 @@
 /* 전체 레이아웃 */
 .container {
     display: flex;
-    width: 100%;
-    min-height: calc(100vh - 70px);
-    background: #f7f7f7;
+    min-height: 100vh;
+    background-color: #f7f7f7;
 }
 
 /* 공통 메인 영역 */
 .main {
     flex: 1;
     padding: 40px;
-    background: #fafafa;
+    margin-left: 50px;
 }
 
-/* 페이지 제목 */
-.title {
-    font-size: 26px;
-    font-weight: 700;
+/* 제목 영역 */
+.titleRow {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
     margin-bottom: 30px;
-    color: #222;
-    margin-top: 0;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.totalCount {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.countNumber {
+    font-weight: 600;
+    color: #67932A;
 }
 
 /* 검색 영역 */
 .searchBox {
     display: flex;
-    justify-content: flex-end;
     gap: 8px;
     margin-bottom: 20px;
 }
 
-.selectBox{
-    border-radius: 6px;
+.selectBox, .searchInput {
     border: 1px solid #ccc;
-    text-align: center;
+    padding: 8px 12px;
+    border-radius: 4px;
     font-size: 14px;
-    padding: 6px 3px;
-    margin: 0;
+}
+
+.selectBox {
+    min-width: 100px;
 }
 
 .searchInput {
-    width: 220px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
+    min-width: 250px;
 }
 
 .searchBtn {
-    background: #67932A;
-    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-    color: #fff;
-    padding: 6px 15px;
-    border-radius: 6px;
+    background-color: #67932A;
+    color: white;
+    padding: 8px 16px;
     border: none;
-    font-size: 14px;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
 }
 
 .searchBtn:hover {
-    background: #587b24;
+    background-color: #587b24;
 }
 
 /* 테이블 */
 .memberTable {
-    table-layout: fixed;
     width: 100%;
     border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    table-layout: fixed;
+}
+
+.memberTable th,
+.memberTable td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    vertical-align: middle;
     font-size: 14px;
 }
 
 /* 테이블 헤더 */
-.memberTable thead th {
-    background: #f3f6ef;
-    padding: 14px 10px;
-    border-bottom: 2px solid #dcdcdc;
+.memberTable th {
+    background-color: #f3f6ef;
     font-weight: 600;
-    text-align: left;
-    color: #333;
-}
-
-.memberTable thead th {
+    user-select: none;
     position: relative;
     cursor: pointer;
-    white-space: nowrap; /* 화살표 줄바꿈 방지 */
-    overflow: visible !important;    /* ← 화살표가 잘리는 현상 해결 */
+    white-space: nowrap;
+}
+
+.memberTable tbody tr:hover {
+    background-color: #fafafa;
 }
 .memberTable th.idCol,
 .memberTable td.idCol {
@@ -211,21 +231,6 @@
     font-weight: 700;
 }
 
-/* 테이블 행 */
-.memberTable tbody tr {
-    transition: 0.2s;
-}
-
-/* 테이블 셀 */
-.memberTable td {
-    padding: 12px 10px;
-    border-bottom: 1px solid #eaeaea;
-}
-
-/* hover 효과 */
-.memberTable tbody tr:hover {
-    background: #f0f4e8;
-}
 
 /* 토글 전체 */
 .toggle {

@@ -1,10 +1,8 @@
 /* 전체 레이아웃 */
 .container {
     display: flex;
-    width: 100%;
-    min-height: calc(100vh - 70px);
-    background: #f7f7f7;
-    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    background-color: #f7f7f7;
 }
 
 /* 링크 스타일 초기화 */
@@ -16,118 +14,102 @@
 /* 메인 영역 */
 .main {
     flex: 1;
-    padding: 30px 40px;
-    background: #fafafa;
-    overflow: visible; 
+    padding: 40px;
+    margin-left: 50px;
 }
 
-/* 제목 */
+/* 제목 영역 */
+.titleRow {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
 .title {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
-    margin-bottom: 20px;
-    color: #111;
-    font-family: 'Noto Sans KR', sans-serif;
+    color: #333;
+    margin: 0;
+}
+
+.totalCount {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.countNumber {
+    font-weight: 600;
+    color: #67932A;
 }
 
 /* 검색 박스 */
 .searchBox {
     display: flex;
-    justify-content: flex-end;
     gap: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.selectBox, .searchInput {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
 .selectBox {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 8px 12px;
-    font-size: 14px;
-    color: #333;
-    outline: none;
-    font-family: 'Noto Sans KR', sans-serif;
+    min-width: 100px;
 }
 
 .searchInput {
-    width: 250px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 8px 12px;
-    font-size: 14px;
-    outline: none;
-    font-family: 'Noto Sans KR', sans-serif;
-}
-.searchInput:focus {
-    border-color: #67932A;
+    min-width: 250px;
 }
 
 .searchBtn {
     background-color: #67932A;
-    color: #fff;
+    color: white;
+    padding: 8px 16px;
     border: none;
     border-radius: 4px;
-    padding: 8px 20px;
-    font-size: 14px;
-    font-weight: 500;
     cursor: pointer;
-    transition: background 0.2s;
-    font-family: 'Noto Sans KR', sans-serif;
-}
-.searchBtn:hover {
-    background-color: #557a22;
+    font-size: 14px;
+    transition: background-color 0.2s;
 }
 
-/* --- 테이블 스타일 (반응형 적용) --- */
+.searchBtn:hover {
+    background-color: #587b24;
+}
+
+/* --- 테이블 스타일 --- */
 .memberTable {
     width: 100%;
-    min-width: 1000px; 
     border-collapse: collapse;
-    table-layout: fixed; 
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border-radius: 8px;
-    overflow: visible; 
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    table-layout: fixed;
+}
+
+.memberTable th,
+.memberTable td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 14px;
 }
 
 /* 테이블 헤더 */
-.memberTable thead th {
-    background-color: #f4f6f1;
-    color: #444;
+.memberTable th {
+    background-color: #f3f6ef;
     font-weight: 600;
-    font-size: 15px;
-    padding: 16px 10px;
-    border-bottom: 2px solid #e1e1e1;
-    cursor: pointer;
     user-select: none;
+    cursor: pointer;
     white-space: nowrap;
-    text-align: center;
-    vertical-align: middle;
-    font-family: 'Noto Sans KR', sans-serif;
-    position: relative;
-    z-index: 10;
 }
 
-/* 테이블 바디 */
-.memberTable tbody tr {
-    border-bottom: 1px solid #f0f0f0;
-}
-.memberTable tbody tr:last-child {
-    border-bottom: none;
-}
 .memberTable tbody tr:hover {
-    background-color: #f9fbf7;
-}
-
-/* 테이블 셀 기본 스타일 */
-.memberTable td {
-    padding: 15px 10px;
-    font-size: 15px;
-    color: #333;
-    vertical-align: middle;
-    text-align: center;
-    line-height: 1.6;
-    font-family: 'Noto Sans KR', sans-serif;
-    word-break: keep-all;
+    background-color: #fafafa;
 }
 
 /* 빈 결과 셀 */
