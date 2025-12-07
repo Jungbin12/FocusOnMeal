@@ -38,7 +38,7 @@ const Footer = () => {
                     <div className={styles.messageBox}>
                         <h3 className={styles.messageTitle}>
                             당신의 건강에<br />
-                            정성을 담아서 냅니다.
+                            정성을 담아드립니다.
                         </h3>
                     </div>
 
