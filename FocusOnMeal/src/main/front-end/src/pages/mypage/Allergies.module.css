@@ -9,7 +9,7 @@
     padding: 40px 20px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .card {
@@ -18,149 +18,170 @@
     background-color: white;
     border-radius: 12px;
     border: 3px solid #7AA83A;
-    padding: 40px;
+    padding: 50px 40px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .title {
-    font-size: 28px;
-    font-weight: bold;
-    color: #1f2937;
-    margin-bottom: 30px;
+    font-size: 34px;
+    color: #5D7D45; /* 진한 올리브 텍스트 */
+    text-align: center;
+    margin-bottom: 60px; 
+    letter-spacing: 1px;
 }
 
 .infoBox {
     background-color: #f3f4f6;
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    font-size: 12px;
-    color: #6b7280;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    color: #6c8c52;
+    text-align: center;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    --color: #6b7280;
 }
 
 .infoBox p {
     margin: 0;
+    font-weight: bold;
 }
 
 .grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 15px 20px;
+    display: flex;
+    flex-wrap: wrap; /* 줄바꿈 허용 */
+    gap: 12px; /* 버튼 사이 간격 */
     margin-bottom: 40px;
+    justify-content: center; /* 가운데 정렬 */
 }
 
 .checkboxLabel {
     display: flex;
     align-items: center;
+    justify-content: center;
     cursor: pointer;
-    font-size: 15px;
-    color: #374151;
     user-select: none;
-    padding: 8px;
-    border-radius: 6px;
-    background-color: transparent;
-    transition: background-color 0.2s;
+    
+    /* 버튼 스타일 */
+    padding: 10px 20px;
+    border: 2px solid #e3f2c1; /* 기본 테두리 */
+    border-radius: 25px; /* 알약 모양 */
+    background-color: #fff;
+    color: #888;
+    font-size: 16px;
+    transition: all 0.2s ease;
 }
 
+/* 마우스 올렸을 때 */
+.checkboxLabel:hover {
+    border-color: #8CBF56;
+    color: #8CBF56;
+    transform: translateY(-2px);
+}
+
+/* ✅ 선택되었을 때 스타일 (핵심) */
 .checkboxLabel.checked {
-    background-color: #dbeafe;
+    background-color: #8CBF56; /* 진한 연두색 배경 */
+    border-color: #8CBF56;
+    color: white; /* 글씨 하얗게 */
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(140, 191, 86, 0.3);
+    transform: translateY(-2px);
 }
 
+/* 실제 체크박스는 숨김 (기능은 유지) */
 .checkbox {
-    width: 18px;
-    height: 18px;
-    margin-right: 8px;
-    cursor: pointer;
-    accent-color: #0b7a2a;
-    flex-shrink: 0;
+    display: none; 
 }
 
-.checkboxText {
+/* .checkboxText {
     line-height: 1.3;
-}
+} */
 
 .selectedBox {
-    background-color: #f3f4f6;
-    padding: 15px;
-    border-radius: 8px;
+    background-color: #fff;
+    border: 2px dashed #e3f2c1; /* 점선 테두리 */
+    padding: 20px;
+    border-radius: 20px;
     margin-bottom: 30px;
-}
-
-.selectedTitle {
-    font-size: 14px;
-    color: #6b7280;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-.selectedList {
-    font-size: 14px;
-    color: #374151;
-    line-height: 1.6;
-}
-
-.buttonContainer {
-    text-align: right;
-}
-
-.saveButton {
-    padding: 12px 40px;
-    background-color: #7AA83A;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.saveButton:hover {
-    background-color: #0b7a2a;
-}
-
-.loadingContainer {
-    min-height: 100vh;
-    background-color: #f9fafb;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.loadingText {
-    font-size: 18px;
-    color: #6b7280;
-}
-
-.errorContainer {
-    min-height: 100vh;
-    background-color: #f9fafb;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.errorContent {
     text-align: center;
 }
 
-.errorTitle {
-    font-size: 18px;
-    color: #dc2626;
+.selectedTitle {
+    font-size: 15px;
+    color: #5D7D45;
     margin-bottom: 10px;
+    font-weight: bold;
 }
 
-.errorMessage {
+.selectedList {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.6;
+    word-break: keep-all; /* 단어 단위 줄바꿈 */
+}
+
+/* 빈 상태 메시지 */
+.emptyMessage {
+    color: #bbb;
     font-size: 14px;
-    color: #6b7280;
-    margin-bottom: 20px;
 }
 
-.refreshButton {
-    padding: 10px 20px;
-    background-color: #7AA83A;
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+}
+
+.saveButton {
+    padding: 15px 60px;
+    background-color: #5D7D45; /* 진한 쑥색 */
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-family: inherit;
+    font-weight: bold;
     cursor: pointer;
+    box-shadow: 0 4px 0 #3b5228; /* 입체감 그림자 */
+    transition: all 0.2s;
+}
+
+.saveButton:hover {
+    background-color: #6c8c52;
+    transform: translateY(2px); /* 눌리는 효과 */
+    box-shadow: 0 2px 0 #3b5228;
+}
+
+.loadingContainer, .errorContainer {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fcfdfa;
+    font-family: 'Jua', sans-serif;
+}
+
+.loadingText {
+    font-size: 20px;
+    color: #8CBF56;
+    animation: bounce 1s infinite;
+}
+
+.errorContent { text-align: center; }
+.errorTitle { font-size: 20px; color: #FF8A65; margin-bottom: 10px; }
+.refreshButton {
+    padding: 10px 20px;
+    background-color: #8CBF56;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }

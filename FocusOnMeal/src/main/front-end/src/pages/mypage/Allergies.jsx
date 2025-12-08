@@ -166,7 +166,6 @@ const Allergies = () => {
 
                     <div className={styles.infoBox}>
                         <p>📊 총 알레르기: {allergies.length}개</p>
-                        <p>✅ 선택됨: {checked.length}개</p>
                     </div>
 
                     <div className={styles.grid}>
@@ -197,12 +196,16 @@ const Allergies = () => {
                             <p className={styles.selectedTitle}>
                                 선택된 알레르기 ({checked.length}개):
                             </p>
-                            <p className={styles.selectedList}>
-                                {allergies
-                                    .filter(a => checked.includes(a.allergyId))
-                                    .map(a => a.allergyName)
-                                    .join(', ')}
-                            </p>
+                            {checked.length > 0 ? (
+                                <p className={styles.selectedList}>
+                                    {allergies
+                                        .filter(a => checked.includes(a.allergyId))
+                                        .map(a => a.allergyName)
+                                        .join(', ')}
+                                </p>
+                            ) : (
+                                <p className={styles.emptyMessage}>선택된 알레르기가 없어요!</p>
+                            )}
                         </div>
                     )}
 
