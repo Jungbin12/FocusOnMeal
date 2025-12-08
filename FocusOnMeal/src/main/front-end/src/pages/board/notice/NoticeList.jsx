@@ -126,6 +126,7 @@ const NoticeList = () => {
                         name="type"
                         value={searchType}
                         onChange={handleTypeChange}
+                        className={styles.select}
                     >
                         <option value="all">제목+내용</option>
                         <option value="title">제목</option>
@@ -160,7 +161,7 @@ const NoticeList = () => {
                     </thead>
                     <tbody>
                         {importantList.map((notice) => (
-                            <tr key={`imp-${notice.noticeNo}`} className={styles.importantRow} style={{backgroundColor: '#f9f9f9'}}>
+                            <tr key={`imp-${notice.noticeNo}`} className={styles.importantRow}>
                                 <td>
                                     <span className={styles.badgeImportant}>필독</span>
                                 </td>
