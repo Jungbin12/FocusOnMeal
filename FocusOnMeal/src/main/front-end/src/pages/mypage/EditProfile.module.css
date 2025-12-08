@@ -1,7 +1,15 @@
+/* ========================================= */
+/* 기본 레이아웃 및 폰트 설정 */ EditProfile
+/* ========================================= */
+.container, .container * {
+    box-sizing: border-box;
+}
+
 .container {
     display: flex;
     min-height: 100vh;
-    background-color: #f9fafb;
+    --background-color: #fcfdfa; /* 아주 연한 미색 배경 */
+    --font-family: 'Jua', "Noto Sans KR", sans-serif;
 }
 
 .content {
@@ -12,136 +20,174 @@
     align-items: center;
 }
 
+/* ========================================= */
+/* 카드 디자인 (메인 박스) */
+/* ========================================= */
 .card {
-    max-width: 600px;
+    max-width: 580px;
     width: 100%;
     background-color: white;
-    border-radius: 12px;
-    border: 3px solid #7AA83A;
-    padding: 40px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 40px; 
+    border: 4px solid #6c8c52;
+    padding: 50px 40px;
+    box-shadow: 0 20px 40px rgba(93, 125, 69, 0.08); 
 }
 
 .title {
-    font-size: 28px;
-    font-weight: bold;
-    color: #1f2937;
-    margin-bottom: 30px;
+    font-size: 32px;
+    font-weight: normal; 
+    color: #5D7D45;
+    margin-bottom: 40px;
     text-align: center;
+    letter-spacing: 1px;
 }
 
+/* ========================================= */
+/* 입력 필드 그룹 */
+/* ========================================= */
 .fieldGroup {
     margin-bottom: 25px;
 }
 
 .fieldGroupLarge {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
 }
 
 .label {
     display: block;
-    font-size: 14px;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: normal;
+    color: #6c8c52; 
+    margin-bottom: 10px;
+    padding-left: 10px;
 }
 
-.input {
+/* 공통 Input 스타일 (알약 모양) */
+.input, .inputDisabled, .inputNickname {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #d1d5db;
-    border-radius: 8px;
+    padding: 14px 20px;
+    border: 2px solid #e3f2c1; 
+    border-radius: 25px;
     font-size: 15px;
+    font-family: inherit; /* 폰트 상속 */
     outline: none;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    color: #555;
 }
 
+/* 입력창 포커스 효과 */
+.input:focus {
+    border-color: #8CBF56; /* 진한 연두색 */
+    box-shadow: 0 0 10px rgba(140, 191, 86, 0.2); 
+}
+
+/* 비활성화된 입력창 (아이디 등) */
 .inputDisabled {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 15px;
-    background-color: #f3f4f6;
-    color: #6b7280;
+    background-color: #f7f9f2; /* 아주 연한 회색/녹색빛 */
+    border-color: #edf2e6;
+    color: #999;
     cursor: not-allowed;
 }
 
+/* 닉네임 입력창 (수정 불가) */
 .inputNickname {
     flex: 1;
-    padding: 12px;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 15px;
-    background-color: #f3f4f6;
-    color: #374151;
-    cursor: not-allowed;
+    background-color: #fff;
+    border-color: #e3f2c1;
+    color: #555;
+    cursor: default;
 }
 
+/* 유효성 검사 상태에 따른 테두리 색상 */
 .inputValid {
-    border-color: #10b981;
+    border-color: #8CBF56; /* 성공: 초록 */
+    background-color: #fafff5;
 }
 
 .inputInvalid {
-    border-color: #ef4444;
+    border-color: #FFAB91; /* 실패: 부드러운 코랄색 */
+    background-color: #fff5f2;
 }
 
+/* ========================================= */
+/* 닉네임 & 랜덤 버튼 영역 */
+/* ========================================= */
+.nicknameWrapper {
+    display: flex;
+    gap: 12px;
+}
+
+.randomButton {
+    padding: 0 24px;
+    /* 신비로운 라벤더 색상 */
+    background-color: #CE93D8; 
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 4px 0 #BA68C8; /* 입체감 */
+}
+
+.randomButton:hover {
+    background-color: #BA68C8;
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #9C27B0;
+}
+
+.randomButton:disabled {
+    background-color: #e0e0e0;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ========================================= */
+/* 텍스트 & 메시지 */
+/* ========================================= */
 .helperText {
-    font-size: 12px;
-    color: #6b7280;
-    margin-top: 5px;
+    font-size: 13px;
+    color: #9aa;
+    margin-top: 8px;
+    padding-left: 10px;
 }
 
 .validationMessage {
     font-size: 13px;
     margin-top: 8px;
+    padding-left: 10px;
+    font-weight: bold;
 }
 
 .validationSuccess {
-    color: #10b981;
+    color: #8CBF56;
 }
 
 .validationError {
-    color: #ef4444;
+    color: #FF8A65;
 }
 
-.nicknameWrapper {
-    display: flex;
-    gap: 10px;
-}
-
-.randomButton {
-    padding: 12px 20px;
-    background-color: #8b5cf6;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    white-space: nowrap;
-}
-
-.randomButton:hover {
-    background-color: #7c3aed;
-}
-
-.randomButton:disabled {
-    background-color: #9ca3af;
-    cursor: not-allowed;
-}
-
+/* 구분선 */
 .divider {
-    height: 1px;
-    background-color: #e5e7eb;
-    margin: 30px 0;
+    height: 2px;
+    background-color: #f1f8e4; /* 아주 연한 연두색 */
+    margin: 40px 0;
+    border-radius: 2px;
 }
 
+/* ========================================= */
+/* 비밀번호 강도 게이지 */
+/* ========================================= */
 .strengthBox {
-    margin-top: 10px;
-    padding: 8px;
-    background-color: #f3f4f6;
-    border-radius: 6px;
+    margin-top: 12px;
+    padding: 12px 15px;
+    background-color: #f9fdf2;
+    border-radius: 15px;
+    border: 1px solid #f1f8e4;
 }
 
 .strengthHeader {
@@ -153,74 +199,96 @@
 
 .strengthLabel {
     font-size: 13px;
-    color: #6b7280;
+    color: #777;
 }
 
 .strengthText {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: bold;
 }
 
 .strengthBarContainer {
-    height: 6px;
-    background-color: #e5e7eb;
-    border-radius: 3px;
+    height: 8px;
+    background-color: #eee;
+    border-radius: 4px;
     overflow: hidden;
 }
 
 .strengthBar {
     height: 100%;
-    transition: width 0.3s, background-color 0.3s;
+    border-radius: 4px;
+    transition: width 0.4s ease, background-color 0.4s ease;
 }
 
+/* ========================================= */
+/* 하단 버튼 그룹 */
+/* ========================================= */
 .buttonGroup {
     display: flex;
-    gap: 10px;
+    gap: 15px;
+    margin-top: 20px;
 }
 
+/* 탈퇴 버튼 (은은한 코랄) */
 .deleteButton {
     flex: 1;
-    padding: 14px;
-    background-color: #ef4444;
-    color: white;
+    padding: 16px;
+    background-color: #FFCCBC; /* 연한 살구색 */
+    color: #D84315; /* 진한 주황 텍스트 */
     border: none;
-    border-radius: 8px;
+    border-radius: 25px;
     font-size: 16px;
-    font-weight: 600;
+    font-family: inherit;
+    font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
 .deleteButton:hover {
-    background-color: #dc2626;
+    background-color: #FFAB91;
 }
 
+/* 수정하기 버튼 (메인) */
 .submitButton {
     flex: 2;
-    padding: 14px;
-    background-color: #3b82f6;
+    padding: 16px;
+    background-color: #8CBF56; /* 메인 초록 */
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
+    border-radius: 25px;
+    font-size: 18px;
+    font-family: inherit;
+    font-weight: normal;
     cursor: pointer;
-    transition: background-color 0.2s;
+    box-shadow: 0 4px 10px rgba(140, 191, 86, 0.4);
+    transition: all 0.2s;
 }
 
 .submitButton:hover {
-    background-color: #2563eb;
+    background-color: #7AA83A; /* 조금 더 진하게 */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(140, 191, 86, 0.5);
 }
 
+/* ========================================= */
+/* 로딩 화면 */
+/* ========================================= */
 .loadingContainer {
     min-height: 100vh;
-    background-color: #f9fafb;
+    background-color: #fcfdfa;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .loadingText {
-    font-size: 18px;
-    color: #6b7280;
+    font-size: 20px;
+    color: #8CBF56;
+    font-family: 'Jua', sans-serif;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
