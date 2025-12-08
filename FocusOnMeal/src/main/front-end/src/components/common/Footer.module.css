@@ -5,14 +5,13 @@
     background: #e9e9e9;
     position: relative;
     overflow: visible;
-    /* 🚨 잔디를 콘텐츠에 가깝게 붙이기 위해 마진 제거/줄임 */
-    margin-top: 0; 
+    margin-top: 0;
 }
 
-/* 🌿 잔디 wrapper (푸터 최상단) */
+/* 🌿 잔디 wrapper (푸터 상단 바깥으로 튀어나옴) */
 .grassWrapper {
     position: absolute;
-    top: 0;
+    bottom: calc(100% - 180px);
     left: 0;
     width: 100%;
     z-index: 3;
@@ -22,10 +21,7 @@
     width: 100%;
     height: auto;
     display: block;
-    /* object-fit: contain;과 object-position: top;을 사용하면 
-       잔디 이미지가 컨테이너에 맞춰지며 전체가 보입니다. */
-    object-fit: contain;
-    object-position: top;
+    vertical-align: bottom;
 }
 
 .footerContent {

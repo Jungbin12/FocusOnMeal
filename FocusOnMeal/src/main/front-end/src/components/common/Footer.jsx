@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './Footer.module.css';
 
 // 🚨 이미지 경로가 '../../assets/logo/footerGrass.png'임을 재차 가정하고 import 문 사용
-import footerGrass from '../../assets/logo/footerGrass.png'; 
+import footerGrass from '../../assets/logo/green_1.png'; 
 import blog from "../../assets/logo/blog.avif";
 import facebook from "../../assets/logo/Facebook.png";
 import kakao from "../../assets/logo/KakaoTalk.png";
@@ -34,20 +34,7 @@ const Footer = () => {
     ];
 
     return (
-        <footer 
-            className={styles.footer}
-            style={{ paddingTop: `${GRASS_HEIGHT}px` }} 
-        >
-
-            {/* 🌿 잔디 이미지 (푸터 최상단) */}
-            <div className={styles.grassWrapper}>
-                <img 
-                    src={footerGrass} 
-                    alt="Footer Grass"
-                    className={styles.grassImage}
-                />
-            </div>
-
+        <footer className={styles.footer}>
             <div className={styles.footerContent}>
                 
                 {/* 상단 영역 */}
