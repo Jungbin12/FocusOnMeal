@@ -17,6 +17,7 @@ import {
     Cell      // [추가]
 } from 'recharts';
 import Footer from '../../components/common/Footer';
+import { ArrowLeft } from 'lucide-react';
 
 /**
  * 토큰을 안전하게 가져오는 함수 (변동 없음)
@@ -418,12 +419,22 @@ function IngredientDetail() {
     return (
         <>
         <div className={styles.container}>
-            <h2 className={styles.pageTitle}>식품성분표 상세 페이지</h2>
-            
-            {/* [수정] 뒤로가기 로직 적용 */}
-            <button onClick={handleGoBack} className={styles.backButton}>
-                뒤로가기
-            </button>
+		<div className={styles.headerSection}>
+		    <div style={{ 
+		        display: 'flex', 
+		        alignItems: 'center', 
+		        gap: '15px', 
+                paddingTop: '30px',
+		        marginBottom: '60px', 
+		        marginLeft: '-60px'  // 왼쪽으로 이동
+		    }}>
+		        <button onClick={handleGoBack} className={styles.backButton}>
+		            <ArrowLeft size={20} />
+		        </button>
+		        
+		        <h1 className={styles.pageTitle}>식품성분표 상세 페이지</h1>
+		    </div>
+		</div>
             
             <div className={styles.mainContent}>
                 
