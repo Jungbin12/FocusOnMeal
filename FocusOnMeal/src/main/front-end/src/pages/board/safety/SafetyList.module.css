@@ -3,7 +3,7 @@
 /* ============================= */
 .container {
     width: 100%;
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 60px auto;
     font-family: 'Jua', "Noto Sans KR", sans-serif;
     color: #333;
@@ -15,16 +15,8 @@
     background-color: transparent;
 }
 
-.main h1 {
-    font-size: 36px;
-    color: #5D7D45;
-    text-align: center;
-    margin-bottom: 50px;
-    letter-spacing: 1px;
-}
-
 .title {
-    font-size: 36px;
+    font-size: 32px;
     color: #5D7D45;
     text-align: center;
     margin-bottom: 50px;
