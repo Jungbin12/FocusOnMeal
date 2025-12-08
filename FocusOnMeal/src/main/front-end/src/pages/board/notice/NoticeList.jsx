@@ -181,7 +181,7 @@ const NoticeList = () => {
                                     <td>[공지]</td>
                                     <td>
                                         {/* 필독은 위에서 처리했으므로 여기선 NEW 뱃지만 체크 */}
-                                        {notice.noticeIsnew === 'Y' && (
+                                        {notice.noticeIsNew === 'Y' && (
                                             <span className={styles.badgeNew}>NEW</span>
                                         )}
                                         <Link to={`/board/notice/detail/${notice.noticeNo}`}>

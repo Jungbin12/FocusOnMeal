@@ -67,7 +67,7 @@ const NoticeDetail = () => {
                                 {notice.noticeImportant === "Y" && (
                                     <span className={styles.badgeImportant}>필독</span>
                                 )}
-                                {notice.noticeIsnew === "Y" && (
+                                {notice.noticeIsNew === "Y" && (
                                     <span className={styles.badgeNew}>NEW</span>
                                 )}
                             </div>
