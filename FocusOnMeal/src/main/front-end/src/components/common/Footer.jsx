@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import styles from './Footer.module.css';
 
+// 🚨 이미지 경로가 '../../assets/logo/footerGrass.png'임을 재차 가정하고 import 문 사용
 import footerGrass from '../../assets/logo/footerGrass.png'; 
 import blog from "../../assets/logo/blog.avif";
 import facebook from "../../assets/logo/Facebook.png";
@@ -9,24 +10,10 @@ import instagram from "../../assets/logo/Instagram.png";
 import naver from "../../assets/logo/naverband.avif";
 import FocusOnMeal from "../../assets/logo/FocusOnMeal.png";
 
+const GRASS_HEIGHT = 70; // 잔디 높이 및 콘텐츠 간격 고정
+
 const Footer = () => {
     const [hoveredSns, setHoveredSns] = useState(null);
-    const grassRef = useRef(null);
-    const [grassHeight, setGrassHeight] = useState(0);
-
-    // 🌿 이미지 로드 후 실제 높이를 자동으로 padding-top에 반영
-    useEffect(() => {
-        if (grassRef.current) {
-            const img = grassRef.current;
-            const updateHeight = () => {
-                setGrassHeight(img.offsetHeight);
-            };
-
-            updateHeight();
-            window.addEventListener('resize', updateHeight);
-            return () => window.removeEventListener('resize', updateHeight);
-        }
-    }, []);
 
     const snsItems = [
         { id: 'blog', name: '블로그', logo: blog, url: 'https://section.blog.naver.com/BlogHome.naver?directoryNo=0&currentPage=1&groupId=0' },
@@ -49,13 +36,12 @@ const Footer = () => {
     return (
         <footer 
             className={styles.footer}
-            style={{ paddingTop: grassHeight }} // 🌿 잔디 높이만큼 푸터 자동 내려가기
+            style={{ paddingTop: `${GRASS_HEIGHT}px` }} 
         >
 
             {/* 🌿 잔디 이미지 (푸터 최상단) */}
             <div className={styles.grassWrapper}>
                 <img 
-                    ref={grassRef}
                     src={footerGrass} 
                     alt="Footer Grass"
                     className={styles.grassImage}
@@ -132,7 +118,7 @@ const Footer = () => {
                         </div>
 
                         <p className={styles.addressText}>
-                            우)20251   서울특별시 중구 을지로 12 창업빌딩 3층   TEL : 02 - 123 - 4567
+                            우)20251   서울특별시 중구 을지로 12 창업빌딩 3층   TEL : 02 - 123 - 4567
                         </p>
 
                         <div className={styles.divider}>
