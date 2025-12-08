@@ -192,7 +192,7 @@ function IngredientSearch() {
   return (
     <>
     <div className={styles.container}>
-      <h2>식품성분표 목록</h2> 
+      <h1>식품성분표 목록</h1> 
       
       {/* 1. 검색/필터 영역 */}
       <form onSubmit={(e) => e.preventDefault()} className={styles.filterSection}>
