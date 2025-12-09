@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from './Dashboard.module.css';
 import axios from "axios";
 import Sidebar from "../../components/mypage/Sidebar";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
     LineChart,
     Line,
@@ -19,6 +19,7 @@ const Dashboard = () => {
     const [dashboard, setDashboard] = useState(null);
     const [selectedChart, setSelectedChart] = useState(null);
     const [loading, setLoading] = useState(true);
+    const chartSectionRef = useRef(null);
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
@@ -32,7 +33,7 @@ const Dashboard = () => {
             return;
         }
 
-        axios.get("http://localhost:8080/api/mypage/dashboard", {
+        axios.get("/api/mypage/dashboard", {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -65,7 +66,7 @@ const Dashboard = () => {
         
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/mypage/price-chart/${ingredientId}?days=30`,
+                `/api/mypage/price-chart/${ingredientId}?days=30`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -75,6 +76,15 @@ const Dashboard = () => {
             console.log('📈 선택한 식재료 차트 데이터:', response.data);
             console.log('📊 변동률 정보:', response.data.changeRate);
             setSelectedChart(response.data);
+
+            // 차트 섹션으로 부드럽게 스크롤 (제목이 보이도록 여유 추가)
+            setTimeout(() => {
+                if (chartSectionRef.current) {
+                    const yOffset = -70;
+                    const y = chartSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+            }, 100);
         } catch (err) {
             console.error("❌ 차트 로드 실패:", err);
         }
@@ -194,7 +204,7 @@ const Dashboard = () => {
                 <h2>{dashboard.memberInfo.memberNickname} 님의 마이페이지</h2>
 
                 {/* 물가 추이 그래프 섹션 */}
-                <div className={styles.chartSection}>
+                <div className={styles.chartSection} ref={chartSectionRef}>
                     <h3>식재료 물가 추이</h3>
                     {selectedChart && selectedChart.dataPoints && selectedChart.dataPoints.length > 0 ? (
                         <div className={styles.chartContainer}>

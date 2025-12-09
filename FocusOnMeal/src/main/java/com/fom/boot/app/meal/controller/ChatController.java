@@ -99,6 +99,10 @@ public class ChatController {
             }
             cleanJson = cleanJson.trim();
 
+            // JSON 문자열 내의 제어 문자 처리 (줄바꿈 등)
+            // JSON 파싱 전에 문자열 값 내부의 제어 문자를 이스케이프 처리
+            cleanJson = escapeControlCharactersInJson(cleanJson);
+
             log.info("정제된 JSON (첫 200자): {}", cleanJson.substring(0, Math.min(200, cleanJson.length())));
 
             // JSON 파싱
@@ -194,6 +198,63 @@ public class ChatController {
             log.error("AI 응답 파싱 실패: {}", aiResponse, e);
             throw new RuntimeException("식단 데이터 파싱에 실패했습니다: " + e.getMessage());
         }
+    }
+
+    /**
+     * JSON 문자열 내의 제어 문자를 이스케이프 처리
+     */
+    private String escapeControlCharactersInJson(String json) {
+        StringBuilder result = new StringBuilder();
+        boolean inString = false;
+        boolean escaped = false;
+
+        for (int i = 0; i < json.length(); i++) {
+            char c = json.charAt(i);
+
+            if (escaped) {
+                result.append(c);
+                escaped = false;
+                continue;
+            }
+
+            if (c == '\\') {
+                result.append(c);
+                escaped = true;
+                continue;
+            }
+
+            if (c == '"') {
+                inString = !inString;
+                result.append(c);
+                continue;
+            }
+
+            // 문자열 내부에서 제어 문자 이스케이프
+            if (inString) {
+                switch (c) {
+                    case '\n':
+                        result.append("\\n");
+                        break;
+                    case '\r':
+                        result.append("\\r");
+                        break;
+                    case '\t':
+                        result.append("\\t");
+                        break;
+                    default:
+                        if (c < 32) {
+                            // 기타 제어 문자는 유니코드 이스케이프
+                            result.append(String.format("\\u%04x", (int) c));
+                        } else {
+                            result.append(c);
+                        }
+                }
+            } else {
+                result.append(c);
+            }
+        }
+
+        return result.toString();
     }
 
     /**

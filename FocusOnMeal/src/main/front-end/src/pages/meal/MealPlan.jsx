@@ -48,7 +48,7 @@ const MealPlan = () => {
     useEffect(() => {
         const fetchAllergyList = async () => {
             try {
-                const response = await fetch("http://localhost:8080/api/mypage/allergy/list");
+                const response = await fetch("/api/mypage/allergy/list");
                 if (response.ok) {
                     const data = await response.json();
                     // API 응답을 화면에 맞게 변환 (allergyId, allergyName, category)
@@ -77,7 +77,7 @@ const MealPlan = () => {
             if (!token) return; // 로그인 안 했으면 skip
 
             try {
-                const response = await fetch("http://localhost:8080/api/mypage/allergies", {
+                const response = await fetch("/api/mypage/allergies", {
                     headers: {
                         "Authorization": `Bearer ${token}`
                     }
@@ -178,7 +178,7 @@ const MealPlan = () => {
                 requestBody.previousPrice = lastPrice;
             }
 
-            const response = await fetch("http://localhost:8080/api/chat/meal-recommendation", {
+            const response = await fetch("/api/chat/meal-recommendation", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -281,7 +281,7 @@ const MealPlan = () => {
 
             console.log("📤 Sending save request:", requestBody);
 
-            const response = await fetch("http://localhost:8080/api/chat/save-meal", {
+            const response = await fetch("/api/chat/save-meal", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

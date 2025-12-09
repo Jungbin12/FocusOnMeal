@@ -30,7 +30,7 @@ const EditProfile = () => {
     });
     const [nicknameSpinning, setNicknameSpinning] = useState(false);
     
-    const API_BASE_URL = "http://localhost:8080";
+    const API_BASE_URL = "";
 
     useEffect(() => {
         loadUserData();

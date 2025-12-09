@@ -8,7 +8,7 @@ const Allergies = () => {
     const [checked, setChecked] = useState([]);
     const [loading, setLoading] = useState(true);
     
-    const API_BASE_URL = "http://localhost:8080";
+    const API_BASE_URL = "";
 
     useEffect(() => {
         loadData();
@@ -116,7 +116,7 @@ const Allergies = () => {
             console.log("📤 저장 요청:", checked);
             
             await axios.post(
-                "http://localhost:8080/api/mypage/allergies",
+                "/api/mypage/allergies",
                 { allergyIds: checked },
                 {
                     headers: { Authorization: `Bearer ${token}` },
