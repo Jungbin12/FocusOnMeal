@@ -7,8 +7,7 @@
 
 ## 📽️ 프로젝트 발표 자료 (PDF)
 프로젝트의 아키텍처, 데이터 흐름도, 상세 코드 리뷰가 포함된 자료입니다.
-* [**👉 FocusOnMeal 프로젝트 발표 PDF 보기**](https://github.com/ljbin0907/FocusOnMeal/blob/main/MealKit%20발표.pdf) 
-*(※ 깃허브 업로드 후 실제 파일 경로 주소로 확인해 주세요)*
+* [**👉 FocusOnMeal 프로젝트 발표 PDF 보기**](https://github.com/Jungbin12/FocusOnMeal/blob/main/MealKit%20%EB%B0%9C%ED%91%9C.pdf) 
 
 ---
 
