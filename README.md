@@ -61,6 +61,7 @@ public List<PriceTrendDTO> getPriceTrend(String itemCode, int days) {
         .sorted(Comparator.comparing(PriceTrendDTO::getRegDate)) // 3. 차트 출력을 위한 날짜순 정렬
         .collect(Collectors.toList());
 }
+```
 
 /* [Back-end] BigDecimal을 활용한 정밀 등락률 계산 */
 public double calculateRate(int current, int past) {
