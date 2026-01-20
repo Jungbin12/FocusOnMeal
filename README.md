@@ -81,7 +81,7 @@ public double calculateRate(int current, int past) {
 * **화면 구현**:
    - ➀ 실시간 알림창: 최신 안전 정보를 상단 Bell 아이콘을 통해 확인하고, '모두 읽음' 및 '개별 삭제'가 가능한 모달 UI를 설계했습니다.
    - ➁ 관심 식재료 대시보드: 사용자가 즐겨찾기한 품목의 현재가를 마이페이지 메인에 배치하여 정보 접근성을 극대화했습니다.
-<img width="640" alt="상품상세정보" src="https://github.com/Jungbin12/FocusOnMeal/blob/0c5e50367644cd5918a90f1ebc345f2269724717/Full-stack.png">
+<img width="420" alt="상품상세정보" src="https://github.com/Jungbin12/FocusOnMeal/blob/0c5e50367644cd5918a90f1ebc345f2269724717/Full-stack.png">
 * **필수 코드 (비동기 상태 관리)**:
 > Axios와 React의 상태 관리 로직을 결합하여, 페이지 새로고침 없이 알림 상태(읽음/삭제)가 서버 DB와 클라이언트 UI에 즉각 동기화되도록 구현했습니다.
 
