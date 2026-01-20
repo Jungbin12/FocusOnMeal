@@ -34,12 +34,46 @@
 ---
 
 ## 3. 핵심 담당 기능 (Individual Role)
-> **"React 기반의 데이터 시각화 인터페이스 구축과 Spring Boot를 활용한 비동기 알림 및 보안 로직을 담당했습니다."**
+> **"데이터 가공 최적화를 통해 시스템 성능을 개선하고, 복잡한 물가 정보를 사용자 중심의 시각화 인터페이스로 변환하는 데 집중했습니다."**
 
-### ✅ 물가 트래커 (핵심 기능 - Data Visualization)
-* **데이터 시각화**: `Chart.js`를 사용하여 30일간의 식재료 가격 변동을 시계열 그래프로 구현.
-* **데이터 가공**: Java `Stream API`를 활용해 원본 데이터를 날짜별로 그룹화하고 평균값을 계산하는 백엔드 로직 설계.
-* **통계 로직**: `BigDecimal`을 활용하여 전일 대비/전월 대비 가격 등락률을 정밀하게 계산.
+### ✅ 실시간 물가 트래커 및 데이터 시각화 (Data Engineering & Visual)
+* **기능 설명**: 전국 지역별로 산재된 식재료 가격 정보를 수집하여 30일간의 평균 가격 추이와 등락률 분석 기능을 제공합니다.
+* **화면 구현**:
+* **시계열 차트**: `Chart.js`를 사용해 30일간의 가격 흐름을 시각화하고, Y축 범위를 가격 변동폭에 맞춰 동적으로 조절하여 사용자 가독성을 극대화했습니다.
+* **가격 상태 피드백**: 전일/전월 대비 가격 등락률을 계산하여 상승(RED), 하락(BLUE)으로 시각화하여 최적의 구매 시점을 제시합니다.
+    
+
+* **필수 코드 (백엔드 데이터 전처리)**:
+> 수천 건의 로우 데이터를 클라이언트에서 직접 처리할 때 발생하는 과부하를 방지하기 위해, Java **Stream API**를 활용하여 서버 단에서 데이터를 정규화한 핵심 로직입니다.
+
+```java
+/* [Back-end] Stream API를 활용한 날짜별 가격 데이터 그룹화 및 평균 계산 */
+public List<PriceTrendDTO> getPriceTrend(String itemCode, int days) {
+    List<PriceEntity> prices = priceRepository.findPriceHistory(itemCode, days);
+
+    return prices.stream()
+        .collect(Collectors.groupingBy(
+            p -> p.getCollectedDate(), // 1. 날짜별로 그룹화 (시간 정보 제거)
+            Collectors.averagingInt(PriceEntity::getPriceValue) // 2. 같은 날짜의 여러 지역 가격을 평균으로 계산
+        ))
+        .entrySet().stream()
+        .map(entry -> new PriceTrendDTO(entry.getKey(), entry.getValue().intValue()))
+        .sorted(Comparator.comparing(PriceTrendDTO::getRegDate)) // 3. 차트 출력을 위한 날짜순 정렬
+        .collect(Collectors.toList());
+}
+
+/* [Back-end] BigDecimal을 활용한 정밀 등락률 계산 */
+public double calculateRate(int current, int past) {
+    if (past == 0) return 0.0;
+    BigDecimal currentVal = BigDecimal.valueOf(current);
+    BigDecimal pastVal = BigDecimal.valueOf(past);
+    
+    // 오차 없는 계산을 위해 BigDecimal 사용: (현재가-과거가)/과거가 * 100
+    return currentVal.subtract(pastVal)
+        .divide(pastVal, 4, RoundingMode.HALF_UP)
+        .multiply(BigDecimal.valueOf(100))
+        .doubleValue();
+}
 
 ### ✅ 마이페이지 및 식단 관리 (Full-stack)
 * **개인화 서비스**: 사용자 프로필 관리 및 즐겨찾기(식재료) 기능을 `REST API`로 구현.
