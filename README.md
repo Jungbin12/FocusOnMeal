@@ -76,9 +76,33 @@ public double calculateRate(int current, int past) {
 }
 ```
 
-### ✅ 마이페이지 및 식단 관리 (Full-stack)
-* **개인화 서비스**: 사용자 프로필 관리 및 즐겨찾기(식재료) 기능을 `REST API`로 구현.
-* **상태 관리**: React의 상태 관리 로직을 통해 식단 삭제 및 업데이트 시 실시간 UI 반영.
+### ✅ 식품 안전 알림 및 마이페이지 (Full-stack)
+* **기능 설명**: 식약처 API를 연동하여 위해 식품 정보를 실시간으로 제공하며, 사용자별 관심 품목 관리 및 알림 설정(ON/OFF) 기능을 구축했습니다.
+* **화면 구현**:
+   - ➀ 실시간 알림창: 최신 안전 정보를 상단 Bell 아이콘을 통해 확인하고, '모두 읽음' 및 '개별 삭제'가 가능한 모달 UI를 설계했습니다.
+   - ➁ 관심 식재료 대시보드: 사용자가 즐겨찾기한 품목의 현재가를 마이페이지 메인에 배치하여 정보 접근성을 극대화했습니다.
+* **필수 코드 (비동기 상태 관리)**:
+> Axios와 React의 상태 관리 로직을 결합하여, 페이지 새로고침 없이 알림 상태(읽음/삭제)가 서버 DB와 클라이언트 UI에 즉각 동기화되도록 구현했습니다.
+
+```java
+/* [Front-end] Axios를 활용한 알림 전체 읽음 처리 및 실시간 UI 반영 */
+const markAllAsRead = async () => {
+    try {
+        // 1. 서버 API 호출을 통한 DB 상태 업데이트 (Patch 메서드 활용)
+        await axios.patch('/api/notifications/read-all'); 
+        
+        // 2. 클라이언트 내부 상태 동기화 (새로고침 없이 UI 즉각 업데이트)
+        setNotifications(prev => prev.map(item => ({ 
+            ...item, 
+            isRead: true 
+        })));
+        setUnreadCount(0); // 읽지 않은 알림 개수 초기화
+    } catch (error) {
+        console.error("알림 처리 중 오류 발생:", error);
+        alert("알림 상태 업데이트에 실패했습니다.");
+    }
+};
+```
 
 ### ✅ 식품 안전 알림 및 설정 (Notification)
 * **공공 API 연동**: 식약처 안전 정보 뉴스를 조회하고 모달 형태의 UI로 제공.
