@@ -38,9 +38,9 @@
 
 ### ✅ 실시간 물가 트래커 및 데이터 시각화 (Data Engineering & Visual)
 * **기능 설명**: 전국 지역별로 산재된 식재료 가격 정보를 수집하여 30일간의 평균 가격 추이와 등락률 분석 기능을 제공합니다.
-* **화면 구현**:
-* **시계열 차트**: `Chart.js`를 사용해 30일간의 가격 흐름을 시각화하고, Y축 범위를 가격 변동폭에 맞춰 동적으로 조절하여 사용자 가독성을 극대화했습니다.
-* **가격 상태 피드백**: 전일/전월 대비 가격 등락률을 계산하여 상승(RED), 하락(BLUE)으로 시각화하여 최적의 구매 시점을 제시합니다.
+* **화면 구현**
+➀ 시계열 차트: `Chart.js`를 사용해 30일간의 가격 흐름을 시각화하고, Y축 범위를 가격 변동폭에 맞춰 동적으로 조절하여 사용자 가독성을 극대화했습니다.
+➁ 가격 상태 피드백: 전일/전월 대비 가격 등락률을 계산하여 상승(RED), 하락(BLUE)으로 시각화하여 최적의 구매 시점을 제시합니다.
     
 
 * **필수 코드 (백엔드 데이터 전처리)**:
@@ -61,7 +61,6 @@ public List<PriceTrendDTO> getPriceTrend(String itemCode, int days) {
         .sorted(Comparator.comparing(PriceTrendDTO::getRegDate)) // 3. 차트 출력을 위한 날짜순 정렬
         .collect(Collectors.toList());
 }
-```
 
 /* [Back-end] BigDecimal을 활용한 정밀 등락률 계산 */
 public double calculateRate(int current, int past) {
@@ -75,6 +74,7 @@ public double calculateRate(int current, int past) {
         .multiply(BigDecimal.valueOf(100))
         .doubleValue();
 }
+```
 
 ### ✅ 마이페이지 및 식단 관리 (Full-stack)
 * **개인화 서비스**: 사용자 프로필 관리 및 즐겨찾기(식재료) 기능을 `REST API`로 구현.
