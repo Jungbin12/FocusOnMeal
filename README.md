@@ -92,8 +92,8 @@ public double calculateRate(int current, int past) {
 * **문제**: 여러 지역의 식재료 가격 데이터가 혼재되어 있어, 그래프 렌더링 시 데이터 불일치 및 속도 저하 발생.
 * **분석**: DB에서 가져온 로우 데이터(Raw Data)를 프론트엔드에서 처리하기에는 오버헤드가 큼.
 * **해결**: 
-    1.  **백엔드 전처리**: Controller 단에서 데이터를 넘기기 전, Java 8+ **Stream API**를 이용해 날짜별 평균가로 그룹화.
-    2.  **데이터 정규화**: `Recharts/Chart.js`가 요구하는 JSON 규격에 맞춰 DTO 설계 후 전달.
+    - ➀  **백엔드 전처리**: Controller 단에서 데이터를 넘기기 전, Java 8+ **Stream API**를 이용해 날짜별 평균가로 그룹화.
+    - ➁  **데이터 정규화**: `Recharts/Chart.js`가 요구하는 JSON 규격에 맞춰 DTO 설계 후 전달.
 * **결과**: 프론트엔드 연산 부하를 최소화하고, 안정적인 시계열 차트 렌더링 구현.
 
 ---
